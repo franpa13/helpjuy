@@ -63,7 +63,7 @@ function VisibilityChoice({
               <input
                 type="radio"
                 name={name}
-                className={styles.srOnly}
+                className={styles.optionInput}
                 checked={selected}
                 onChange={() => onChange(value)}
               />
