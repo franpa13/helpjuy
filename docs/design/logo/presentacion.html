@@ -1,60 +1,20 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="utf-8">
-<title>HelpJuy — Logo</title>
+<html lang="es"><head><meta charset="utf-8"><title>HelpJuy — Logo</title>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@800&display=block" rel="stylesheet">
 <style>
-  :root { --red:#C8102E; --ink:#141414; --paper:#F7F5F0; --line:#D9D6CE; }
-  * { box-sizing:border-box; margin:0 }
-  body { font-family:"Atkinson Hyperlegible",sans-serif; background:#e9e6df; color:var(--ink); padding:32px; width:1400px }
-  .grid { display:grid; grid-template-columns:1.4fr 1fr; gap:16px }
-  .tile { min-height:300px; display:flex; align-items:center; justify-content:center; position:relative }
-  .tile small { position:absolute; left:16px; bottom:12px; font-size:13px; opacity:.7 }
-  .red { background:var(--red); color:#fff }
-  .paper { background:var(--paper); color:var(--ink); border:1px solid var(--line) }
-  .ink { background:var(--ink); color:#fff }
-  .lock { display:inline-flex; align-items:center; gap:22px }
-  .word { font-family:"Barlow Condensed",sans-serif; font-weight:800; font-size:96px; line-height:1; text-transform:uppercase; letter-spacing:.02em; transform:translateY(4px) }
-  .row { display:flex; gap:40px; align-items:end }
-  .cap { font-size:13px; text-align:center; margin-top:8px; opacity:.7 }
-  .icon { border-radius:22%; overflow:hidden }
-  .wide { grid-column:1 / -1 }
-  .card { width:340px; height:214px; background:#fff; border:3px solid var(--ink); border-radius:10px; overflow:hidden; display:grid; grid-template-rows:auto 1fr }
-  .card .h { background:var(--red); color:#fff; display:flex; align-items:center; gap:10px; padding:8px 12px; font-family:"Barlow Condensed",sans-serif; font-weight:800; font-size:22px; text-transform:uppercase; letter-spacing:.06em }
-  .card .b { display:flex; align-items:center; justify-content:center; color:var(--muted,#6b6b6b); font-size:14px }
-</style>
-</head>
-<body>
-<div class="grid">
-  <div class="tile red">
-    <div class="lock"><svg width="94" height="94" viewBox="0 0 90 90" shape-rendering="crispEdges"><path d="M30 0H60V20H70V30H90V60H70V70H60V90H30V70H20V60H0V30H20V20H30Z M40 40V50H50V40Z" fill="#fff" fill-rule="evenodd"/></svg><span class="word">HelpJuy</span></div>
-    <small>Principal sobre rojo</small>
-  </div>
-  <div class="tile paper">
-    <svg width="180" height="180" viewBox="0 0 90 90" shape-rendering="crispEdges"><path d="M30 0H60V20H70V30H90V60H70V70H60V90H30V70H20V60H0V30H20V20H30Z M40 40V50H50V40Z" fill="#C8102E" fill-rule="evenodd"/></svg>
-    <small>Símbolo</small>
-  </div>
-  <div class="tile paper">
-    <div class="lock"><svg width="94" height="94" viewBox="0 0 90 90" shape-rendering="crispEdges"><path d="M30 0H60V20H70V30H90V60H70V70H60V90H30V70H20V60H0V30H20V20H30Z M40 40V50H50V40Z" fill="#C8102E" fill-rule="evenodd"/></svg><span class="word">HelpJuy</span></div>
-    <small>Sobre fondo claro</small>
-  </div>
-  <div class="tile ink">
-    <div class="row">
-      <div><img class="icon" src="../../../apps/web/src/app/icon.svg" width="128" height="128"><div class="cap">App</div></div>
-      <div><img class="icon" src="../../../apps/web/src/app/icon.svg" width="48" height="48"><div class="cap">48</div></div>
-      <div><img class="icon" src="../../../apps/web/src/app/icon.svg" width="32" height="32"><div class="cap">32</div></div>
-      <div><img class="icon" src="../../../apps/web/src/app/icon.svg" width="16" height="16"><div class="cap">16</div></div>
-    </div>
-    <small>Ícono y favicon</small>
-  </div>
-  <div class="tile paper wide" style="min-height:280px">
-    <div class="card">
-      <div class="h"><svg width="26" height="26" viewBox="0 0 90 90" shape-rendering="crispEdges"><path d="M30 0H60V20H70V30H90V60H70V70H60V90H30V70H20V60H0V30H20V20H30Z M40 40V50H50V40Z" fill="#fff" fill-rule="evenodd"/></svg>Emergencia médica</div>
-      <div class="b">Tarjeta de billetera (Plan 3)</div>
-    </div>
-    <small>Aplicado a la tarjeta impresa</small>
-  </div>
-</div>
-</body>
-</html>
+:root{--red:#C8102E;--ink:#141414;--paper:#F7F5F0;--line:#D9D6CE}*{box-sizing:border-box;margin:0}
+body{font-family:"Atkinson Hyperlegible",sans-serif;background:#e9e6df;color:var(--ink);padding:32px;width:1400px}
+.grid{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}.tile{min-height:300px;display:flex;align-items:center;justify-content:center;position:relative}
+.tile small{position:absolute;left:16px;bottom:12px;font-size:13px;opacity:.7}.red{background:var(--red);color:#fff}.paper{background:var(--paper);border:1px solid var(--line)}.ink{background:var(--ink);color:#fff}
+.lock{display:inline-flex;align-items:center;gap:30px}.word{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:96px;line-height:1;text-transform:uppercase;letter-spacing:.02em;transform:translateY(4px)}
+.row{display:flex;gap:40px;align-items:end}.cap{font-size:13px;text-align:center;margin-top:8px;opacity:.7}.wide{grid-column:1/-1}
+.card{width:340px;height:214px;background:#fff;border:3px solid var(--ink);border-radius:10px;overflow:hidden;display:grid;grid-template-rows:auto 1fr}
+.card .h{background:var(--red);color:#fff;display:flex;align-items:center;gap:10px;padding:8px 12px;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:22px;text-transform:uppercase;letter-spacing:.06em}
+.card .b{display:flex;align-items:center;justify-content:center;color:#6b6b6b;font-size:14px}
+</style></head><body><div class="grid">
+<div class="tile red"><div class="lock"><svg width="94" height="94" viewBox="0 0 100 100" shape-rendering="crispEdges"><path d="M0 0H40V40H0Z M8 8V32H32V8Z M14 14H26V26H14Z M60 0H100V40H60Z M68 8V32H92V8Z M74 14H86V26H74Z M0 60H40V100H0Z M8 68V92H32V68Z M14 74H26V86H14Z M46 0H54V8H46Z M46 16H54V24H46Z M46 46H54V54H46Z M0 46H8V54H0Z M24 46H32V54H24Z M46 76H54V84H46Z M46 92H54V100H46Z" fill="#fff" fill-rule="evenodd"/><path d="M73 60H87V73H100V87H87V100H73V87H60V73H73Z" fill="#fff"/></svg><span class="word" style="color:#fff">HelpJuy</span></div><small>Principal sobre rojo</small></div>
+<div class="tile paper"><svg width="190" height="190" viewBox="0 0 100 100" shape-rendering="crispEdges"><path d="M0 0H40V40H0Z M8 8V32H32V8Z M14 14H26V26H14Z M60 0H100V40H60Z M68 8V32H92V8Z M74 14H86V26H74Z M0 60H40V100H0Z M8 68V92H32V68Z M14 74H26V86H14Z M46 0H54V8H46Z M46 16H54V24H46Z M46 46H54V54H46Z M0 46H8V54H0Z M24 46H32V54H24Z M46 76H54V84H46Z M46 92H54V100H46Z" fill="#141414" fill-rule="evenodd"/><path d="M73 60H87V73H100V87H87V100H73V87H60V73H73Z" fill="#C8102E"/></svg><small>Símbolo: un QR cuyo cuarto ojo es una cruz de emergencia</small></div>
+<div class="tile paper"><div class="lock"><svg width="94" height="94" viewBox="0 0 100 100" shape-rendering="crispEdges"><path d="M0 0H40V40H0Z M8 8V32H32V8Z M14 14H26V26H14Z M60 0H100V40H60Z M68 8V32H92V8Z M74 14H86V26H74Z M0 60H40V100H0Z M8 68V92H32V68Z M14 74H26V86H14Z M46 0H54V8H46Z M46 16H54V24H46Z M46 46H54V54H46Z M0 46H8V54H0Z M24 46H32V54H24Z M46 76H54V84H46Z M46 92H54V100H46Z" fill="#141414" fill-rule="evenodd"/><path d="M73 60H87V73H100V87H87V100H73V87H60V73H73Z" fill="#C8102E"/></svg><span class="word" style="color:#141414">HelpJuy</span></div><small>Sobre fondo claro</small></div>
+<div class="tile ink"><div class="row"><div><img src="helpjuy-icono-app.svg" width="128" height="128"><div class="cap">App</div></div><div><img src="helpjuy-icono-app.svg" width="48" height="48"><div class="cap">48</div></div><div><img src="helpjuy-icono-app.svg" width="32" height="32"><div class="cap">32</div></div><div><img src="helpjuy-icono-app.svg" width="16" height="16"><div class="cap">16</div></div></div><small>Ícono y favicon</small></div>
+<div class="tile paper wide" style="min-height:280px"><div class="card"><div class="h"><svg width="26" height="26" viewBox="0 0 100 100" shape-rendering="crispEdges"><path d="M0 0H40V40H0Z M8 8V32H32V8Z M14 14H26V26H14Z M60 0H100V40H60Z M68 8V32H92V8Z M74 14H86V26H74Z M0 60H40V100H0Z M8 68V92H32V68Z M14 74H26V86H14Z M46 0H54V8H46Z M46 16H54V24H46Z M46 46H54V54H46Z M0 46H8V54H0Z M24 46H32V54H24Z M46 76H54V84H46Z M46 92H54V100H46Z" fill="#fff" fill-rule="evenodd"/><path d="M73 60H87V73H100V87H87V100H73V87H60V73H73Z" fill="#fff"/></svg>Emergencia médica</div><div class="b">Tarjeta de billetera</div></div><small>Aplicado a la tarjeta impresa</small></div>
+</div></body></html>

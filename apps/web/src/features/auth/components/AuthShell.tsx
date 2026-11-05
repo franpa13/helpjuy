@@ -6,7 +6,7 @@ export function AppStrip({ right }: { right?: ReactNode }) {
   return (
     <header className="strip">
       <Link href="/" aria-label="HelpJuy, inicio">
-        <Logo size={22} />
+        <Logo size={26} />
       </Link>
       <span>{right ?? 'Jujuy'}</span>
     </header>

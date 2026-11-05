@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>HelpJuy — Conceptos de logo v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@800&display=block" rel="stylesheet">
+<style>
+  :root { --red:#C8102E; --ink:#141414; --paper:#F7F5F0; --line:#D9D6CE; }
+  * { box-sizing:border-box; margin:0 }
+  body { font-family:"Atkinson Hyperlegible",sans-serif; background:#e9e6df; color:var(--ink); padding:28px; width:1400px }
+  h2 { font-family:"Barlow Condensed",sans-serif; font-size:30px; text-transform:uppercase; margin:8px 0 12px }
+  .row { display:grid; grid-template-columns:1.3fr 1fr 1fr; gap:14px; margin-bottom:26px }
+  .tile { height:250px; display:flex; align-items:center; justify-content:center; gap:22px }
+  .red { background:var(--red); color:#fff }
+  .paper { background:var(--paper); border:1px solid var(--line) }
+  .ink { background:var(--ink); color:#fff }
+  .word { font-family:"Barlow Condensed",sans-serif; font-weight:800; font-size:84px; line-height:1; text-transform:uppercase; letter-spacing:.02em; transform:translateY(4px) }
+  .sizes { display:flex; gap:26px; align-items:end }
+  .ic { border-radius:22%; background:var(--red); display:flex; align-items:center; justify-content:center }
+</style>
+</head>
+<body>
+<template id="A">
+  <!-- Concepto A: visor de cámara (escaneo) + cruz hecha de módulos de QR -->
+  <svg viewBox="0 0 100 100" shape-rendering="crispEdges">
+    <path class="frame" d="M0 0H30V9H9V30H0Z M70 0H100V30H91V9H70Z M0 70H9V91H30V100H0Z M100 70V100H70V91H91V70Z"/>
+    <g class="mark">
+      <rect x="39" y="21" width="22" height="17"/>
+      <rect x="21" y="39" width="17" height="22"/>
+      <rect x="39" y="39" width="22" height="22"/>
+      <rect x="62" y="39" width="17" height="22"/>
+      <rect x="39" y="62" width="22" height="17"/>
+    </g>
+  </svg>
+</template>
+<template id="B">
+  <!-- Concepto B: un QR cuyo cuarto ojo es una cruz de emergencia -->
+  <svg viewBox="0 0 100 100" shape-rendering="crispEdges">
+    <g class="frame">
+      <path fill-rule="evenodd" d="M0 0H40V40H0Z M8 8V32H32V8Z M14 14H26V26H14Z"/>
+      <path fill-rule="evenodd" d="M60 0H100V40H60Z M68 8V32H92V8Z M74 14H86V26H74Z"/>
+      <path fill-rule="evenodd" d="M0 60H40V100H0Z M8 68V92H32V68Z M14 74H26V86H14Z"/>
+      <rect x="46" y="0" width="8" height="8"/><rect x="46" y="16" width="8" height="8"/>
+      <rect x="46" y="46" width="8" height="8"/><rect x="0" y="46" width="8" height="8"/><rect x="24" y="46" width="8" height="8"/>
+      <rect x="46" y="76" width="8" height="8"/><rect x="46" y="92" width="8" height="8"/>
+    </g>
+    <path class="mark" d="M73 60H87V73H100V87H87V100H73V87H60V73H73Z"/>
+  </svg>
+</template>
+
+<h2>A · Escaneá la ficha (visor de cámara + cruz de módulos)</h2>
+<div class="row" data-c="A">
+  <div class="tile red"><span class="lk" data-fill="#fff" data-mark="#fff" data-s="92"></span><span class="word">HelpJuy</span></div>
+  <div class="tile paper"><span class="lk" data-fill="#141414" data-mark="#C8102E" data-s="92"></span><span class="word" style="font-size:64px">HelpJuy</span></div>
+  <div class="tile ink sizes"></div>
+</div>
+
+<h2>B · QR médico (el cuarto ojo del QR es una cruz)</h2>
+<div class="row" data-c="B">
+  <div class="tile red"><span class="lk" data-fill="#fff" data-mark="#fff" data-s="92"></span><span class="word">HelpJuy</span></div>
+  <div class="tile paper"><span class="lk" data-fill="#141414" data-mark="#C8102E" data-s="92"></span><span class="word" style="font-size:64px">HelpJuy</span></div>
+  <div class="tile ink sizes"></div>
+</div>
+
+<script>
+  const make = (id, fill, mark, size) => {
+    const svg = document.getElementById(id).content.firstElementChild.cloneNode(true);
+    svg.setAttribute('width', size); svg.setAttribute('height', size);
+    svg.querySelectorAll('.frame').forEach(e => e.setAttribute('fill', fill));
+    svg.querySelectorAll('.mark').forEach(e => e.setAttribute('fill', mark));
+    return svg;
+  };
+  document.querySelectorAll('.row').forEach(row => {
+    const id = row.dataset.c;
+    row.querySelectorAll('.lk').forEach(s => s.replaceWith(make(id, s.dataset.fill, s.dataset.mark, +s.dataset.s)));
+    const sizes = row.querySelector('.sizes');
+    for (const px of [128, 48, 32, 16]) {
+      const ic = document.createElement('div'); ic.className = 'ic';
+      ic.style.width = ic.style.height = px + 'px';
+      ic.appendChild(make(id, '#fff', '#fff', Math.round(px * 0.64)));
+      sizes.appendChild(ic);
+    }
+  });
+</script>
+</body>
+</html>

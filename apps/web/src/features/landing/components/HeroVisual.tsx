@@ -50,7 +50,7 @@ export function HeroVisual() {
 
       <div className={styles.card}>
         <div className={styles.cardHead}>
-          <LogoSymbol size={14} />
+          <LogoSymbol size={14} crossColor="currentColor" />
           Emergencia médica
         </div>
         <div className={styles.cardBody}>
