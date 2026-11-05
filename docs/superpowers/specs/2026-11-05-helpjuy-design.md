@@ -113,6 +113,14 @@ Referencia: `docs/design/ficha-emergencia-v3.html`.
 - Botón **"Compartir por WhatsApp"** ("Me hice mi ficha de emergencia, hacé la tuya").
 - Mobile-first, liviana para Androids de gama baja.
 
+### 6.8 Grupos familiares y avisos de emergencia (agregado el 2026-11-05)
+Detalle completo en `docs/specs/family/spec.md`. Se construye en el Plan 3.
+- Un usuario crea **grupos familiares** e invita a otras **cuentas**, que tienen que aceptar. Una persona puede estar en varios grupos.
+- Estar en un grupo **no da acceso a los datos médicos** de los demás; solo sirve para recibir avisos.
+- **Escaneo normal**: le avisa solo al dueño de la ficha. **Emergencia**: quien escanea toca "Es una emergencia: avisar a la familia" y se avisa a todos los miembros de los grupos del dueño. Hay un límite de un aviso cada 10 minutos por perfil.
+- Canales gratuitos: email (Resend), notificación push web y un botón "Avisar por WhatsApp" que abre el WhatsApp de quien escanea. SMS y la API oficial de WhatsApp quedan fuera porque son pagos.
+- La ubicación solo se manda si quien escanea la permite; se guarda aproximada y se borra a los 30 días.
+
 ## 7. Marco legal (Argentina, Jujuy)
 
 No es asesoramiento legal; es la base que el producto respeta.
