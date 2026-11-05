@@ -16,8 +16,11 @@ test('registro → alta de perfil → aparece en el panel', async ({ page }) => 
   await page.getByRole('checkbox', { name: /Leí y acepto/ }).check();
   await accept.click();
 
-  await expect(page).toHaveURL(/\/panel$/);
+  // Después de crear el perfil va directo al editor de la ficha
+  await expect(page).toHaveURL(/\/panel\/perfiles\/[\w-]+$/);
+  await page.goto('/panel');
   await expect(page.getByText('Juan Pérez')).toBeVisible();
+  await expect(page.getByText('Falta un contacto de emergencia')).toBeVisible();
   await expect(page.getByText('Confirmá tu email para recibir avisos')).toBeVisible();
 });
 
