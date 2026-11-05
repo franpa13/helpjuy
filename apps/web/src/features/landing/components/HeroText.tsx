@@ -2,6 +2,7 @@
 
 import { motion, type Variants } from 'motion/react';
 import Link from 'next/link';
+import { Fragment } from 'react';
 import styles from './landing.module.css';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -25,12 +26,15 @@ export function HeroText() {
     <div className={styles.heroText}>
       <motion.h1 className={styles.heroTitle} variants={title} initial="hidden" animate="show" aria-label={TITLE}>
         {words.map((w, i) => (
-          <span key={i} className={styles.wordMask} aria-hidden="true">
-            <motion.span className={styles.word} variants={word}>
-              {w}
-            </motion.span>
-            {i < words.length - 1 ? ' ' : ''}
-          </span>
+          // El espacio va afuera de la máscara: dentro de un inline-block el navegador lo descarta.
+          <Fragment key={i}>
+            <span className={styles.wordMask} aria-hidden="true">
+              <motion.span className={styles.word} variants={word}>
+                {w}
+              </motion.span>
+            </span>
+            {i < words.length - 1 ? ' ' : null}
+          </Fragment>
         ))}
       </motion.h1>
 

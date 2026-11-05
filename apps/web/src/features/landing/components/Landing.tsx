@@ -1,3 +1,28 @@
+import {
+  Bike,
+  BellRing,
+  ClipboardPen,
+  Droplet,
+  Eye,
+  Gift,
+  HardHat,
+  HeartPulse,
+  Landmark,
+  ListChecks,
+  PhoneCall,
+  Pill,
+  Printer,
+  Refrigerator,
+  Scale,
+  ScanQrCode,
+  ShieldCheck,
+  Smartphone,
+  Trash,
+  TriangleExclamationPoint,
+  Wallet,
+  WifiOff,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { Logo } from '@/shared/brand/Logo';
 import { Reveal, StaggerItem, StaggerList } from '@/shared/motion/Reveal';
@@ -9,50 +34,63 @@ import styles from './landing.module.css';
 
 const STEPS = [
   {
+    icon: ClipboardPen,
     title: 'Cargá tus datos',
     text: 'Alergias, enfermedades, remedios, grupo sanguíneo y a quién llamar. Todo es opcional: completás lo que quieras, cuando quieras.',
   },
   {
+    icon: Printer,
     title: 'Imprimí tu QR',
     text: 'Te armamos la tarjeta para la billetera y el sticker para el casco. Lo imprimís en tu casa o en cualquier fotocopiadora.',
   },
   {
+    icon: ScanQrCode,
     title: 'Si pasa algo, lo escanean',
     text: 'Con la cámara del celular, sin app ni contraseña. Ven tu ficha al instante y pueden llamar al 107 o a tu familia con un toque.',
   },
 ];
 
 const DATA = [
-  { name: 'Alergias', why: 'Evita que te den un remedio que te hace mal, como la penicilina o el ibuprofeno.' },
-  { name: 'Medicación', why: 'Si tomás anticoagulantes, un golpe en la cabeza se trata de otra manera.' },
-  { name: 'Enfermedades', why: 'Diabetes, epilepsia o problemas del corazón cambian lo primero que revisan.' },
-  { name: 'Grupo sanguíneo', why: 'Ayuda a preparar una transfusión si hace falta.' },
-  { name: 'Edad y peso', why: 'Con eso calculan las dosis, sobre todo en chicos y adultos mayores.' },
-  { name: 'Contactos', why: 'Le avisan a tu familia en seguida, aunque no tengas el celular a mano.' },
+  { icon: TriangleExclamationPoint, name: 'Alergias', why: 'Evita que te den un remedio que te hace mal, como la penicilina o el ibuprofeno.' },
+  { icon: Pill, name: 'Medicación', why: 'Si tomás anticoagulantes, un golpe en la cabeza se trata de otra manera.' },
+  { icon: HeartPulse, name: 'Enfermedades', why: 'Diabetes, epilepsia o problemas del corazón cambian lo primero que revisan.' },
+  { icon: Droplet, name: 'Grupo sanguíneo', why: 'Ayuda a preparar una transfusión si hace falta.' },
+  { icon: Scale, name: 'Edad y peso', why: 'Con eso calculan las dosis, sobre todo en chicos y adultos mayores.' },
+  { icon: PhoneCall, name: 'Contactos', why: 'Le avisan a tu familia en seguida, aunque no tengas el celular a mano.' },
 ];
 
 const PLACES = [
-  { name: 'Billetera', text: 'Una tarjeta del tamaño de una de crédito. Es lo primero que se revisa para identificarte.' },
-  { name: 'Casco', text: 'Un sticker con tus datos más importantes impresos, por si no hay señal en la ruta.' },
-  { name: 'Moto, auto o bici', text: 'En el tablero, el parabrisas o el cuadro. Sirve también si sos peatón y la llevás encima.' },
-  { name: 'Heladera', text: 'Para adultos mayores en casa: los equipos de emergencia saben buscar ahí.' },
+  { icon: Wallet, name: 'Billetera', text: 'Una tarjeta del tamaño de una de crédito. Es lo primero que se revisa para identificarte.' },
+  { icon: HardHat, name: 'Casco', text: 'Un sticker con tus datos más importantes impresos, por si no hay señal en la ruta.' },
+  { icon: Bike, name: 'Moto, auto o bici', text: 'En el tablero, el parabrisas o el cuadro. Sirve también si sos peatón y la llevás encima.' },
+  { icon: Refrigerator, name: 'Heladera', text: 'Para adultos mayores en casa: los equipos de emergencia saben buscar ahí.' },
 ];
 
 const PRIVACY = [
-  { title: 'Todo es opcional', text: 'Ningún dato es obligatorio. Cargás solo lo que te parezca útil.' },
+  { icon: ListChecks, title: 'Todo es opcional', text: 'Ningún dato es obligatorio. Cargás solo lo que te parezca útil.' },
   {
+    icon: Eye,
     title: 'Vos elegís qué se ve',
     text: 'Cada dato se puede mostrar en el QR o dejar privado. Antes de imprimir ves exactamente lo que va a ver el paramédico.',
   },
-  { title: 'Sabés cuándo lo escanean', text: 'Cada escaneo queda registrado y te avisamos por email.' },
+  { icon: BellRing, title: 'Sabés cuándo lo escanean', text: 'Cada escaneo queda registrado y te avisamos por email.' },
   {
+    icon: Trash,
     title: 'Borrás todo cuando quieras',
     text: 'Descargás tus datos o eliminás la cuenta con un clic. Si perdés el casco, generás un QR nuevo y el viejo deja de funcionar.',
   },
   {
+    icon: Landmark,
     title: 'Cumple la ley',
     text: 'Los datos de salud son datos sensibles según la Ley 25.326. Te pedimos consentimiento claro y se guardan en servidores de la Unión Europea.',
   },
+];
+
+const FACTS: Array<{ icon: LucideIcon; text: string }> = [
+  { icon: Gift, text: 'Gratis, sin publicidad' },
+  { icon: Smartphone, text: 'Sin instalar nada: se abre con la cámara' },
+  { icon: WifiOff, text: 'Lo impreso sirve aunque no haya señal' },
+  { icon: ShieldCheck, text: 'Cumple la Ley 25.326 de datos personales' },
 ];
 
 const FAQ = [
@@ -105,6 +143,17 @@ export function Landing() {
           </div>
         </section>
 
+        <section className={styles.facts} aria-label="En pocas palabras">
+          <StaggerList as="ul" className={styles.factsList}>
+            {FACTS.map(({ icon: Icon, text }) => (
+              <StaggerItem as="li" key={text} className={styles.fact}>
+                <Icon className={styles.factIcon} aria-hidden="true" strokeWidth={2.2} />
+                <span>{text}</span>
+              </StaggerItem>
+            ))}
+          </StaggerList>
+        </section>
+
         <section className={styles.section} aria-labelledby="como-funciona">
           <Reveal>
             <h2 id="como-funciona" className={styles.h2}>
@@ -114,7 +163,12 @@ export function Landing() {
           <ol className={styles.steps}>
             {STEPS.map((s, i) => (
               <li key={s.title} className={styles.step}>
-                <StepNumber n={i + 1} />
+                <div className={styles.stepHead}>
+                  <StepNumber n={i + 1} />
+                  <span className={styles.iconTileRed}>
+                    <s.icon aria-hidden="true" strokeWidth={2.2} />
+                  </span>
+                </div>
                 <Reveal delay={0.1 + i * 0.12} y={16}>
                   <h3 className={styles.h3}>{s.title}</h3>
                   <p>{s.text}</p>
@@ -136,9 +190,14 @@ export function Landing() {
               </p>
             </Reveal>
             <StaggerList as="dl" className={styles.dataList}>
-              {DATA.map((d) => (
+              {DATA.map((d, i) => (
                 <StaggerItem key={d.name} className={styles.dataRow} from={{ x: 24 }}>
-                  <dt>{d.name}</dt>
+                  <dt>
+                    <span className={i === 0 ? styles.iconTileRed : styles.iconTileLine}>
+                      <d.icon aria-hidden="true" strokeWidth={2.2} />
+                    </span>
+                    {d.name}
+                  </dt>
                   <dd>{d.why}</dd>
                 </StaggerItem>
               ))}
@@ -158,6 +217,7 @@ export function Landing() {
           <StaggerList as="ul" className={styles.places}>
             {PLACES.map((p) => (
               <StaggerItem as="li" key={p.name}>
+                <p.icon className={styles.placeIcon} aria-hidden="true" strokeWidth={2} />
                 <h3 className={styles.h3}>{p.name}</h3>
                 <p>{p.text}</p>
               </StaggerItem>
@@ -175,8 +235,13 @@ export function Landing() {
             <StaggerList as="ul" className={styles.privacyList}>
               {PRIVACY.map((p) => (
                 <StaggerItem as="li" key={p.title} from={{ x: -18 }}>
-                  <h3 className={styles.h3}>{p.title}</h3>
-                  <p>{p.text}</p>
+                  <span className={styles.iconTileRed}>
+                    <p.icon aria-hidden="true" strokeWidth={2.2} />
+                  </span>
+                  <div>
+                    <h3 className={styles.h3}>{p.title}</h3>
+                    <p>{p.text}</p>
+                  </div>
                 </StaggerItem>
               ))}
             </StaggerList>

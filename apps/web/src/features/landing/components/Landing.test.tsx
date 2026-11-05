@@ -19,6 +19,7 @@ describe('Landing', () => {
     render(<Landing />);
     expect(screen.getByRole('heading', { name: 'Tus datos son tuyos' })).toBeInTheDocument();
     // Arranca invisible hasta entrar en pantalla (animación de scroll), por eso no usamos toBeVisible.
-    expect(screen.getByText(/Ley 25\.326/)).toBeInTheDocument();
+    // Aparece en la franja de datos clave y en la sección de privacidad.
+    expect(screen.getAllByText(/Ley 25\.326/)).toHaveLength(2);
   });
 });
