@@ -16,7 +16,8 @@ Que la familia de una persona se entere en seguida si alguien escanea su QR y ma
 3. El `ADMIN` invita y saca miembros. Cualquier miembro puede salir cuando quiera *(diseñador)*. Si el admin sale, el rol pasa al miembro más antiguo; si no queda nadie, el grupo se borra *(diseñador)*.
 4. **Estar en un grupo no da acceso a los datos médicos** de otros miembros. Solo sirve para recibir avisos.
 5. **Escaneo normal**: solo se registra y se le avisa al dueño de la ficha (feature `scan-log`). **Nunca** se avisa a la familia por un escaneo normal.
-6. **Emergencia**: quien escanea toca "Es una emergencia: avisar a la familia". Se avisa a **todos los miembros de todos los grupos** del dueño de la ficha, excepto a quien silenció ese grupo.
+6. **Emergencia**: quien escanea toca "Es una emergencia: avisar a la familia". Se avisa al **dueño de la ficha** (si es un perfil a cargo, al adulto que lo administra) y a **todos los miembros no silenciados de todos sus grupos**, una sola vez por persona.
+6b. **Probar aviso** (solo admin): manda a los miembros no silenciados del grupo un email con el prefijo **[PRUEBA]** y el texto "Esto es una prueba, no pasó nada". No cuenta para la ventana de 10 minutos.
 7. Perfiles sin cuenta propia (por ejemplo, un hijo menor) avisan a los grupos del adulto que los administra *(diseñador)*.
 8. Límite: como máximo **un aviso de emergencia cada 10 minutos por perfil**. Los toques siguientes dentro de esa ventana se registran pero no reenvían *(diseñador)*.
 9. **Ubicación**: solo si quien escanea la permite en su navegador. Se guarda aproximada (redondeada a unos 100 m) y se borra a los 30 días *(diseñador)*.
@@ -24,7 +25,7 @@ Que la familia de una persona se entere en seguida si alguien escanea su QR y ma
 
 ## Canales (todos gratuitos)
 - **Email**, por Resend.
-- **Notificación push web**, por Web Push con claves VAPID. Funciona sin instalar nada en Android; en iPhone requiere agregar la web a la pantalla de inicio.
+- **Notificación push web** *(segunda etapa)*: Web Push con claves VAPID. En Android funciona sin instalar nada; en iPhone hay que agregar la web a la pantalla de inicio.
 - **WhatsApp desde el celular de quien escanea**: el botón "Avisar por WhatsApp a {contacto}" abre `https://wa.me/{numero}?text=...` con el mensaje ya escrito. No tiene costo para HelpJuy.
 - SMS y la API oficial de WhatsApp quedan **fuera de alcance**, porque cobran por mensaje.
 

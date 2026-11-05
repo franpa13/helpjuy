@@ -7,3 +7,4 @@ export * from './consent';
 export * from './profiles';
 export * from './medical';
 export * from './public-card';
+export * from './family';

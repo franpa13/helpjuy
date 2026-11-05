@@ -33,6 +33,8 @@ model User {
   emailTokens     EmailToken[]
   profiles        Profile[]
   consents        ConsentRecord[]
+  familyMembers   FamilyMember[]
+  familyInvites   FamilyInvite[]
 }
 
 model Session {
@@ -71,6 +73,7 @@ model Profile {
   updatedAt      DateTime        @updatedAt
   consents       ConsentRecord[]
   medicalRecord  MedicalRecord?
+  alerts         EmergencyAlert[]
 
   @@index([ownerId])
 }
@@ -93,4 +96,58 @@ model MedicalRecord {
   ciphertext String
   visibility Json
   updatedAt  DateTime @updatedAt
+}
+
+enum FamilyRole {
+  ADMIN
+  MEMBER
+}
+
+/// Grupo familiar: cuentas conectadas para recibir avisos. No da acceso a datos médicos.
+model FamilyGroup {
+  id        String         @id @default(uuid())
+  name      String
+  createdAt DateTime       @default(now())
+  members   FamilyMember[]
+  invites   FamilyInvite[]
+}
+
+model FamilyMember {
+  groupId  String
+  group    FamilyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId   String
+  user     User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role     FamilyRole  @default(MEMBER)
+  muted    Boolean     @default(false)
+  joinedAt DateTime    @default(now())
+
+  @@id([groupId, userId])
+  @@index([userId])
+}
+
+model FamilyInvite {
+  id          String      @id @default(uuid())
+  groupId     String
+  group       FamilyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  tokenHash   String      @unique
+  invitedById String
+  invitedBy   User        @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+  expiresAt   DateTime
+  usedAt      DateTime?
+  revokedAt   DateTime?
+  createdAt   DateTime    @default(now())
+}
+
+model EmergencyAlert {
+  id         String   @id @default(uuid())
+  profileId  String
+  profile    Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  lat        Float?
+  lng        Float?
+  notified   Int      @default(0)
+  suppressed Boolean  @default(false)
+  test       Boolean  @default(false)
+
+  @@index([profileId, createdAt])
 }
