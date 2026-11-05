@@ -1,0 +1,17 @@
+{
+  "name": "@helpjuy/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"contracts: sin tests\""
+  },
+  "dependencies": {
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.0"
+  }
+}

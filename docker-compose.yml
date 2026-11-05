@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: helpjuy
+      POSTGRES_PASSWORD: helpjuy
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - helpjuy-pg:/var/lib/postgresql/data
+volumes:
+  helpjuy-pg:
