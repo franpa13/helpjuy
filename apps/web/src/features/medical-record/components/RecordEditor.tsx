@@ -8,6 +8,7 @@ import {
   type Section,
   type Visibility,
 } from '@helpjuy/contracts';
+import { Eye, EyeOff } from 'lucide-react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { ApiError, apiFetch } from '@/shared/api/client';
 import { Alert } from '@/shared/ui/Alert';
@@ -36,12 +37,18 @@ function VisibilityToggle({ section, on, onChange }: { section: Section; on: boo
       type="button"
       role="switch"
       aria-checked={on}
-      aria-label={`${SECTION_LABEL[section]}: se ve en mi QR`}
       className={`${styles.toggle} ${on ? styles.toggleOn : ''}`}
       onClick={() => onChange(!on)}
     >
-      <span className={styles.knob} aria-hidden="true" />
-      {on ? 'Se ve en el QR' : 'Privado'}
+      <span className={styles.srOnly}>{SECTION_LABEL[section]}: </span>
+      <span className={styles.toggleLabel}>Mostrar en mi QR</span>
+      <span className={styles.track} aria-hidden="true">
+        <span className={styles.knob} />
+      </span>
+      <span className={styles.toggleState}>
+        {on ? <Eye size={16} aria-hidden="true" /> : <EyeOff size={16} aria-hidden="true" />}
+        {on ? 'Visible' : 'Oculto'}
+      </span>
     </button>
   );
 }
@@ -123,6 +130,7 @@ export function RecordEditor({ profile, initial }: Props) {
   const [errors, setErrors] = useState<EditorErrors>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const percent = useMemo(() => draftCompletion(draft), [draft]);
+  const visibleSections = (Object.keys(SECTION_LABEL) as Section[]).filter((s) => visibility[s]);
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -489,6 +497,18 @@ export function RecordEditor({ profile, initial }: Props) {
                 maxLength={500}
                 error={err('notes')} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
       </Block>
+
+      <div className={styles.summary} aria-live="polite">
+        {visibleSections.length > 0 ? (
+          <p>
+            <strong>Quien escanee tu QR va a ver:</strong> {visibleSections.map((s) => SECTION_LABEL[s]).join(', ')}.
+          </p>
+        ) : (
+          <Alert tone="warning">
+            Quien escanee tu QR solo va a ver tu nombre. Activá al menos alergias, medicación y contactos.
+          </Alert>
+        )}
+      </div>
 
       <div className={styles.saveBar}>
         {status === 'saved' && <Alert tone="success">Guardado. Tu QR ya muestra estos datos.</Alert>}

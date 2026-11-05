@@ -73,11 +73,11 @@
 .toggle {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 6px 12px 6px 6px;
+  gap: 10px;
+  min-height: 40px;
+  padding: 6px 12px;
   border: 2px solid var(--line);
-  border-radius: 999px;
+  border-radius: var(--radius);
   background: var(--paper);
   color: var(--muted);
   font: inherit;
@@ -86,23 +86,12 @@
   cursor: pointer;
 }
 
-.knob {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--line);
-  transition: background 0.2s ease;
-}
-
 .toggleOn {
   border-color: var(--green);
   background: var(--green-tint);
   color: var(--green);
 }
 
-.toggleOn .knob {
-  background: var(--green);
-}
 
 .blockBody {
   display: grid;
@@ -216,4 +205,60 @@
   border-radius: var(--radius);
   font-weight: 700;
   text-decoration: none;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.toggleLabel {
+  color: var(--ink);
+}
+
+.track {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--line);
+  transition: background 0.2s ease;
+}
+
+.track .knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: var(--white);
+  transition: transform 0.2s ease;
+}
+
+.toggleOn .track {
+  background: var(--green);
+}
+
+.toggleOn .track .knob {
+  transform: translateX(18px);
+  background: var(--white);
+}
+
+.toggleState {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 70px;
+}
+
+.summary p {
+  padding: 12px 14px;
+  background: var(--white);
+  border-left: 6px solid var(--green);
+  font-size: 16px;
 }

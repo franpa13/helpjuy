@@ -75,4 +75,10 @@ describe('EmergencyCard', () => {
     expect(screen.getByText("Sin contacto de emergencia cargado")).toBeInTheDocument();
     expect(screen.getByRole("region", { name: "Alergias" })).toBeInTheDocument();
   });
+
+  it("si la persona ocultó todo, lo dice en vez de quedar en blanco", () => {
+    render(<EmergencyCard card={{ firstName: "Lucía", lastName: "Mamani", active: true, updatedAt: "2026-11-05T10:00:00.000Z" }} />);
+    expect(screen.getByText("Esta persona eligió no mostrar sus datos médicos")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: /107/ })[0]).toHaveAttribute("href", "tel:107");
+  });
 });

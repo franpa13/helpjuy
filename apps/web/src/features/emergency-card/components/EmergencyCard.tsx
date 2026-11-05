@@ -47,6 +47,8 @@ export function EmergencyCard({ card }: { card: PublicCardDto }) {
     card.care &&
     (card.care.communication || card.care.directives || card.care.transfusion !== 'UNKNOWN' || card.care.organDonor !== 'UNKNOWN');
   const hasMore = card.history || card.insurance || card.doctor || card.notes;
+  const SECTION_KEYS = ['identity', 'vitals', 'allergies', 'conditions', 'medications', 'contacts', 'care', 'history', 'insurance', 'doctor', 'notes'] as const;
+  const nothingVisible = card.updatedAt !== null && SECTION_KEYS.every((k) => card[k] === undefined);
   const hasMedical =
     !!card.allergies?.items.length ||
     !!card.allergies?.none ||
@@ -102,13 +104,19 @@ export function EmergencyCard({ card }: { card: PublicCardDto }) {
 
       <div className={styles.layout}>
         <main className={styles.content}>
-          {!card.active && !hasMedical && (
+          {nothingVisible && (
+            <section className={`${styles.sec} ${styles.inactive}`}>
+              <h2>Esta persona eligió no mostrar sus datos médicos</h2>
+              <p>Si necesita ayuda, llamá al 107.</p>
+            </section>
+          )}
+          {!nothingVisible && !card.active && !hasMedical && (
             <section className={`${styles.sec} ${styles.inactive}`}>
               <h2>Esta ficha todavía no tiene datos de emergencia</h2>
               <p>Si la persona necesita ayuda, llamá al 107.</p>
             </section>
           )}
-          {!card.active && hasMedical && (
+          {!nothingVisible && !card.active && hasMedical && (
             <section className={`${styles.sec} ${styles.inactive}`}>
               <h2>Sin contacto de emergencia cargado</h2>
               <p>Si la persona necesita ayuda, llamá al 107.</p>

@@ -48,8 +48,29 @@ describe('RecordEditor', () => {
 
   it('la obra social arranca privada (no se ve en el QR)', () => {
     render(<RecordEditor profile={profile} initial={initial} />);
-    expect(screen.getByRole('switch', { name: /Obra social: se ve en mi QR/ })).not.toBeChecked();
-    expect(screen.getByRole('switch', { name: /Alergias: se ve en mi QR/ })).toBeChecked();
+    expect(screen.getByRole('switch', { name: /Obra social.*Mostrar en mi QR/ })).not.toBeChecked();
+    expect(screen.getByRole('switch', { name: /Alergias.*Mostrar en mi QR/ })).toBeChecked();
+  });
+
+  it('el interruptor muestra su estado con palabras, sin depender del color', async () => {
+    const user = userEvent.setup();
+    render(<RecordEditor profile={profile} initial={initial} />);
+    const sw = screen.getByRole('switch', { name: /Alergias.*Mostrar en mi QR/ });
+    expect(sw).toHaveTextContent('Visible');
+    await user.click(sw);
+    expect(sw).toHaveTextContent('Oculto');
+    expect(sw).not.toBeChecked();
+  });
+
+  it('resume qué va a ver quien escanee el QR', () => {
+    render(<RecordEditor profile={profile} initial={initial} />);
+    expect(screen.getByText(/Quien escanee tu QR va a ver:/).closest('p')).toHaveTextContent('Alergias');
+  });
+
+  it('si todo está oculto, avisa que solo se va a ver el nombre', () => {
+    const hidden = Object.fromEntries(Object.keys(initial.visibility).map((k) => [k, false])) as typeof initial.visibility;
+    render(<RecordEditor profile={profile} initial={{ ...initial, visibility: hidden }} />);
+    expect(screen.getByText('Quien escanee tu QR solo va a ver tu nombre. Activá al menos alergias, medicación y contactos.')).toBeInTheDocument();
   });
 
   it('un teléfono inválido muestra "Revisá el teléfono" y no envía', async () => {

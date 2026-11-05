@@ -36,7 +36,7 @@ test('cargar la ficha, verla como paramédico y ocultar una sección', async ({ 
   await expect(card.getByRole('link', { name: /Jorge/ }).first()).toHaveAttribute('href', 'tel:3884123456');
 
   // Ocultar la medicación y confirmar que desaparece de la ficha pública
-  await page.getByRole('switch', { name: /Medicación: se ve en mi QR/ }).click();
+  await page.getByRole('switch', { name: /Medicación.*Mostrar en mi QR/ }).click();
   await page.getByRole('button', { name: 'Guardar ficha' }).click();
   await expect(page.getByText('Guardado. Tu QR ya muestra estos datos.')).toBeVisible();
   await expect
