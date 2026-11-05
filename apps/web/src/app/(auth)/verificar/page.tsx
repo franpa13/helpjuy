@@ -6,7 +6,7 @@ export const metadata = { title: 'Confirmar email — HelpJuy' };
 export default async function VerificarPage({ searchParams }: PageProps<'/verificar'>) {
   const { token } = await searchParams;
   return (
-    <AuthShell title="Confirmar email">
+    <AuthShell variant="recover" title="Confirmar email">
       <VerifyEmail token={typeof token === 'string' ? token : ''} />
     </AuthShell>
   );

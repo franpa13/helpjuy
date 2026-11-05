@@ -5,7 +5,12 @@ export const metadata = { title: 'Creá tu ficha — HelpJuy' };
 
 export default function RegistroPage() {
   return (
-    <AuthShell title="Creá tu ficha de emergencia" subtitle="Tarda menos de 3 minutos. Es gratis.">
+    <AuthShell
+      variant="register"
+      step={1}
+      title="Creá tu cuenta"
+      subtitle="Es gratis. Después cargás tu ficha y te llevás tu QR."
+    >
       <RegisterForm googleEnabled={process.env.GOOGLE_AUTH_ENABLED === 'true'} />
     </AuthShell>
   );

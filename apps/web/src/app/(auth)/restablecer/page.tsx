@@ -6,7 +6,7 @@ export const metadata = { title: 'Contraseña nueva — HelpJuy' };
 export default async function RestablecerPage({ searchParams }: PageProps<'/restablecer'>) {
   const { token } = await searchParams;
   return (
-    <AuthShell title="Elegí una contraseña nueva">
+    <AuthShell variant="recover" title="Elegí una contraseña nueva" subtitle="Al guardarla se cierran las sesiones abiertas en otros dispositivos.">
       <ResetForm token={typeof token === 'string' ? token : ''} />
     </AuthShell>
   );

@@ -5,7 +5,7 @@ export const metadata = { title: 'Recuperar contraseña — HelpJuy' };
 
 export default function RecuperarPage() {
   return (
-    <AuthShell title="Recuperar contraseña" subtitle="Te mandamos un link a tu email para elegir una nueva.">
+    <AuthShell variant="recover" title="Recuperar contraseña" subtitle="Te mandamos un link a tu email para elegir una nueva.">
       <ForgotForm />
     </AuthShell>
   );

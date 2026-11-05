@@ -9,6 +9,7 @@ import { safeNext, toFieldErrors, type FieldErrors } from '@/shared/forms/errors
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
 import { Field } from '@/shared/ui/Field';
+import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 import { GoogleButton } from './GoogleButton';
 
@@ -42,13 +43,13 @@ export function LoginForm({ next, googleEnabled = false, error }: { next?: strin
       {formError && <Alert tone="error">{formError}</Alert>}
       {googleEnabled && <GoogleButton next={safeNext(next, '/panel')} />}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
-      <Field label="Contraseña" name="password" type="password" autoComplete="current-password" error={errors.password} />
+      <PasswordField label="Contraseña" name="password" autoComplete="current-password" error={errors.password} />
+      <p style={{ marginTop: -6, textAlign: 'right', fontSize: 15 }}>
+        <Link href="/recuperar">Me olvidé la contraseña</Link>
+      </p>
       <Button type="submit" disabled={sending}>
         {sending ? 'Ingresando…' : 'Ingresar'}
       </Button>
-      <p className="muted">
-        <Link href="/recuperar">Me olvidé la contraseña</Link>
-      </p>
       <p className="muted">
         ¿No tenés cuenta? <Link href="/registro">Creá tu ficha</Link>
       </p>

@@ -1,0 +1,233 @@
+/* Pantallas de cuenta: panel de confianza (azul noche) + formulario (papel). */
+.shell {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--paper);
+}
+
+@media (min-width: 960px) {
+  .shell {
+    grid-template-columns: minmax(380px, 0.9fr) 1.1fr;
+    grid-template-rows: 1fr;
+  }
+}
+
+/* ---------- Panel de confianza ---------- */
+.aside {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px 18px;
+  background: var(--night);
+  color: var(--white);
+}
+
+@media (min-width: 960px) {
+  .aside {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    gap: 0;
+    padding: 36px clamp(32px, 4vw, 56px);
+  }
+}
+
+.brand {
+  color: var(--white);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.asideBody {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 960px) {
+  .asideBody {
+    margin: auto 0;
+    max-width: 30em;
+  }
+}
+
+.headline {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+
+@media (min-width: 960px) {
+  .headline {
+    font-size: clamp(40px, 3.6vw, 58px);
+    line-height: 0.92;
+  }
+}
+
+.lead {
+  display: none;
+}
+
+.trust {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .lead {
+    display: block;
+    margin-top: 18px;
+    font-size: 18px;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.85);
+  }
+
+  .trust {
+    list-style: none;
+    padding: 0;
+    margin-top: 32px;
+    display: grid;
+    gap: 14px;
+    font-weight: 700;
+    font-size: 17px;
+  }
+
+  .trust li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+}
+
+.trustIcon {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius);
+  background: var(--red-bright);
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.sos {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .sos {
+    display: block;
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-head), 'Arial Narrow', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .sos a {
+    color: var(--red-bright);
+  }
+}
+
+/* El símbolo enorme y casi invisible: textura de marca, no decoración que compita. */
+.watermark {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .watermark {
+    display: block;
+    position: absolute;
+    right: -70px;
+    bottom: -60px;
+    opacity: 0.06;
+    pointer-events: none;
+  }
+}
+
+/* ---------- Formulario ---------- */
+.main {
+  display: flex;
+  justify-content: center;
+  padding: 28px 16px 48px;
+}
+
+@media (min-width: 960px) {
+  .main {
+    align-items: center;
+    padding: 48px clamp(24px, 5vw, 80px);
+  }
+}
+
+.panel {
+  width: 100%;
+  max-width: 440px;
+}
+
+.title {
+  font-size: clamp(36px, 7vw, 52px);
+  line-height: 0.92;
+}
+
+.subtitle {
+  margin-top: 10px;
+  font-size: 17px;
+  color: var(--muted);
+}
+
+.body {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 3px solid var(--ink);
+}
+
+/* Pasos del alta: Cuenta → Ficha → QR */
+.steps {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 4px solid var(--line);
+}
+
+.steps li[data-state='current'] {
+  color: var(--ink);
+  border-color: var(--red);
+}
+
+.steps li[data-state='done'] {
+  border-color: var(--green);
+}
+
+.stepDot {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--ink);
+  font-size: 12px;
+}
+
+.steps li[data-state='current'] .stepDot {
+  background: var(--red);
+  color: var(--white);
+}

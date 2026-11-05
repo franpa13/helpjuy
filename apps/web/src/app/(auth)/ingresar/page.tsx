@@ -7,7 +7,7 @@ export default async function IngresarPage({ searchParams }: PageProps<'/ingresa
   const { next, error } = await searchParams;
   const googleEnabled = process.env.GOOGLE_AUTH_ENABLED === 'true';
   return (
-    <AuthShell title="Ingresá">
+    <AuthShell variant="login" title="Ingresá" subtitle={googleEnabled ? 'Con Google o con tu email.' : 'Con tu email y tu contraseña.'}>
       <LoginForm
         next={typeof next === 'string' ? next : undefined}
         error={typeof error === 'string' ? error : undefined}

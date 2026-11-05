@@ -9,6 +9,7 @@ import { toFieldErrors, type FieldErrors } from '@/shared/forms/errors';
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
 import { Field } from '@/shared/ui/Field';
+import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 import { GoogleButton } from './GoogleButton';
 
@@ -43,17 +44,13 @@ export function RegisterForm({ googleEnabled = false }: { googleEnabled?: boolea
       {formError && <Alert tone="error">{formError}</Alert>}
       {googleEnabled && <GoogleButton next="/panel" />}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
-      <Field
-        label="Contraseña"
-        name="password"
-        type="password"
-        autoComplete="new-password"
-        hint="Mínimo 8 caracteres"
-        error={errors.password}
-      />
+      <PasswordField label="Contraseña" name="password" autoComplete="new-password" minLength={8} error={errors.password} />
       <Button type="submit" disabled={sending}>
         {sending ? 'Creando…' : 'Crear cuenta'}
       </Button>
+      <p className="muted" style={{ fontSize: 14 }}>
+        Todavía no guardamos nada de tu salud. Eso lo cargás vos en el paso siguiente, después de leer y aceptar cómo cuidamos tus datos.
+      </p>
       <p className="muted">
         ¿Ya tenés cuenta? <Link href="/ingresar">Ingresá</Link>
       </p>

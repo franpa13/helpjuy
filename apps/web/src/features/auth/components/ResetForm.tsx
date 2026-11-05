@@ -7,7 +7,7 @@ import { ApiError, postJson } from '@/shared/api/client';
 import { toFieldErrors, type FieldErrors } from '@/shared/forms/errors';
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
-import { Field } from '@/shared/ui/Field';
+import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 
 export function ResetForm({ token }: { token: string }) {
@@ -61,14 +61,7 @@ export function ResetForm({ token }: { token: string }) {
           {formError} <Link href="/recuperar">Pedir otro link</Link>
         </Alert>
       )}
-      <Field
-        label="Contraseña nueva"
-        name="password"
-        type="password"
-        autoComplete="new-password"
-        hint="Mínimo 8 caracteres"
-        error={errors.password}
-      />
+      <PasswordField label="Contraseña nueva" name="password" autoComplete="new-password" minLength={8} error={errors.password} />
       <Button type="submit" disabled={sending}>
         Guardar contraseña
       </Button>
