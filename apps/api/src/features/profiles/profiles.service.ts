@@ -1,10 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { completion, isActive, type CreateProfileInput, type ProfileDto, type UpdateProfileInput } from '@helpjuy/contracts';
 import type { MedicalRecord, Profile } from '../../generated/prisma/client.js';
 import { MedicalCipher } from '../../shared/crypto/medical-cipher.js';
 import { randomToken } from '../../shared/crypto/tokens.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { ConsentService } from '../consent/consent.service.js';
+import { CardCache } from '../emergency-card/card-cache.js';
 
 export const newPublicToken = () => randomToken(16);
 
@@ -24,11 +25,21 @@ function baseDto(p: Profile): Omit<ProfileDto, 'completion' | 'active'> {
 
 @Injectable()
 export class ProfilesService {
+  private readonly logger = new Logger('Profiles');
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly consent: ConsentService,
     private readonly cipher: MedicalCipher,
+    private readonly cardCache: CardCache,
   ) {}
+
+  /** Invalida la ficha pública cacheada; un fallo se loguea y no rompe la operación. */
+  private async invalidateCard(tokens: string[]): Promise<void> {
+    await this.cardCache.invalidate(tokens).catch((err: Error) => {
+      this.logger.warn(`No se pudo invalidar la ficha pública: ${err.message}`);
+    });
+  }
 
   toDto(p: ProfileWithRecord): ProfileDto {
     const record = p.medicalRecord ? this.cipher.decrypt(p.medicalRecord.ciphertext) : null;
@@ -75,20 +86,24 @@ export class ProfilesService {
 
   async update(ownerId: string, id: string, input: UpdateProfileInput): Promise<ProfileWithRecord> {
     await this.getOwned(ownerId, id);
-    return this.prisma.profile.update({ where: { id }, data: input, include: { medicalRecord: true } });
+    const updated = await this.prisma.profile.update({ where: { id }, data: input, include: { medicalRecord: true } });
+    await this.invalidateCard([updated.publicToken]);
+    return updated;
   }
 
   async remove(ownerId: string, id: string): Promise<void> {
-    await this.getOwned(ownerId, id);
+    const profile = await this.getOwned(ownerId, id);
     await this.prisma.profile.delete({ where: { id } });
+    await this.invalidateCard([profile.publicToken]);
   }
 
   async rotateToken(ownerId: string, id: string): Promise<string> {
-    await this.getOwned(ownerId, id);
+    const profile = await this.getOwned(ownerId, id);
     const updated = await this.prisma.profile.update({
       where: { id },
       data: { publicToken: newPublicToken(), tokenRotatedAt: new Date() },
     });
+    await this.invalidateCard([profile.publicToken, updated.publicToken]);
     return updated.publicToken;
   }
 }
