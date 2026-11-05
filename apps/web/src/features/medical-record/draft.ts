@@ -130,7 +130,10 @@ export function validate(d: Draft, visibility: Visibility) {
   for (const issue of result.error.issues) {
     const key = issue.path.slice(1).join('.');
     if (errors[key]) continue;
-    errors[key] = MESSAGES.find(([re]) => re.test(key))?.[1] ?? 'Revisá este dato';
+    errors[key] =
+      issue.code === 'too_big' && (issue as { origin?: string }).origin === 'string'
+        ? 'Texto demasiado largo'
+        : (MESSAGES.find(([re]) => re.test(key))?.[1] ?? 'Revisá este dato');
   }
   return { ok: false as const, errors };
 }

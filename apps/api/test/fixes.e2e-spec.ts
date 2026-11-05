@@ -88,3 +88,29 @@ describe('si falla el envío de emails (e2e)', () => {
     await request(server).post('/auth/forgot-password').send({ email: 'y@y.com' }).expect(204);
   });
 });
+
+describe("ficha pública pedida por la web (e2e)", () => {
+  let app: INestApplication;
+  let server: any;
+
+  beforeEach(async () => {
+    app = await createTestApp();
+    await resetDb(app.get(PrismaService));
+    server = app.getHttpServer();
+  });
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it("los pedidos server-to-server de la web no comparten el límite de 60 por minuto", async () => {
+    for (let i = 0; i < 70; i++) {
+      await request(server).get("/public/cards/AAAAAAAAAAAAAAAAAAAAAA").set("x-proxy-secret", SECRET).expect(404);
+    }
+  });
+
+  it("sin el secreto sigue el límite de 60 por minuto por IP", async () => {
+    for (let i = 0; i < 60; i++) await request(server).get("/public/cards/AAAAAAAAAAAAAAAAAAAAAA").expect(404);
+    await request(server).get("/public/cards/AAAAAAAAAAAAAAAAAAAAAA").expect(429);
+  });
+});

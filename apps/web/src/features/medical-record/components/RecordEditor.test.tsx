@@ -68,4 +68,18 @@ describe('RecordEditor', () => {
     render(<RecordEditor profile={profile} initial={initial} />);
     expect(screen.getByText('Ficha al 0%')).toBeInTheDocument();
   });
+
+  it("cada campo de texto tiene el mismo largo máximo que acepta la API", async () => {
+    const user = userEvent.setup();
+    render(<RecordEditor profile={profile} initial={initial} />);
+    await user.click(screen.getByRole("button", { name: "Agregar alergia" }));
+    await user.click(screen.getByRole("button", { name: "Agregar remedio" }));
+    await user.click(screen.getByRole("button", { name: "Agregar contacto" }));
+    const max = (label: string) => (screen.getByLabelText(label) as HTMLInputElement).maxLength;
+    expect(max("Alergia 1")).toBe(80);
+    expect(max("Reacción 1")).toBe(80);
+    expect(max("Dosis 1")).toBe(60);
+    expect(max("Relación 1")).toBe(40);
+    expect(max("Algo más que quieras dejar anotado")).toBe(500);
+  });
 });

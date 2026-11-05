@@ -38,28 +38,36 @@ export class HttpCardCache implements CardCache {
         this.logger.warn(`La web respondió ${res.status} al revalidar`);
         return;
       }
-      await Promise.all(
-        tokens.map((t) =>
-          fetch(`${this.webUrl}/e/${t}`, { signal: AbortSignal.timeout(TIMEOUT_MS) }).catch(() => undefined),
-        ),
-      );
+      // Warm-up sin esperar: el guardado no tiene por qué demorarse por esto.
+      for (const t of tokens) {
+        void fetch(`${this.webUrl}/e/${t}`, { signal: AbortSignal.timeout(TIMEOUT_MS) }).catch(() => undefined);
+      }
     } catch (err) {
       this.logger.warn(`No se pudo revalidar la ficha pública: ${(err as Error).message}`);
     }
   }
 }
 
+type Env = Partial<Record<'NODE_ENV' | 'WEB_URL' | 'REVALIDATE_SECRET', string>>;
+
+/**
+ * En producción, sin estas variables las fichas nunca se invalidarían: mejor no arrancar
+ * que mostrar datos viejos (o un QR rotado) sin que nadie se entere.
+ */
+export function createCardCache(env: Env): CardCache {
+  const { WEB_URL: webUrl, REVALIDATE_SECRET: secret } = env;
+  if (webUrl && secret) return new HttpCardCache(webUrl, secret);
+  if (env.NODE_ENV === 'production') {
+    const missing = [!webUrl && 'WEB_URL', !secret && 'REVALIDATE_SECRET'].filter(Boolean).join(' y ');
+    throw new Error(`Falta configurar ${missing}: sin eso la ficha pública no se actualiza al editarla`);
+  }
+  return new NoopCardCache();
+}
+
 @Global()
 @Module({
   providers: [
-    {
-      provide: CardCache,
-      useFactory: (): CardCache => {
-        const webUrl = process.env.WEB_URL;
-        const secret = process.env.REVALIDATE_SECRET;
-        return webUrl && secret ? new HttpCardCache(webUrl, secret) : new NoopCardCache();
-      },
-    },
+    { provide: CardCache, useFactory: (): CardCache => createCardCache(process.env) },
   ],
   exports: [CardCache],
 })

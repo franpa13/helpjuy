@@ -47,6 +47,14 @@ export function EmergencyCard({ card }: { card: PublicCardDto }) {
     card.care &&
     (card.care.communication || card.care.directives || card.care.transfusion !== 'UNKNOWN' || card.care.organDonor !== 'UNKNOWN');
   const hasMore = card.history || card.insurance || card.doctor || card.notes;
+  const hasMedical =
+    !!card.allergies?.items.length ||
+    !!card.allergies?.none ||
+    !!card.conditions?.items.length ||
+    !!card.medications?.items.length ||
+    !!card.vitals?.bloodType ||
+    !!hasCare ||
+    !!hasMore;
 
   return (
     <div className={styles.page}>
@@ -94,9 +102,15 @@ export function EmergencyCard({ card }: { card: PublicCardDto }) {
 
       <div className={styles.layout}>
         <main className={styles.content}>
-          {!card.active && (
+          {!card.active && !hasMedical && (
             <section className={`${styles.sec} ${styles.inactive}`}>
               <h2>Esta ficha todavía no tiene datos de emergencia</h2>
+              <p>Si la persona necesita ayuda, llamá al 107.</p>
+            </section>
+          )}
+          {!card.active && hasMedical && (
+            <section className={`${styles.sec} ${styles.inactive}`}>
+              <h2>Sin contacto de emergencia cargado</h2>
               <p>Si la persona necesita ayuda, llamá al 107.</p>
             </section>
           )}

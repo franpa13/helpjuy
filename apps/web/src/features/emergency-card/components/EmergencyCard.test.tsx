@@ -68,4 +68,11 @@ describe('EmergencyCard', () => {
     render(<EmergencyCard card={full} />);
     expect(screen.getByText(/no verificados por un médico/)).toBeInTheDocument();
   });
+
+  it("con datos médicos pero sin contacto no dice que no tiene datos", () => {
+    render(<EmergencyCard card={{ ...full, active: false, contacts: [] }} />);
+    expect(screen.queryByText("Esta ficha todavía no tiene datos de emergencia")).toBeNull();
+    expect(screen.getByText("Sin contacto de emergencia cargado")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Alergias" })).toBeInTheDocument();
+  });
 });

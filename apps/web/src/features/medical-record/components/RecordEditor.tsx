@@ -198,7 +198,9 @@ export function RecordEditor({ profile, initial }: Props) {
             hint="En la ficha solo se muestra la edad"
             error={err('birthDate')}
           />
-          <Field label="Idioma" value={draft.language} onChange={(e) => set('language', e.target.value)} placeholder="Español" />
+          <Field label="Idioma"
+                maxLength={40}
+                error={err('language')} value={draft.language} onChange={(e) => set('language', e.target.value)} placeholder="Español" />
           <Select
             label="Grupo sanguíneo"
             value={draft.bloodType}
@@ -236,6 +238,7 @@ export function RecordEditor({ profile, initial }: Props) {
             <div key={i} className={styles.row}>
               <Field
                 label={`Alergia ${i + 1}`}
+                maxLength={80}
                 value={a.substance}
                 onChange={(e) => setRow('allergies', i, { substance: e.target.value })}
                 placeholder="Penicilina"
@@ -243,6 +246,8 @@ export function RecordEditor({ profile, initial }: Props) {
               />
               <Field
                 label={`Reacción ${i + 1}`}
+                maxLength={80}
+                error={err(`allergies.${i}.reaction`)}
                 value={a.reaction}
                 onChange={(e) => setRow('allergies', i, { reaction: e.target.value })}
                 placeholder="Me hincho, me cuesta respirar"
@@ -276,12 +281,15 @@ export function RecordEditor({ profile, initial }: Props) {
             <div key={i} className={styles.row}>
               <Field
                 label={`Enfermedad ${i + 1}`}
+                maxLength={80}
                 value={c.name}
                 onChange={(e) => setRow('conditions', i, { name: e.target.value })}
                 placeholder="Diabetes tipo 1"
                 error={err(`conditions.${i}.name`)}
               />
-              <Field label={`Detalle ${i + 1}`} value={c.note} onChange={(e) => setRow('conditions', i, { note: e.target.value })} />
+              <Field label={`Detalle ${i + 1}`}
+                maxLength={120}
+                error={err(`conditions.${i}.note`)} value={c.note} onChange={(e) => setRow('conditions', i, { note: e.target.value })} />
               <button type="button" className={styles.remove} onClick={() => removeRow('conditions', i)}>
                 Quitar
               </button>
@@ -311,12 +319,15 @@ export function RecordEditor({ profile, initial }: Props) {
             <div key={i} className={styles.row}>
               <Field
                 label={`Remedio ${i + 1}`}
+                maxLength={80}
                 value={m.name}
                 onChange={(e) => setRow('medications', i, { name: e.target.value })}
                 placeholder="Losartán"
                 error={err(`medications.${i}.name`)}
               />
-              <Field label={`Dosis ${i + 1}`} value={m.dose} onChange={(e) => setRow('medications', i, { dose: e.target.value })} placeholder="50 mg a la mañana" />
+              <Field label={`Dosis ${i + 1}`}
+                maxLength={60}
+                error={err(`medications.${i}.dose`)} value={m.dose} onChange={(e) => setRow('medications', i, { dose: e.target.value })} placeholder="50 mg a la mañana" />
               <label className={styles.none}>
                 <input
                   type="checkbox"
@@ -351,18 +362,22 @@ export function RecordEditor({ profile, initial }: Props) {
           <div key={i} className={styles.row}>
             <Field
               label={`Nombre del contacto ${i + 1}`}
+                maxLength={60}
               value={c.name}
               onChange={(e) => setRow('contacts', i, { name: e.target.value })}
               error={err(`contacts.${i}.name`)}
             />
             <Field
               label={`Relación ${i + 1}`}
+                maxLength={40}
+                error={err(`contacts.${i}.relation`)}
               value={c.relation}
               onChange={(e) => setRow('contacts', i, { relation: e.target.value })}
               placeholder="Madre, pareja, amigo…"
             />
             <Field
               label={`Teléfono del contacto ${i + 1}`}
+                maxLength={20}
               type="tel"
               inputMode="tel"
               value={c.phone}
@@ -388,6 +403,8 @@ export function RecordEditor({ profile, initial }: Props) {
       <Block title="Para tener en cuenta" sections={['care']} visibility={visibility} setVisible={setVisible}>
         <Field
           label="¿Cómo comunicarse con vos?"
+                maxLength={200}
+                error={err('communication')}
           value={draft.communication}
           onChange={(e) => set('communication', e.target.value)}
           placeholder="Soy sordo, leo los labios"
@@ -416,6 +433,8 @@ export function RecordEditor({ profile, initial }: Props) {
         </div>
         <Field
           label="Voluntades anticipadas"
+                maxLength={300}
+                error={err('directives')}
           value={draft.directives}
           onChange={(e) => set('directives', e.target.value)}
           placeholder="Lo que querés que se respete"
@@ -424,9 +443,13 @@ export function RecordEditor({ profile, initial }: Props) {
 
       <Block title="Cirugías e implantes" sections={['history']} visibility={visibility} setVisible={setVisible}>
         <div className={styles.grid2}>
-          <Field label="Cirugías" value={draft.surgeries} onChange={(e) => set('surgeries', e.target.value)} />
+          <Field label="Cirugías"
+                maxLength={300}
+                error={err('surgeries')} value={draft.surgeries} onChange={(e) => set('surgeries', e.target.value)} />
           <Field
             label="Implantes o prótesis"
+                maxLength={200}
+                error={err('implants')}
             value={draft.implants}
             onChange={(e) => set('implants', e.target.value)}
             placeholder="Marcapasos, placa de titanio…"
@@ -436,16 +459,23 @@ export function RecordEditor({ profile, initial }: Props) {
 
       <Block title="Obra social" sections={['insurance']} visibility={visibility} setVisible={setVisible}>
         <div className={styles.grid2}>
-          <Field label="Obra social o prepaga" value={draft.insuranceName} onChange={(e) => set('insuranceName', e.target.value)} />
-          <Field label="Número de afiliado" value={draft.insuranceNumber} onChange={(e) => set('insuranceNumber', e.target.value)} />
+          <Field label="Obra social o prepaga"
+                maxLength={60}
+                error={err('insurance.name')} value={draft.insuranceName} onChange={(e) => set('insuranceName', e.target.value)} />
+          <Field label="Número de afiliado"
+                maxLength={40}
+                error={err('insurance.number')} value={draft.insuranceNumber} onChange={(e) => set('insuranceNumber', e.target.value)} />
         </div>
       </Block>
 
       <Block title="Médico de cabecera" sections={['doctor']} visibility={visibility} setVisible={setVisible}>
         <div className={styles.grid2}>
-          <Field label="Nombre del médico" value={draft.doctorName} onChange={(e) => set('doctorName', e.target.value)} />
+          <Field label="Nombre del médico"
+                maxLength={60}
+                error={err('doctor.name')} value={draft.doctorName} onChange={(e) => set('doctorName', e.target.value)} />
           <Field
             label="Teléfono del médico"
+                maxLength={20}
             type="tel"
             value={draft.doctorPhone}
             onChange={(e) => set('doctorPhone', e.target.value)}
@@ -455,7 +485,9 @@ export function RecordEditor({ profile, initial }: Props) {
       </Block>
 
       <Block title="Notas" sections={['notes']} visibility={visibility} setVisible={setVisible}>
-        <Field label="Algo más que quieras dejar anotado" value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
+        <Field label="Algo más que quieras dejar anotado"
+                maxLength={500}
+                error={err('notes')} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
       </Block>
 
       <div className={styles.saveBar}>
