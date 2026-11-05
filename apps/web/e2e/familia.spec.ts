@@ -34,7 +34,7 @@ test('grupo familiar: invitar por link, unirse y recibir el aviso de emergencia'
   await page.getByLabel('Nombre del grupo').fill('Familia Paredes');
   await page.getByRole('button', { name: 'Crear grupo' }).click();
   await expect(page.getByRole('heading', { name: 'Familia Paredes' })).toBeVisible();
-  await page.getByRole('button', { name: 'Invitar a alguien' }).click();
+  // Al crear el grupo, el link de invitación aparece solo
   const inviteUrl = await page.getByLabel('Link de invitación').inputValue();
   expect(inviteUrl).toMatch(/\/unirme\/[A-Za-z0-9_-]{43}$/);
   await expect(page.getByRole('link', { name: 'Compartir por WhatsApp' })).toHaveAttribute('href', /^https:\/\/wa\.me\/\?text=/);

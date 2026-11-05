@@ -2,11 +2,12 @@
 
 import type { CreatedInviteDto, EmergencyAlertResultDto, FamilyGroupDto, FamilyInviteDto } from '@helpjuy/contracts';
 import { BellOff, BellRing, Copy, Send, UserMinus, Users } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiFetch, postJson } from '@/shared/api/client';
 import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
 import { Field } from '@/shared/ui/Field';
+import { AlertPreview, FamilyIntro, IntroLead } from './FamilyIntro';
 import styles from './family.module.css';
 
 const initials = (name: string) =>
@@ -57,7 +58,18 @@ function CreateGroup({ onCreated, first }: { onCreated: (g: FamilyGroupDto) => v
   );
 }
 
-function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChange: (g: FamilyGroupDto) => void; onGone: () => void }) {
+function GroupCard({
+  group,
+  onChange,
+  onGone,
+  autoInvite = false,
+}: {
+  group: FamilyGroupDto;
+  onChange: (g: FamilyGroupDto) => void;
+  onGone: () => void;
+  /** Recién creado: mostramos el link de invitación sin un clic extra. */
+  autoInvite?: boolean;
+}) {
   const admin = group.myRole === 'ADMIN';
   const me = group.members.find((m) => m.isMe)!;
   const [invite, setInvite] = useState<CreatedInviteDto | null>(null);
@@ -85,6 +97,15 @@ function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChang
       fail(err);
     }
   }
+
+  const invitedOnce = useRef(false);
+  useEffect(() => {
+    if (autoInvite && admin && !invitedOnce.current) {
+      invitedOnce.current = true;
+      void createInvite();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoInvite, admin]);
 
   async function revoke(id: string) {
     await apiFetch(`/family-groups/${group.id}/invites/${id}`, { method: 'DELETE' }).catch(fail);
@@ -172,6 +193,12 @@ function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChang
         ))}
       </ul>
 
+      {group.members.length === 1 && (
+        <p className={styles.alone}>
+          Todavía sos la única persona del grupo. Mandá el link a quienes querés que se enteren si te pasa algo.
+        </p>
+      )}
+
       {admin && (
         <div className={styles.inviteBox}>
           {!invite ? (
@@ -241,35 +268,65 @@ function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChang
   );
 }
 
-export function FamilyGroups({ initial, emailVerified = true }: { initial: FamilyGroupDto[]; emailVerified?: boolean }) {
+export function FamilyGroups({
+  initial,
+  emailVerified = true,
+  myName,
+}: {
+  initial: FamilyGroupDto[];
+  emailVerified?: boolean;
+  /** Para la vista previa del aviso: "Posible emergencia: {tu nombre}". */
+  myName?: string;
+}) {
   const [groups, setGroups] = useState(initial);
+  const [justCreated, setJustCreated] = useState<string | null>(null);
   const replace = (g: FamilyGroupDto) => setGroups((gs) => gs.map((x) => (x.id === g.id ? g : x)));
+  const created = (g: FamilyGroupDto) => {
+    setGroups((gs) => [...gs, g]);
+    setJustCreated(g.id);
+  };
+
+  const verifyNotice = !emailVerified && (
+    <Alert tone="warning">
+      Confirmá tu email para recibir los avisos de emergencia. Te mandamos un link cuando creaste la cuenta; podés pedir otro desde Mis fichas.
+    </Alert>
+  );
+
+  if (groups.length === 0) {
+    return (
+      <div className="stack">
+        {verifyNotice}
+        <div className={styles.emptyLayout}>
+          <IntroLead />
+          <section className={`${styles.createCard} ${styles.areaCreate}`}>
+            <h2>Creá tu grupo</h2>
+            <p className={styles.meta}>Después te damos el link para invitar a tu familia.</p>
+            <CreateGroup first onCreated={created} />
+          </section>
+          <FamilyIntro />
+          <AlertPreview name={myName} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="stack">
-      {!emailVerified && (
-        <Alert tone="warning">
-          Confirmá tu email para recibir los avisos de emergencia. Te mandamos un link cuando creaste la cuenta; podés pedir otro desde Tus fichas.
-        </Alert>
-      )}
-      {groups.length === 0 && (
-        <section className={styles.empty}>
-          <h2>Todavía no tenés un grupo familiar</h2>
-          <p>
-            Armalo con las personas que querés que se enteren si te pasa algo. Cada una necesita su cuenta (gratis) y acepta la
-            invitación. <strong>Nadie ve los datos médicos de los demás.</strong>
-          </p>
-        </section>
-      )}
-
+      {verifyNotice}
       {groups.map((g) => (
-        <GroupCard key={g.id} group={g} onChange={replace} onGone={() => setGroups((gs) => gs.filter((x) => x.id !== g.id))} />
+        <GroupCard
+          key={g.id}
+          group={g}
+          autoInvite={g.id === justCreated}
+          onChange={replace}
+          onGone={() => setGroups((gs) => gs.filter((x) => x.id !== g.id))}
+        />
       ))}
-
-      <section className={styles.createWrap}>
-        <h2 className="label">{groups.length === 0 ? 'Crear tu grupo' : 'Crear otro grupo'}</h2>
-        <CreateGroup first={groups.length === 0} onCreated={(g) => setGroups((gs) => [...gs, g])} />
-      </section>
+      <details className={styles.more}>
+        <summary>Crear otro grupo</summary>
+        <p className={styles.meta}>Por ejemplo, uno con tu familia y otro con amigos o compañeros de trabajo.</p>
+        <CreateGroup first={false} onCreated={created} />
+      </details>
     </div>
   );
 }

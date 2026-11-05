@@ -20,15 +20,30 @@ const group = (over: Partial<FamilyGroupDto> = {}): FamilyGroupDto => ({
 });
 
 describe('FamilyGroups', () => {
-  it('sin grupos invita a crear el primero', async () => {
-    const user = userEvent.setup();
-    const created = group({ members: [group().members[0]] });
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(201, created));
+  it('sin grupos explica cómo funciona en 3 pasos y muestra el aviso que reciben', () => {
     render(<FamilyGroups initial={[]} />);
     expect(screen.getByText(/Todavía no tenés un grupo familiar/)).toBeInTheDocument();
+    const steps = screen.getByRole('list', { name: 'Cómo funciona' });
+    expect(within(steps).getAllByRole('listitem')).toHaveLength(3);
+    expect(screen.getByLabelText('Ejemplo del email que recibe tu familia')).toHaveTextContent('Posible emergencia');
+  });
+
+  it('al crear el grupo aparece enseguida el link para invitar', async () => {
+    const user = userEvent.setup();
+    const created = group({ members: [group().members[0]] });
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (url, init) => {
+      const u = String(url);
+      if (u === '/api/family-groups') return json(201, created);
+      if (u.endsWith('/invites') && init?.method === 'POST')
+        return json(201, { url: 'http://localhost:3000/unirme/nuevo', expiresAt: '2026-11-12T00:00:00.000Z' });
+      return json(200, []);
+    });
+    render(<FamilyGroups initial={[]} />);
+    await user.clear(screen.getByLabelText('Nombre del grupo'));
     await user.type(screen.getByLabelText('Nombre del grupo'), 'Familia Paredes');
     await user.click(screen.getByRole('button', { name: 'Crear grupo' }));
     expect(await screen.findByRole('heading', { name: 'Familia Paredes' })).toBeInTheDocument();
+    expect(await screen.findByDisplayValue('http://localhost:3000/unirme/nuevo')).toBeInTheDocument();
     expect(fetchSpy.mock.calls[0][0]).toBe('/api/family-groups');
   });
 

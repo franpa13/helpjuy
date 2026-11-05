@@ -263,3 +263,196 @@
     align-items: end;
   }
 }
+
+/* ---------- Estado vacío: cómo funciona + crear ---------- */
+/* Celular: intro → crear → pasos → ejemplo. Escritorio: pasos a la izquierda, crear + ejemplo a la derecha. */
+.emptyLayout {
+  display: grid;
+  gap: 24px;
+  grid-template-areas: 'lead' 'create' 'steps' 'preview';
+}
+
+@media (min-width: 1000px) {
+  .emptyLayout {
+    grid-template-columns: 1.1fr 1fr;
+    grid-template-areas:
+      'lead create'
+      'steps create'
+      'steps preview';
+    grid-template-rows: auto auto 1fr;
+    gap: 24px 40px;
+    align-items: start;
+  }
+}
+
+.areaLead {
+  grid-area: lead;
+}
+
+.areaCreate {
+  grid-area: create;
+}
+
+.areaSteps {
+  grid-area: steps;
+}
+
+.areaPreview {
+  grid-area: preview;
+}
+
+.intro {
+  display: grid;
+  gap: 22px;
+}
+
+.introLead {
+  font-size: 19px;
+  line-height: 1.5;
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  border-top: 3px solid var(--ink);
+}
+
+.steps li {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.steps strong {
+  display: block;
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.stepNum {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 48px;
+  line-height: 0.85;
+  color: var(--red);
+  min-width: 30px;
+}
+
+.stepText {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.promises {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.promises li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.promises svg {
+  flex-shrink: 0;
+  color: var(--green);
+}
+
+.createCard {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--red);
+}
+
+.createCard h2 {
+  font-size: 30px;
+}
+
+.createCard .create {
+  grid-template-columns: 1fr;
+  margin-top: 8px;
+}
+
+/* Vista previa del email */
+.preview {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.previewCaption {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.mail {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 15px;
+  box-shadow: 0 12px 24px -18px rgb(0 0 0 / 0.35);
+}
+
+.mailFrom {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mailSubject {
+  margin: 0 -16px;
+  padding: 8px 16px;
+  background: var(--red);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.mailLink {
+  color: var(--blue);
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+.more {
+  padding: 14px 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+}
+
+.more summary {
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.more .create {
+  margin-top: 10px;
+}
+
+.alone {
+  padding: 10px 14px;
+  border-left: 6px solid var(--amber);
+  background: var(--amber-tint);
+  font-weight: 700;
+}
