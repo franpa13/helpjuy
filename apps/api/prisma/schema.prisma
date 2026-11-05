@@ -1,0 +1,86 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum EmailTokenType {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+}
+
+enum Relationship {
+  SELF
+  CHILD
+  PARENT
+  PARTNER
+  OTHER
+}
+
+model User {
+  id              String          @id @default(uuid())
+  email           String          @unique
+  passwordHash    String?
+  emailVerifiedAt DateTime?
+  googleId        String?         @unique
+  createdAt       DateTime        @default(now())
+  sessions        Session[]
+  emailTokens     EmailToken[]
+  profiles        Profile[]
+  consents        ConsentRecord[]
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model EmailToken {
+  id        String         @id @default(uuid())
+  tokenHash String         @unique
+  userId    String
+  user      User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      EmailTokenType
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime       @default(now())
+}
+
+model Profile {
+  id             String          @id @default(uuid())
+  ownerId        String
+  owner          User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  firstName      String
+  lastName       String
+  relationship   Relationship
+  isMinor        Boolean         @default(false)
+  publicToken    String          @unique
+  tokenRotatedAt DateTime        @default(now())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  consents       ConsentRecord[]
+
+  @@index([ownerId])
+}
+
+model ConsentRecord {
+  id               String   @id @default(uuid())
+  profileId        String
+  profile          Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  version          String
+  guardianDeclared Boolean  @default(false)
+  acceptedAt       DateTime @default(now())
+}
