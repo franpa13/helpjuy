@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Logo } from '@/shared/brand/Logo';
 import { HeroVisual } from './HeroVisual';
 import styles from './landing.module.css';
 
@@ -72,9 +73,8 @@ export function Landing() {
   return (
     <>
       <header className={styles.nav}>
-        <Link href="/" className={styles.brand}>
-          <i className="cross" aria-hidden="true" />
-          HelpJuy
+        <Link href="/" className={styles.brand} aria-label="HelpJuy, inicio">
+          <Logo size={26} />
         </Link>
         <nav className={styles.navLinks} aria-label="Cuenta">
           <Link href="/ingresar">Ingresar</Link>

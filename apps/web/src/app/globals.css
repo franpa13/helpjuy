@@ -103,16 +103,6 @@ h2 {
   text-decoration: none;
 }
 
-.cross {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  margin-right: 8px;
-  vertical-align: -1px;
-  background:
-    linear-gradient(var(--white), var(--white)) center / 4px 100% no-repeat,
-    linear-gradient(var(--white), var(--white)) center / 100% 4px no-repeat;
-}
 
 .page {
   width: 100%;

@@ -1,3 +1,4 @@
+import { LogoSymbol } from '@/shared/brand/Logo';
 import { FakeQr } from './FakeQr';
 import styles from './landing.module.css';
 
@@ -49,7 +50,7 @@ export function HeroVisual() {
 
       <div className={styles.card}>
         <div className={styles.cardHead}>
-          <i className="cross" aria-hidden="true" />
+          <LogoSymbol size={14} />
           Emergencia médica
         </div>
         <div className={styles.cardBody}>

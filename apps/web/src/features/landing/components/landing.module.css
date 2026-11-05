@@ -295,6 +295,9 @@
 }
 
 .cardHead {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 6px 10px;
   background: var(--red);
   color: var(--white);

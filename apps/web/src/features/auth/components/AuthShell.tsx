@@ -1,12 +1,12 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { Logo } from '@/shared/brand/Logo';
 
 export function AppStrip({ right }: { right?: ReactNode }) {
   return (
     <header className="strip">
-      <Link href="/">
-        <i className="cross" aria-hidden="true" />
-        HelpJuy
+      <Link href="/" aria-label="HelpJuy, inicio">
+        <Logo size={22} />
       </Link>
       <span>{right ?? 'Jujuy'}</span>
     </header>
