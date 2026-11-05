@@ -6,7 +6,7 @@ export const SESSION_COOKIE = 'hj_session';
 
 /**
  * Llamada a la API desde un Server Component, reenviando la cookie de sesión
- * y la IP real del usuario. Devuelve null si no hay sesión (401).
+ * y la IP real del usuario. Devuelve null si no hay sesión (401) o si el recurso no existe (404).
  */
 export async function apiServer<T>(path: string): Promise<T | null> {
   const store = await cookies();
@@ -18,7 +18,7 @@ export async function apiServer<T>(path: string): Promise<T | null> {
     },
     cache: 'no-store',
   });
-  if (res.status === 401) return null;
+  if (res.status === 401 || res.status === 404) return null;
   if (!res.ok) throw new Error(`API ${path} respondió ${res.status}`);
   return (await res.json()) as T;
 }

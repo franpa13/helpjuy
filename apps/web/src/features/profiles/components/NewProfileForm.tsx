@@ -54,8 +54,9 @@ export function NewProfileForm({ consent: initialConsent, isFirst }: { consent: 
     setFormError(null);
     setSending(true);
     try {
-      await postJson<ProfileDto>('/profiles', { ...draft, consent: acceptance });
-      router.push('/panel');
+      const created = await postJson<ProfileDto>('/profiles', { ...draft, consent: acceptance });
+      // Después de aceptar el consentimiento, directo a cargar la ficha.
+      router.push(`/panel/perfiles/${created.id}`);
       router.refresh();
     } catch (err) {
       setSending(false);

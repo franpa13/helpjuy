@@ -104,3 +104,22 @@
   height: 20px;
   accent-color: var(--ink);
 }
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.active {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.inactive {
+  color: var(--amber);
+  font-weight: 700;
+}

@@ -1,8 +1,6 @@
 import { RELATIONSHIP_LABELS, type ProfileDto } from '@helpjuy/contracts';
+import Link from 'next/link';
 import styles from './profiles.module.css';
-
-// El porcentaje real llega con la ficha médica (Plan 2); por ahora solo hay nombre.
-const PLACEHOLDER_PROGRESS = 10;
 
 export function ProfileList({ profiles }: { profiles: ProfileDto[] }) {
   return (
@@ -16,9 +14,19 @@ export function ProfileList({ profiles }: { profiles: ProfileDto[] }) {
             <div className={styles.meta}>
               {RELATIONSHIP_LABELS[p.relationship]}
               {p.isMinor ? ' · menor' : ''}
+              {' · '}
+              <span className={p.active ? styles.active : styles.inactive}>
+                {p.active ? 'QR activo' : 'Falta un contacto de emergencia'}
+              </span>
+            </div>
+            <div className={styles.links}>
+              <Link href={`/panel/perfiles/${p.id}`}>Editar ficha</Link>
+              <a href={`/e/${p.publicToken}`} target="_blank" rel="noreferrer">
+                Ver como el paramédico
+              </a>
             </div>
           </div>
-          <span className={styles.progress}>Ficha al {PLACEHOLDER_PROGRESS}%</span>
+          <span className={styles.progress}>Ficha al {p.completion}%</span>
         </li>
       ))}
     </ul>
