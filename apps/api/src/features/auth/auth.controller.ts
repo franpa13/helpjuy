@@ -21,6 +21,9 @@ import { CurrentUser } from './current-user.decorator.js';
 import { SessionGuard } from './session.guard.js';
 import { SESSION_COOKIE, SESSION_TTL_MS, SessionService } from './session.service.js';
 
+// Límite estricto solo en las acciones sensibles; /auth/me queda con el global.
+const STRICT = { default: { limit: 10, ttl: 60_000 } };
+
 const cookieOptions = () => ({
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
@@ -28,7 +31,7 @@ const cookieOptions = () => ({
   path: '/',
 });
 
-@Throttle({ default: { limit: 10, ttl: 60_000 } })
+
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -36,6 +39,7 @@ export class AuthController {
     private readonly sessions: SessionService,
   ) {}
 
+  @Throttle(STRICT)
   @Post('register')
   async register(
     @Body(new ZodValidationPipe(registerSchema)) body: RegisterInput,
@@ -46,6 +50,7 @@ export class AuthController {
     return toMe(user);
   }
 
+  @Throttle(STRICT)
   @Post('login')
   @HttpCode(200)
   async login(
@@ -70,12 +75,14 @@ export class AuthController {
     return toMe(user);
   }
 
+  @Throttle(STRICT)
   @Post('verify-email')
   @HttpCode(204)
   async verifyEmail(@Body(new ZodValidationPipe(tokenSchema)) body: TokenInput): Promise<void> {
     await this.auth.verifyEmail(body.token);
   }
 
+  @Throttle(STRICT)
   @Post('resend-verification')
   @HttpCode(204)
   @UseGuards(SessionGuard)
@@ -84,12 +91,14 @@ export class AuthController {
     await this.auth.sendVerification(user);
   }
 
+  @Throttle(STRICT)
   @Post('forgot-password')
   @HttpCode(204)
   async forgotPassword(@Body(new ZodValidationPipe(forgotPasswordSchema)) body: ForgotPasswordInput): Promise<void> {
     await this.auth.forgotPassword(body.email);
   }
 
+  @Throttle(STRICT)
   @Post('reset-password')
   @HttpCode(204)
   async resetPassword(@Body(new ZodValidationPipe(resetPasswordSchema)) body: ResetPasswordInput): Promise<void> {

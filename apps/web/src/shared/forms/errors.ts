@@ -18,6 +18,15 @@ export function toFieldErrors(error: ZodError, messages: Record<string, string>)
 
 /** Devuelve un `next` interno seguro (evita redirecciones a otros sitios). */
 export function safeNext(next: string | undefined | null, fallback: string): string {
-  if (!next || !next.startsWith('/') || next.startsWith('//') || next.startsWith('/\\')) return fallback;
-  return next;
+  if (!next || !next.startsWith('/')) return fallback;
+  // El parser de URL ignora tabs/saltos y trata "\" como "/": resolvemos y exigimos el mismo origen.
+  const base = 'http://helpjuy.invalid';
+  let url: URL;
+  try {
+    url = new URL(next, base);
+  } catch {
+    return fallback;
+  }
+  if (url.origin !== base) return fallback;
+  return url.pathname + url.search;
 }

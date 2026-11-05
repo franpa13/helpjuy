@@ -11,7 +11,7 @@ export default defineConfig({
     {
       command: 'pnpm --filter api db:deploy && pnpm --filter api start',
       url: 'http://localhost:4000/health',
-      env: { DATABASE_URL: TEST_DB, PORT: '4000', RESEND_API_KEY: '', NODE_ENV: 'test' },
+      env: { DATABASE_URL: TEST_DB, PORT: '4000', RESEND_API_KEY: '', NODE_ENV: 'test', PROXY_SECRET: 'e2e-secret' },
       reuseExistingServer: false,
       timeout: 120_000,
       cwd: '../..',
@@ -19,7 +19,7 @@ export default defineConfig({
     {
       command: 'pnpm dev',
       url: 'http://localhost:3000',
-      env: { API_URL: 'http://localhost:4000' },
+      env: { API_URL: 'http://localhost:4000', PROXY_SECRET: 'e2e-secret' },
       reuseExistingServer: false,
       timeout: 120_000,
     },

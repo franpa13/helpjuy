@@ -1,9 +1,9 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { hash, verify } from '@node-rs/argon2';
 import type { LoginInput, MeResponse, RegisterInput } from '@helpjuy/contracts';
 import { EmailTokenType, Prisma, type User } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
-import { Mailer } from '../mail/mailer.js';
+import { Mailer, type MailMessage } from '../mail/mailer.js';
 import { resetPasswordMessage, verifyEmailMessage } from './auth-emails.js';
 import { EmailTokenService } from './email-token.service.js';
 import { SessionService } from './session.service.js';
@@ -18,6 +18,8 @@ export function toMe(user: User): MeResponse {
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger('Auth');
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly sessions: SessionService,
@@ -52,7 +54,16 @@ export class AuthService {
 
   async sendVerification(user: User): Promise<void> {
     const token = await this.emailTokens.issue(user.id, EmailTokenType.VERIFY_EMAIL);
-    await this.mailer.send(verifyEmailMessage(user.email, token));
+    await this.sendSafely(verifyEmailMessage(user.email, token));
+  }
+
+  /** Un email caído no debe romper el registro ni revelar si una cuenta existe: se loguea y sigue. */
+  private async sendSafely(msg: MailMessage): Promise<void> {
+    try {
+      await this.mailer.send(msg);
+    } catch (err) {
+      this.logger.error(`No se pudo enviar "${msg.subject}": ${(err as Error).message}`);
+    }
   }
 
   async verifyEmail(token: string): Promise<void> {
@@ -65,7 +76,7 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({ where: { email } });
     if (!user) return;
     const token = await this.emailTokens.issue(user.id, EmailTokenType.RESET_PASSWORD);
-    await this.mailer.send(resetPasswordMessage(user.email, token));
+    await this.sendSafely(resetPasswordMessage(user.email, token));
   }
 
   async resetPassword(token: string, password: string): Promise<void> {
