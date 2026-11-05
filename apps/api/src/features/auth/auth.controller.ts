@@ -2,11 +2,17 @@ import { Body, Controller, Get, HttpCode, Post, Req, Res, UseGuards } from '@nes
 import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import {
+  forgotPasswordSchema,
   loginSchema,
   registerSchema,
+  resetPasswordSchema,
+  tokenSchema,
+  type ForgotPasswordInput,
   type LoginInput,
   type MeResponse,
   type RegisterInput,
+  type ResetPasswordInput,
+  type TokenInput,
 } from '@helpjuy/contracts';
 import type { User } from '../../generated/prisma/client.js';
 import { ZodValidationPipe } from '../../shared/zod-validation.pipe.js';
@@ -62,5 +68,31 @@ export class AuthController {
   @UseGuards(SessionGuard)
   me(@CurrentUser() user: User): MeResponse {
     return toMe(user);
+  }
+
+  @Post('verify-email')
+  @HttpCode(204)
+  async verifyEmail(@Body(new ZodValidationPipe(tokenSchema)) body: TokenInput): Promise<void> {
+    await this.auth.verifyEmail(body.token);
+  }
+
+  @Post('resend-verification')
+  @HttpCode(204)
+  @UseGuards(SessionGuard)
+  async resendVerification(@CurrentUser() user: User): Promise<void> {
+    if (user.emailVerifiedAt) return;
+    await this.auth.sendVerification(user);
+  }
+
+  @Post('forgot-password')
+  @HttpCode(204)
+  async forgotPassword(@Body(new ZodValidationPipe(forgotPasswordSchema)) body: ForgotPasswordInput): Promise<void> {
+    await this.auth.forgotPassword(body.email);
+  }
+
+  @Post('reset-password')
+  @HttpCode(204)
+  async resetPassword(@Body(new ZodValidationPipe(resetPasswordSchema)) body: ResetPasswordInput): Promise<void> {
+    await this.auth.resetPassword(body.token, body.password);
   }
 }

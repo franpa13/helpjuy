@@ -15,3 +15,15 @@ export const loginSchema = z.object({
 export type LoginInput = z.infer<typeof loginSchema>;
 
 export type MeResponse = { id: string; email: string; emailVerified: boolean };
+
+export const tokenSchema = z.object({ token: z.string().min(10).max(200) });
+export type TokenInput = z.infer<typeof tokenSchema>;
+
+export const forgotPasswordSchema = z.object({ email: emailSchema });
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  token: z.string().min(10).max(200),
+  password: z.string().min(8).max(128),
+});
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
