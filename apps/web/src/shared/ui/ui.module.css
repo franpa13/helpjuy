@@ -1,0 +1,95 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 18px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.danger {
+  background: var(--red);
+  border-color: var(--red);
+}
+
+.secondary {
+  background: transparent;
+  color: var(--ink);
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.input {
+  width: 100%;
+  min-height: 52px;
+  padding: 12px 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--red);
+  background: var(--red-tint);
+}
+
+.hint {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.error {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--red);
+}
+
+.section {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--white);
+}
+
+.alert {
+  padding: 12px 14px;
+  border-left: 8px solid var(--ink);
+  background: var(--white);
+  font-size: 16px;
+}
+
+.alert-error {
+  border-color: var(--red);
+  background: var(--red-tint);
+}
+
+.alert-warning {
+  border-color: var(--amber);
+  background: var(--amber-tint);
+}
+
+.alert-success {
+  border-color: var(--green);
+  background: var(--green-tint);
+}
