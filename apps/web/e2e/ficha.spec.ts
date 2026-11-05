@@ -4,7 +4,7 @@ test('cargar la ficha, verla como paramédico y ocultar una sección', async ({ 
   // Registro y alta de perfil
   await page.goto('/registro');
   await page.getByLabel('Email').fill(`ficha+${Date.now()}@mail.com`);
-  await page.getByLabel('Contraseña').fill('claveSegura1');
+  await page.getByLabel('Contraseña', { exact: true }).fill('claveSegura1');
   await page.getByRole('button', { name: 'Crear cuenta' }).click();
   await page.getByLabel('Nombre').fill('Lucía');
   await page.getByLabel('Apellido').fill('Mamani');
