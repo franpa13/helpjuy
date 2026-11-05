@@ -10,7 +10,7 @@ import type { User } from '../../generated/prisma/client.js';
 import { ZodValidationPipe } from '../../shared/zod-validation.pipe.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
 import { SessionGuard } from '../auth/session.guard.js';
-import { ProfilesService, toProfileDto } from './profiles.service.js';
+import { ProfilesService } from './profiles.service.js';
 
 @UseGuards(SessionGuard)
 @Controller('profiles')
@@ -19,7 +19,7 @@ export class ProfilesController {
 
   @Get()
   async list(@CurrentUser() user: User): Promise<ProfileDto[]> {
-    return (await this.profiles.list(user.id)).map(toProfileDto);
+    return (await this.profiles.list(user.id)).map((p) => this.profiles.toDto(p));
   }
 
   @Post()
@@ -27,12 +27,12 @@ export class ProfilesController {
     @CurrentUser() user: User,
     @Body(new ZodValidationPipe(createProfileSchema)) body: CreateProfileInput,
   ): Promise<ProfileDto> {
-    return toProfileDto(await this.profiles.create(user.id, body));
+    return this.profiles.toDto(await this.profiles.create(user.id, body));
   }
 
   @Get(':id')
   async get(@CurrentUser() user: User, @Param('id') id: string): Promise<ProfileDto> {
-    return toProfileDto(await this.profiles.getOwned(user.id, id));
+    return this.profiles.toDto(await this.profiles.getOwned(user.id, id));
   }
 
   @Patch(':id')
@@ -41,7 +41,7 @@ export class ProfilesController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateProfileSchema)) body: UpdateProfileInput,
   ): Promise<ProfileDto> {
-    return toProfileDto(await this.profiles.update(user.id, id, body));
+    return this.profiles.toDto(await this.profiles.update(user.id, id, body));
   }
 
   @Delete(':id')

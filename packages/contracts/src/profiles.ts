@@ -38,4 +38,8 @@ export type ProfileDto = {
   isMinor: boolean;
   publicToken: string;
   createdAt: string;
+  /** Porcentaje de la ficha completa (0–100). */
+  completion: number;
+  /** El QR está activo: tiene al menos un contacto de emergencia. */
+  active: boolean;
 };
