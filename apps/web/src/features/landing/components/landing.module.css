@@ -36,6 +36,7 @@
 }
 
 .navLinks .navCta {
+  white-space: nowrap;
   padding: 8px 14px;
   background: var(--white);
   color: var(--red);
@@ -65,6 +66,19 @@
     grid-template-columns: 1.15fr 1fr;
     gap: 40px;
   }
+}
+
+.wordMask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.06em;
+  margin-bottom: -0.06em;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
 }
 
 .heroTitle {
@@ -141,13 +155,19 @@
   aspect-ratio: 460 / 520;
 }
 
-.phone {
+.phoneFloat {
   position: absolute;
   top: 0;
   right: 0;
   width: 66%;
   height: 100%;
+}
+
+.phone {
+  width: 100%;
+  height: 100%;
   padding: 10px;
+  will-change: transform;
   border-radius: 34px;
   background: var(--ink);
   box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.55);
@@ -174,6 +194,58 @@
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.fBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.fWaiting {
+  flex: 1;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  color: var(--ink);
+  font-family: var(--font-head), "Arial Narrow", sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dots i {
+  width: 7px;
+  height: 7px;
+  background: var(--red);
+}
+
+.chip {
+  position: absolute;
+  top: -20px;
+  left: -6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px -10px rgb(0 0 0 / 0.6);
+}
+
+.chip svg {
+  color: #4ade80;
 }
 
 .fName {
@@ -281,16 +353,26 @@
   background: var(--ink);
 }
 
-.card {
+.cardPos {
   position: absolute;
   left: 0;
   bottom: 6%;
   width: 62%;
+  z-index: 2;
+}
+
+.cardFloat {
+  position: relative;
+}
+
+.card {
+  position: relative;
   background: var(--white);
   color: var(--ink);
   border: 3px solid var(--ink);
   border-radius: 8px;
   transform: rotate(-5deg);
+  will-change: transform;
   box-shadow: 0 24px 40px -24px rgb(0 0 0 / 0.6);
 }
 
@@ -327,7 +409,7 @@
   height: auto;
 }
 
-/* El único movimiento de la página: una pasada de "escaneo" sobre el QR al cargar. */
+/* Línea de escaneo: la anima Motion (HeroVisual). */
 .scanLine {
   position: absolute;
   left: 0;
@@ -337,28 +419,7 @@
   background: var(--red);
   box-shadow: 0 0 10px 2px rgb(200 16 46 / 0.6);
   opacity: 0;
-  animation: scan 1.6s ease-in-out 0.6s 2;
-}
-
-@keyframes scan {
-  0% {
-    top: 0;
-    opacity: 1;
-  }
-  50% {
-    top: calc(100% - 3px);
-    opacity: 1;
-  }
-  100% {
-    top: 0;
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scanLine {
-    animation: none;
-  }
+  pointer-events: none;
 }
 
 .cardData {
@@ -449,14 +510,19 @@
   }
 }
 
-.stepNum {
+.stepNumMask {
   display: block;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.stepNum {
+  display: inline-block;
   font-family: var(--font-head), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 88px;
   line-height: 0.8;
   color: var(--red);
-  margin-bottom: 16px;
 }
 
 .step p {
@@ -582,39 +648,37 @@
   border-top: 3px solid var(--ink);
 }
 
-.faq details {
+.faqItem {
   border-bottom: 1px solid var(--line);
 }
 
-.faq summary {
+.faqQ {
+  width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 16px;
   padding: 18px 0;
-  cursor: pointer;
-  list-style: none;
+  background: none;
+  border: 0;
+  color: inherit;
+  text-align: left;
+  font: inherit;
   font-weight: 700;
   font-size: 19px;
+  cursor: pointer;
 }
 
-.faq summary::-webkit-details-marker {
-  display: none;
-}
-
-.faq summary::after {
-  content: '+';
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+.faqIcon {
+  display: inline-block;
+  font-family: var(--font-head), "Arial Narrow", sans-serif;
   font-weight: 800;
-  font-size: 28px;
+  font-size: 32px;
   line-height: 0.8;
   color: var(--red);
 }
 
-.faq details[open] summary::after {
-  content: '−';
-}
-
-.faq details p {
+.faqA {
   padding: 0 0 20px;
   max-width: 40em;
 }
@@ -656,4 +720,28 @@
   font-weight: 800;
   font-size: 26px;
   text-transform: uppercase;
+}
+
+@media (max-width: 559px) {
+  .brand svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .brand > span > span {
+    font-size: 24px !important;
+  }
+
+  .navLinks {
+    gap: 12px;
+    font-size: 15px;
+  }
+
+  .navLinks .navCta {
+    padding: 7px 10px;
+  }
+
+  .cardPos {
+    bottom: -2%;
+  }
 }

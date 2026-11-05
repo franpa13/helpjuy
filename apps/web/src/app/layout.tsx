@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Atkinson_Hyperlegible, Barlow_Condensed } from 'next/font/google';
+import { MotionProvider } from '@/shared/motion/MotionProvider';
 import './globals.css';
 
 const body = Atkinson_Hyperlegible({
@@ -26,7 +27,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="es" className={`${body.variable} ${head.variable}`}>
-      <body>{children}</body>
+      <body>
+        <MotionProvider>{children}</MotionProvider>
+      </body>
     </html>
   );
 }

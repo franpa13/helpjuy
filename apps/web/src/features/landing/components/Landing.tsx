@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { Logo } from '@/shared/brand/Logo';
+import { Reveal, StaggerItem, StaggerList } from '@/shared/motion/Reveal';
+import { Faq } from './Faq';
+import { HeroText } from './HeroText';
 import { HeroVisual } from './HeroVisual';
+import { StepNumber } from './StepNumber';
 import styles from './landing.module.css';
 
 const STEPS = [
@@ -36,10 +40,19 @@ const PLACES = [
 
 const PRIVACY = [
   { title: 'Todo es opcional', text: 'Ningún dato es obligatorio. Cargás solo lo que te parezca útil.' },
-  { title: 'Vos elegís qué se ve', text: 'Cada dato se puede mostrar en el QR o dejar privado. Antes de imprimir ves exactamente lo que va a ver el paramédico.' },
+  {
+    title: 'Vos elegís qué se ve',
+    text: 'Cada dato se puede mostrar en el QR o dejar privado. Antes de imprimir ves exactamente lo que va a ver el paramédico.',
+  },
   { title: 'Sabés cuándo lo escanean', text: 'Cada escaneo queda registrado y te avisamos por email.' },
-  { title: 'Borrás todo cuando quieras', text: 'Descargás tus datos o eliminás la cuenta con un clic. Si perdés el casco, generás un QR nuevo y el viejo deja de funcionar.' },
-  { title: 'Cumple la ley', text: 'Los datos de salud son datos sensibles según la Ley 25.326. Te pedimos consentimiento claro y se guardan en servidores de la Unión Europea.' },
+  {
+    title: 'Borrás todo cuando quieras',
+    text: 'Descargás tus datos o eliminás la cuenta con un clic. Si perdés el casco, generás un QR nuevo y el viejo deja de funcionar.',
+  },
+  {
+    title: 'Cumple la ley',
+    text: 'Los datos de salud son datos sensibles según la Ley 25.326. Te pedimos consentimiento claro y se guardan en servidores de la Unión Europea.',
+  },
 ];
 
 const FAQ = [
@@ -87,38 +100,25 @@ export function Landing() {
       <main>
         <section className={styles.hero}>
           <div className={styles.heroInner}>
-            <div className={styles.heroText}>
-              <h1 className={styles.heroTitle}>Si no podés hablar, tu ficha habla por vos</h1>
-              <p className={styles.heroLead}>
-                Cargá tus alergias, tu medicación y a quién llamar. Imprimí tu QR y llevalo en la billetera o en el casco.
-                Si tenés un accidente, el paramédico lo escanea y sabe cómo ayudarte.
-              </p>
-              <div className={styles.heroCtas}>
-                <Link href="/registro" className={styles.ctaPrimary}>
-                  Crear mi ficha gratis
-                </Link>
-                <Link href="/ingresar" className={styles.ctaGhost}>
-                  Ya tengo cuenta
-                </Link>
-              </div>
-              <p className={styles.heroNote}>Es gratis, no hay que instalar nada y lo empezás en menos de 3 minutos.</p>
-            </div>
+            <HeroText />
             <HeroVisual />
           </div>
         </section>
 
         <section className={styles.section} aria-labelledby="como-funciona">
-          <h2 id="como-funciona" className={styles.h2}>
-            Cómo funciona
-          </h2>
+          <Reveal>
+            <h2 id="como-funciona" className={styles.h2}>
+              Cómo funciona
+            </h2>
+          </Reveal>
           <ol className={styles.steps}>
             {STEPS.map((s, i) => (
               <li key={s.title} className={styles.step}>
-                <span className={styles.stepNum} aria-hidden="true">
-                  {i + 1}
-                </span>
-                <h3 className={styles.h3}>{s.title}</h3>
-                <p>{s.text}</p>
+                <StepNumber n={i + 1} />
+                <Reveal delay={0.1 + i * 0.12} y={16}>
+                  <h3 className={styles.h3}>{s.title}</h3>
+                  <p>{s.text}</p>
+                </Reveal>
               </li>
             ))}
           </ol>
@@ -126,76 +126,83 @@ export function Landing() {
 
         <section className={`${styles.section} ${styles.sectionPaper}`} aria-labelledby="que-ve">
           <div className={styles.split}>
-            <div>
+            <Reveal>
               <h2 id="que-ve" className={styles.h2}>
                 Lo que ve el paramédico en los primeros segundos
               </h2>
               <p className={styles.sectionLead}>
-                Cuando alguien está inconsciente, el equipo de emergencia no puede preguntarle nada. Tu ficha contesta por vos, en el
-                orden en que lo necesitan.
+                Cuando alguien está inconsciente, el equipo de emergencia no puede preguntarle nada. Tu ficha contesta por
+                vos, en el orden en que lo necesitan.
               </p>
-            </div>
-            <dl className={styles.dataList}>
+            </Reveal>
+            <StaggerList as="dl" className={styles.dataList}>
               {DATA.map((d) => (
-                <div key={d.name} className={styles.dataRow}>
+                <StaggerItem key={d.name} className={styles.dataRow} from={{ x: 24 }}>
                   <dt>{d.name}</dt>
                   <dd>{d.why}</dd>
-                </div>
+                </StaggerItem>
               ))}
-            </dl>
+            </StaggerList>
           </div>
         </section>
 
         <section className={styles.section} aria-labelledby="donde">
-          <h2 id="donde" className={styles.h2}>
-            Llevalo donde estés
-          </h2>
-          <p className={styles.sectionLead}>No hace falta tener auto ni moto. Un accidente le puede pasar a cualquiera, también caminando.</p>
-          <ul className={styles.places}>
+          <Reveal>
+            <h2 id="donde" className={styles.h2}>
+              Llevalo donde estés
+            </h2>
+            <p className={styles.sectionLead}>
+              No hace falta tener auto ni moto. Un accidente le puede pasar a cualquiera, también caminando.
+            </p>
+          </Reveal>
+          <StaggerList as="ul" className={styles.places}>
             {PLACES.map((p) => (
-              <li key={p.name}>
+              <StaggerItem as="li" key={p.name}>
                 <h3 className={styles.h3}>{p.name}</h3>
                 <p>{p.text}</p>
-              </li>
+              </StaggerItem>
             ))}
-          </ul>
+          </StaggerList>
         </section>
 
         <section className={styles.privacy} aria-labelledby="privacidad">
           <div className={styles.privacyInner}>
-            <h2 id="privacidad" className={styles.h2}>
-              Tus datos son tuyos
-            </h2>
-            <ul className={styles.privacyList}>
+            <Reveal>
+              <h2 id="privacidad" className={styles.h2}>
+                Tus datos son tuyos
+              </h2>
+            </Reveal>
+            <StaggerList as="ul" className={styles.privacyList}>
               {PRIVACY.map((p) => (
-                <li key={p.title}>
+                <StaggerItem as="li" key={p.title} from={{ x: -18 }}>
                   <h3 className={styles.h3}>{p.title}</h3>
                   <p>{p.text}</p>
-                </li>
+                </StaggerItem>
               ))}
-            </ul>
+            </StaggerList>
           </div>
         </section>
 
         <section className={styles.section} aria-labelledby="preguntas">
-          <h2 id="preguntas" className={styles.h2}>
-            Preguntas frecuentes
-          </h2>
-          <div className={styles.faq}>
-            {FAQ.map((f) => (
-              <details key={f.q}>
-                <summary>{f.q}</summary>
-                <p>{f.a}</p>
-              </details>
-            ))}
-          </div>
+          <Reveal>
+            <h2 id="preguntas" className={styles.h2}>
+              Preguntas frecuentes
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <Faq items={FAQ} />
+          </Reveal>
         </section>
 
         <section className={styles.final}>
-          <h2 className={styles.finalTitle}>Hacé tu ficha hoy. Ojalá nunca la necesites.</h2>
-          <Link href="/registro" className={styles.ctaPrimary}>
-            Crear mi ficha gratis
-          </Link>
+          <Reveal>
+            <h2 className={styles.finalTitle}>Hacé tu ficha hoy. Ojalá nunca la necesites.</h2>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <Link href="/registro" className={styles.ctaPrimary}>
+              Crear mi ficha gratis
+            </Link>
+          </Reveal>
         </section>
       </main>
 
@@ -203,9 +210,7 @@ export function Landing() {
         <p className={styles.footerSos}>
           En una emergencia llamá al <a href="tel:107">107</a> (SAME Jujuy).
         </p>
-        <p>
-          HelpJuy no reemplaza la atención médica. Los datos los carga cada persona y no los verifica un médico.
-        </p>
+        <p>HelpJuy no reemplaza la atención médica. Los datos los carga cada persona y no los verifica un médico.</p>
         <p>Hecho en Jujuy, Argentina.</p>
       </footer>
     </>

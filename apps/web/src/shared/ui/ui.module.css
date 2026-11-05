@@ -19,6 +19,14 @@
   cursor: pointer;
 }
 
+.button {
+  transition: transform 0.12s ease, opacity 0.2s ease;
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
 .button:disabled {
   opacity: 0.45;
   cursor: not-allowed;

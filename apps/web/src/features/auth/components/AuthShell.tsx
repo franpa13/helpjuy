@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Logo } from '@/shared/brand/Logo';
+import { FadeIn } from '@/shared/motion/FadeIn';
 
 export function AppStrip({ right }: { right?: ReactNode }) {
   return (
@@ -18,11 +19,13 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
     <>
       <AppStrip />
       <main className="page">
+        <FadeIn>
         <div className="page-title">
           <h1>{title}</h1>
           {subtitle && <p>{subtitle}</p>}
         </div>
         {children}
+      </FadeIn>
       </main>
     </>
   );
