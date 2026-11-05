@@ -22,4 +22,11 @@ describe('Landing', () => {
     // Aparece en la franja de datos clave y en la sección de privacidad.
     expect(screen.getAllByText(/Ley 25\.326/)).toHaveLength(2);
   });
+
+  it("muestra los objetos que la gente lleva o tiene", () => {
+    render(<Landing />);
+    for (const name of ["Billetera", "Celular", "Llavero", "Moto y casco", "Auto", "Heladera"]) {
+      expect(screen.getByRole("heading", { name })).toBeInTheDocument();
+    }
+  });
 });

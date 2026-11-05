@@ -1,14 +1,15 @@
 import {
-  Bike,
   BellRing,
   ClipboardPen,
   Droplet,
   Eye,
   Gift,
-  HardHat,
   HeartPulse,
+  KeyRound,
+  CarFront,
   Landmark,
   ListChecks,
+  Motorbike,
   PhoneCall,
   Pill,
   Printer,
@@ -19,7 +20,7 @@ import {
   Smartphone,
   Trash,
   TriangleExclamationPoint,
-  Wallet,
+  WalletCards,
   WifiOff,
   type LucideIcon,
 } from 'lucide-react';
@@ -60,10 +61,36 @@ const DATA = [
 ];
 
 const PLACES = [
-  { icon: Wallet, name: 'Billetera', text: 'Una tarjeta del tamaño de una de crédito. Es lo primero que se revisa para identificarte.' },
-  { icon: HardHat, name: 'Casco', text: 'Un sticker con tus datos más importantes impresos, por si no hay señal en la ruta.' },
-  { icon: Bike, name: 'Moto, auto o bici', text: 'En el tablero, el parabrisas o el cuadro. Sirve también si sos peatón y la llevás encima.' },
-  { icon: Refrigerator, name: 'Heladera', text: 'Para adultos mayores en casa: los equipos de emergencia saben buscar ahí.' },
+  {
+    icon: WalletCards,
+    name: 'Billetera',
+    text: 'Una tarjeta del tamaño de una de crédito, al lado del DNI. Es lo primero que se revisa para identificarte.',
+  },
+  {
+    icon: Smartphone,
+    name: 'Celular',
+    text: 'Un sticker atrás, debajo de la funda. Es lo que casi todos llevamos siempre encima.',
+  },
+  {
+    icon: KeyRound,
+    name: 'Llavero',
+    text: 'Una tarjetita plastificada colgada de las llaves, para salir sin pensar en nada más.',
+  },
+  {
+    icon: Motorbike,
+    name: 'Moto y casco',
+    text: 'Un sticker en el casco y otro en la moto, con tus datos clave impresos por si no hay señal en la ruta.',
+  },
+  {
+    icon: CarFront,
+    name: 'Auto',
+    text: 'En el parasol o la guantera del lado del conductor, donde un rescatista mira primero.',
+  },
+  {
+    icon: Refrigerator,
+    name: 'Heladera',
+    text: 'Para adultos mayores en casa: los equipos de emergencia saben buscar ahí.',
+  },
 ];
 
 const PRIVACY = [
