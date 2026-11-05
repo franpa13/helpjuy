@@ -64,9 +64,22 @@ describe('FamilyGroups', () => {
 
   it('"Probar aviso" muestra a cuántas personas les llegó', async () => {
     const user = userEvent.setup();
-    vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(201, { notified: 2 }));
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(201, { notified: 2, family: 1 }));
     render(<FamilyGroups initial={[group()]} />);
     await user.click(screen.getByRole('button', { name: 'Probar aviso' }));
     expect(await screen.findByText('Mandamos un aviso de prueba a 2 personas. Revisen su email.')).toBeInTheDocument();
+  });
+
+  it('si ya mandó una prueba hace poco, explica que espere', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(429, { error: 'test_alert_cooldown' }));
+    render(<FamilyGroups initial={[group()]} />);
+    await user.click(screen.getByRole('button', { name: 'Probar aviso' }));
+    expect(await screen.findByText('Ya mandaste una prueba hace poco. Esperá unos minutos para mandar otra.')).toBeInTheDocument();
+  });
+
+  it('sin email confirmado avisa que no le van a llegar los avisos', () => {
+    render(<FamilyGroups initial={[group()]} emailVerified={false} />);
+    expect(screen.getByText(/Confirmá tu email para recibir los avisos/)).toBeInTheDocument();
   });
 });

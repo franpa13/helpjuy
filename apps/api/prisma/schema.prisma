@@ -105,9 +105,10 @@ enum FamilyRole {
 
 /// Grupo familiar: cuentas conectadas para recibir avisos. No da acceso a datos médicos.
 model FamilyGroup {
-  id        String         @id @default(uuid())
-  name      String
-  createdAt DateTime       @default(now())
+  id              String         @id @default(uuid())
+  name            String
+  createdAt       DateTime       @default(now())
+  lastTestAlertAt DateTime?
   members   FamilyMember[]
   invites   FamilyInvite[]
 }
@@ -145,8 +146,9 @@ model EmergencyAlert {
   createdAt  DateTime @default(now())
   lat        Float?
   lng        Float?
-  notified   Int      @default(0)
-  suppressed Boolean  @default(false)
+  notified       Int      @default(0)
+  familyNotified Int      @default(0)
+  suppressed     Boolean  @default(false)
   test       Boolean  @default(false)
 
   @@index([profileId, createdAt])

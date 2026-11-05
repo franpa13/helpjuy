@@ -9,7 +9,7 @@ describe('EmergencyActions', () => {
     const user = userEvent.setup();
     const fetchSpy = vi
       .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(new Response(JSON.stringify({ notified: 2 }), { status: 201, headers: { 'Content-Type': 'application/json' } }));
+      .mockResolvedValue(new Response(JSON.stringify({ notified: 3, family: 2 }), { status: 201, headers: { 'Content-Type': 'application/json' } }));
     render(<EmergencyActions token={T} firstName="Lucía" lastName="Mamani" />);
     await user.click(screen.getByRole('button', { name: 'Es una emergencia: avisar a la familia' }));
     expect(fetchSpy).not.toHaveBeenCalled();
@@ -17,6 +17,19 @@ describe('EmergencyActions', () => {
     await user.click(screen.getByRole('button', { name: 'Sí, avisar a la familia de Lucía' }));
     expect(await screen.findByText('Avisamos a 2 personas de la familia de Lucía.')).toBeInTheDocument();
     expect(fetchSpy.mock.calls[0][0]).toBe(`/api/public/cards/${T}/emergency`);
+  });
+
+  it('si la persona no tiene familia en HelpJuy, no dice que avisó a la familia', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(JSON.stringify({ notified: 1, family: 0 }), { status: 201, headers: { 'Content-Type': 'application/json' } }),
+    );
+    render(<EmergencyActions token={T} firstName="Lucía" lastName="Mamani" />);
+    await user.click(screen.getByRole('button', { name: 'Es una emergencia: avisar a la familia' }));
+    await user.click(screen.getByRole('checkbox', { name: /Compartir mi ubicación/ }));
+    await user.click(screen.getByRole('button', { name: 'Sí, avisar a la familia de Lucía' }));
+    expect(await screen.findByText('Lucía no tiene familia registrada en HelpJuy. Le avisamos solo a Lucía por email.')).toBeInTheDocument();
+    expect(screen.getByText(/Llamá al 107 y, si podés, al contacto/)).toBeInTheDocument();
   });
 
   it('se puede cancelar', async () => {
@@ -35,6 +48,7 @@ describe('EmergencyActions', () => {
     await user.click(screen.getByRole('checkbox', { name: /Compartir mi ubicación/ }));
     await user.click(screen.getByRole('button', { name: 'Sí, avisar a la familia de Lucía' }));
     expect(await screen.findByText(/No pudimos avisar.*107/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reintentar' })).toBeInTheDocument();
   });
 
   it('WhatsApp al contacto con número argentino y mensaje armado', () => {

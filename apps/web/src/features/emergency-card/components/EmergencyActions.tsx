@@ -34,14 +34,14 @@ type Props = { token: string; firstName: string; lastName: string; contact?: { n
 export function EmergencyActions({ token, firstName, lastName, contact }: Props) {
   const [step, setStep] = useState<'idle' | 'confirm' | 'sending' | 'done' | 'error'>('idle');
   const [shareLocation, setShareLocation] = useState(true);
-  const [notified, setNotified] = useState(0);
+  const [result, setResult] = useState<EmergencyAlertResultDto>({ notified: 0, family: 0 });
 
   async function send() {
     setStep('sending');
     try {
       const pos = shareLocation ? await getPosition() : null;
       const r = await postJson<EmergencyAlertResultDto>(`/public/cards/${token}/emergency`, pos ?? {});
-      setNotified(r.notified);
+      setResult(r);
       setStep('done');
     } catch {
       setStep('error');
@@ -82,18 +82,23 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
       {step === 'done' && (
         <p className={styles.doneMsg} role="status">
           <strong>
-            {notified > 0
-              ? `Avisamos a ${notified} ${notified === 1 ? 'persona' : 'personas'} de la familia de ${firstName}.`
-              : `Avisamos a la familia de ${firstName}.`}
+            {result.family > 0
+              ? `Avisamos a ${result.family} ${result.family === 1 ? 'persona' : 'personas'} de la familia de ${firstName}.`
+              : result.notified > 0
+                ? `${firstName} no tiene familia registrada en HelpJuy. Le avisamos solo a ${firstName} por email.`
+                : `No hay a quién avisar por HelpJuy.`}
           </strong>{' '}
-          Si es grave, llamá al 107 ahora.
+          {result.family > 0 ? 'Si es grave, llamá al 107 ahora.' : 'Llamá al 107 y, si podés, al contacto de emergencia.'}
         </p>
       )}
 
       {step === 'error' && (
-        <p className={styles.errorMsg} role="alert">
-          No pudimos avisar (puede ser la señal). Llamá al 107 y, si podés, al contacto de emergencia.
-        </p>
+        <div className={styles.errorMsg} role="alert">
+          <p>No pudimos avisar (puede ser la señal). Llamá al 107 y, si podés, al contacto de emergencia.</p>
+          <button type="button" className={styles.cancelBtn} style={{ marginTop: 10 }} onClick={send}>
+            Reintentar
+          </button>
+        </div>
       )}
 
       {contact && (

@@ -21,10 +21,13 @@ const groupInclude = {
 type GroupWithMembers = Prisma.FamilyGroupGetPayload<{ include: typeof groupInclude }>;
 type UserLite = { email: string; profiles: { firstName: string; lastName: string; relationship: string }[] };
 
-/** El nombre que ven los demás: el de su propia ficha ("Yo"); si no tiene, la parte local del email. */
+/**
+ * El nombre que ven los demás: solo el de su propia ficha ("Yo"). Nunca el de un hijo a cargo
+ * ni el email, que son datos que la persona no eligió compartir con el grupo.
+ */
 export function displayName(user: UserLite): string {
-  const self = user.profiles.find((p) => p.relationship === 'SELF') ?? user.profiles[0];
-  return self ? `${self.firstName} ${self.lastName}` : user.email.split('@')[0];
+  const self = user.profiles.find((p) => p.relationship === 'SELF');
+  return self ? `${self.firstName} ${self.lastName}` : 'Miembro sin ficha propia';
 }
 
 @Injectable()
@@ -145,6 +148,9 @@ export class FamilyService {
 
   async accept(userId: string, token: string): Promise<FamilyGroupDto> {
     const invite = await this.validInvite(token);
+    // Si ya es miembro (por ejemplo, tocó el link que se mandó a un grupo de WhatsApp), no gastamos la invitación.
+    const already = await this.prisma.familyMember.findUnique({ where: { groupId_userId: { groupId: invite.groupId, userId } } });
+    if (already) return this.get(userId, invite.groupId);
     await this.prisma.$transaction(async (tx) => {
       // updateMany con usedAt: null: dos aceptaciones simultáneas no pasan las dos.
       const { count } = await tx.familyInvite.updateMany({

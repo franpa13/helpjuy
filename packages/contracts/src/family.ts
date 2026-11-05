@@ -1,6 +1,12 @@
 import { z } from 'zod';
 
-export const familyGroupNameSchema = z.object({ name: z.string().trim().min(1).max(60) });
+// Sin caracteres de control: el nombre va en asuntos de email y mensajes.
+export const familyGroupNameSchema = z.object({
+  name: z
+    .string()
+    .transform((s) => s.replace(/[\u0000-\u001f\u007f]/g, ' ').trim())
+    .pipe(z.string().min(1).max(60)),
+});
 export type FamilyGroupNameInput = z.infer<typeof familyGroupNameSchema>;
 
 export const familyMuteSchema = z.object({ muted: z.boolean() });
@@ -27,4 +33,5 @@ export type FamilyGroupDto = {
 export type FamilyInviteDto = { id: string; invitedByName: string; createdAt: string; expiresAt: string };
 export type CreatedInviteDto = { url: string; expiresAt: string };
 export type InvitePreviewDto = { groupName: string; inviterName: string; memberCount: number };
-export type EmergencyAlertResultDto = { notified: number };
+/** notified: emails enviados. family: cuántos fueron a familiares (sin contar al dueño de la ficha). */
+export type EmergencyAlertResultDto = { notified: number; family: number };

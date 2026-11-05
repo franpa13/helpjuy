@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { verifyEmail } from './helpers/db';
 
 async function register(page: Page, email: string) {
   await page.getByLabel('Email').fill(email);
@@ -12,6 +13,8 @@ test('grupo familiar: invitar por link, unirse y recibir el aviso de emergencia'
   // A: cuenta, ficha con contacto (QR activo)
   await page.goto('/registro');
   await register(page, `fam-a+${stamp}@mail.com`);
+  await expect(page).toHaveURL(/\/panel\/perfiles\/nuevo/);
+  await verifyEmail(`fam-a+${stamp}@mail.com`);
   await page.getByLabel('Nombre').fill('Francisco');
   await page.getByLabel('Apellido').fill('Paredes');
   await page.getByRole('button', { name: 'Seguir' }).click();
@@ -44,6 +47,7 @@ test('grupo familiar: invitar por link, unirse y recibir el aviso de emergencia'
   await b.getByRole('link', { name: 'Crear mi cuenta y unirme' }).click();
   await register(b, `fam-b+${stamp}@mail.com`);
   await expect(b).toHaveURL(/\/unirme\//);
+  await verifyEmail(`fam-b+${stamp}@mail.com`);
   await b.getByRole('button', { name: 'Unirme a Familia Paredes' }).click();
   await expect(b).toHaveURL(/\/panel\/familia$/);
   await expect(b.getByRole('list', { name: 'Miembros de Familia Paredes' }).getByRole('listitem')).toHaveCount(2);
@@ -54,6 +58,6 @@ test('grupo familiar: invitar por link, unirse y recibir el aviso de emergencia'
   await visitor.getByRole('button', { name: 'Es una emergencia: avisar a la familia' }).click();
   await visitor.getByRole('checkbox', { name: /Compartir mi ubicación/ }).uncheck();
   await visitor.getByRole('button', { name: 'Sí, avisar a la familia de Francisco' }).click();
-  await expect(visitor.getByText('Avisamos a 2 personas de la familia de Francisco.')).toBeVisible();
+  await expect(visitor.getByText('Avisamos a 1 persona de la familia de Francisco.')).toBeVisible();
   await expect(visitor.getByRole('link', { name: 'Avisar por WhatsApp a Ana' })).toHaveAttribute('href', /wa\.me\/5493884123456/);
 });

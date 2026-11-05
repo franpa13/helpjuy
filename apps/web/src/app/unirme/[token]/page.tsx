@@ -3,15 +3,25 @@ import { BellRing, EyeOff, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import { AuthShell } from '@/features/auth/components/AuthShell';
 import { AcceptInvite } from '@/features/family/components/AcceptInvite';
+import { headers } from 'next/headers';
+import { clientIpHeaders } from '@/shared/api/client-ip';
 import { apiServer } from '@/shared/api/server';
 import { Alert } from '@/shared/ui/Alert';
 import { buttonClass } from '@/shared/ui/Button';
 
 export const metadata = { title: 'Invitación a un grupo familiar — HelpJuy', robots: { index: false, follow: false } };
 
-async function getPreview(token: string): Promise<InvitePreviewDto | null> {
-  const res = await fetch(`${process.env.API_URL}/family-invites/${encodeURIComponent(token)}`, { cache: 'no-store' });
-  return res.ok ? ((await res.json()) as InvitePreviewDto) : null;
+async function getPreview(token: string): Promise<InvitePreviewDto | 'invalid' | 'error'> {
+  try {
+    const res = await fetch(`${process.env.API_URL}/family-invites/${encodeURIComponent(token)}`, {
+      cache: 'no-store',
+      headers: clientIpHeaders(await headers()),
+    });
+    if (res.status === 400 || res.status === 404) return 'invalid';
+    return res.ok ? ((await res.json()) as InvitePreviewDto) : 'error';
+  } catch {
+    return 'error';
+  }
 }
 
 export default async function UnirmePage({ params }: PageProps<'/unirme/[token]'>) {
@@ -19,7 +29,14 @@ export default async function UnirmePage({ params }: PageProps<'/unirme/[token]'
   const [preview, me] = await Promise.all([getPreview(token), apiServer('/auth/me')]);
   const next = `/unirme/${token}`;
 
-  if (!preview) {
+  if (preview === 'error') {
+    return (
+      <AuthShell variant="recover" title="No pudimos abrir la invitación">
+        <Alert tone="warning">Puede ser la conexión. Esperá un momento y volvé a abrir el link.</Alert>
+      </AuthShell>
+    );
+  }
+  if (preview === 'invalid') {
     return (
       <AuthShell variant="recover" title="Esta invitación no sirve">
         <Alert tone="error">La invitación venció, se canceló o ya se usó. Pedile a quien te invitó un link nuevo.</Alert>

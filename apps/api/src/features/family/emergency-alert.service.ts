@@ -1,14 +1,18 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { HttpException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import type { EmergencyAlertInput, EmergencyAlertResultDto } from '@helpjuy/contracts';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { Mailer, type MailMessage } from '../mail/mailer.js';
 import { FamilyService } from './family.service.js';
 
 const DEDUPE_WINDOW_MS = 10 * 60 * 1000;
+const TEST_COOLDOWN_MS = 10 * 60 * 1000;
+const LOCATION_RETENTION_MS = 30 * 24 * 60 * 60 * 1000;
 const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
 const timeInJujuy = (d: Date) =>
   new Intl.DateTimeFormat('es-AR', { timeZone: 'America/Argentina/Jujuy', hour: '2-digit', minute: '2-digit' }).format(d);
+
+type Recipient = { id: string; email: string };
 
 @Injectable()
 export class EmergencyAlertService {
@@ -20,64 +24,117 @@ export class EmergencyAlertService {
     private readonly family: FamilyService,
   ) {}
 
-  /** Dueño de la ficha + miembros no silenciados de todos sus grupos, sin repetir personas. */
-  async recipients(ownerId: string): Promise<string[]> {
+  /**
+   * Dueño de la ficha + miembros no silenciados de todos sus grupos, sin repetir personas.
+   * Solo emails verificados: así nadie puede usar los avisos para mandarle emails a una dirección ajena.
+   */
+  async recipients(ownerId: string): Promise<{ owner: Recipient | null; family: Recipient[] }> {
     const members = await this.prisma.familyMember.findMany({
-      where: { muted: false, group: { members: { some: { userId: ownerId } } } },
+      where: {
+        muted: false,
+        userId: { not: ownerId },
+        user: { emailVerifiedAt: { not: null } },
+        group: { members: { some: { userId: ownerId } } },
+      },
       select: { user: { select: { id: true, email: true } } },
     });
-    const owner = await this.prisma.user.findUniqueOrThrow({ where: { id: ownerId }, select: { id: true, email: true } });
-    const byId = new Map([[owner.id, owner.email]]);
-    for (const m of members) byId.set(m.user.id, m.user.email);
-    return [...byId.values()];
+    const owner = await this.prisma.user.findFirst({
+      where: { id: ownerId, emailVerifiedAt: { not: null } },
+      select: { id: true, email: true },
+    });
+    const family = [...new Map(members.map((m) => [m.user.id, m.user])).values()];
+    return { owner, family };
   }
 
   async trigger(publicToken: string, input: EmergencyAlertInput): Promise<EmergencyAlertResultDto> {
+    await this.forgetOldLocations();
     const profile = await this.prisma.profile.findUnique({ where: { publicToken } });
     if (!profile) throw new NotFoundException({ error: 'not_found' });
 
-    const lat = input.lat !== undefined && input.lng !== undefined ? round3(input.lat) : null;
-    const lng = input.lat !== undefined && input.lng !== undefined ? round3(input.lng) : null;
+    const hasLocation = input.lat !== undefined && input.lng !== undefined;
+    const lat = hasLocation ? round3(input.lat!) : null;
+    const lng = hasLocation ? round3(input.lng!) : null;
 
-    // Un aviso cada 10 minutos por persona: un doble toque o una broma no llena de emails a la familia.
-    const recent = await this.prisma.emergencyAlert.findFirst({
-      where: { profileId: profile.id, suppressed: false, test: false, createdAt: { gt: new Date(Date.now() - DEDUPE_WINDOW_MS) } },
-      orderBy: { createdAt: 'desc' },
-    });
-    if (recent) {
-      await this.prisma.emergencyAlert.create({
-        data: { profileId: profile.id, lat, lng, notified: recent.notified, suppressed: true },
+    // Bajo un lock por perfil: dos toques simultáneos no pueden mandar dos tandas de emails.
+    // La fila se reserva ANTES de enviar, así el segundo pedido la ve y queda suprimido.
+    const reserved = await this.prisma.$transaction(async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${profile.id}))`;
+      const recent = await tx.emergencyAlert.findFirst({
+        where: {
+          profileId: profile.id,
+          suppressed: false,
+          test: false,
+          createdAt: { gt: new Date(Date.now() - DEDUPE_WINDOW_MS) },
+        },
+        orderBy: { createdAt: 'desc' },
       });
-      return { notified: recent.notified };
+      if (recent) {
+        await tx.emergencyAlert.create({
+          data: { profileId: profile.id, lat, lng, notified: recent.notified, familyNotified: recent.familyNotified, suppressed: true },
+        });
+        return { recent };
+      }
+      return { alert: await tx.emergencyAlert.create({ data: { profileId: profile.id, lat, lng } }) };
+    });
+    if ('recent' in reserved && reserved.recent) {
+      return { notified: reserved.recent.notified, family: reserved.recent.familyNotified };
     }
+    const alert = reserved.alert!;
 
-    const to = await this.recipients(profile.ownerId);
+    const { owner, family } = await this.recipients(profile.ownerId);
     const name = `${profile.firstName} ${profile.lastName}`;
-    const now = new Date();
-    await Promise.all(to.map((email) => this.sendSafely(this.alertMessage(email, name, profile.firstName, now, lat, lng))));
-    await this.prisma.emergencyAlert.create({ data: { profileId: profile.id, lat, lng, notified: to.length } });
-    return { notified: to.length };
+    const at = new Date();
+    const send = (r: Recipient) => this.sendSafely(this.alertMessage(r.email, name, profile.firstName, at, lat, lng));
+    const [ownerOk, ...familyOk] = await Promise.all([owner ? send(owner) : Promise.resolve(false), ...family.map(send)]);
+    const familySent = familyOk.filter(Boolean).length;
+    const notified = familySent + (ownerOk ? 1 : 0);
+    const attempted = family.length + (owner ? 1 : 0);
+
+    if (attempted > 0 && notified === 0) {
+      // No salió ningún email: no cuenta para la espera de 10 minutos, así se puede reintentar.
+      await this.prisma.emergencyAlert.delete({ where: { id: alert.id } });
+      throw new ServiceUnavailableException({ error: 'send_failed' });
+    }
+    await this.prisma.emergencyAlert.update({ where: { id: alert.id }, data: { notified, familyNotified: familySent } });
+    return { notified, family: familySent };
   }
 
-  /** "Probar aviso": para que la familia sepa que funciona antes de que haga falta. */
+  /** "Probar aviso": para que la familia sepa que funciona antes de que haga falta. Una vez cada 10 minutos por grupo. */
   async test(adminId: string, groupId: string): Promise<EmergencyAlertResultDto> {
     const group = await this.family.requireAdmin(adminId, groupId);
+    const since = new Date(Date.now() - TEST_COOLDOWN_MS);
+    const { count } = await this.prisma.familyGroup.updateMany({
+      where: { id: groupId, OR: [{ lastTestAlertAt: null }, { lastTestAlertAt: { lt: since } }] },
+      data: { lastTestAlertAt: new Date() },
+    });
+    if (count === 0) throw new HttpException({ error: 'test_alert_cooldown' }, 429);
+
     const members = await this.prisma.familyMember.findMany({
-      where: { groupId, muted: false },
-      select: { user: { select: { email: true } } },
+      where: { groupId, muted: false, user: { emailVerifiedAt: { not: null } } },
+      select: { userId: true, user: { select: { email: true } } },
     });
     const web = process.env.WEB_URL ?? 'http://localhost:3000';
-    await Promise.all(
-      members.map(({ user }) =>
-        this.sendSafely({
+    const results = await Promise.all(
+      members.map(async ({ userId, user }) => ({
+        self: userId === adminId,
+        ok: await this.sendSafely({
           to: user.email,
           subject: `[PRUEBA] Aviso de emergencia de ${group.name}`,
           text: `Esto es una prueba, no pasó nada.\n\nSi alguien escanea el QR de un miembro de "${group.name}" y marca una emergencia, te va a llegar un email como este.\n\nPodés silenciar el grupo desde ${web}/panel/familia.`,
           html: `<p><strong>Esto es una prueba, no pasó nada.</strong></p><p>Si alguien escanea el QR de un miembro de "${escape(group.name)}" y marca una emergencia, te va a llegar un email como este.</p>`,
         }),
-      ),
+      })),
     );
-    return { notified: members.length };
+    const sent = results.filter((r) => r.ok);
+    return { notified: sent.length, family: sent.filter((r) => !r.self).length };
+  }
+
+  /** Spec: la ubicación se guarda aproximada y se borra a los 30 días. */
+  private async forgetOldLocations(): Promise<void> {
+    await this.prisma.emergencyAlert.updateMany({
+      where: { createdAt: { lt: new Date(Date.now() - LOCATION_RETENTION_MS) }, OR: [{ lat: { not: null } }, { lng: { not: null } }] },
+      data: { lat: null, lng: null },
+    });
   }
 
   private alertMessage(to: string, name: string, firstName: string, at: Date, lat: number | null, lng: number | null): MailMessage {
@@ -102,11 +159,14 @@ export class EmergencyAlertService {
     return { to, subject: `Posible emergencia: ${name}`, text, html };
   }
 
-  private async sendSafely(msg: MailMessage): Promise<void> {
+  /** true si se envió. No loguea la dirección (dato personal). */
+  private async sendSafely(msg: MailMessage): Promise<boolean> {
     try {
       await this.mailer.send(msg);
+      return true;
     } catch (err) {
-      this.logger.error(`No se pudo enviar el aviso a ${msg.to}: ${(err as Error).message}`);
+      this.logger.error(`No se pudo enviar un aviso: ${(err as Error).message}`);
+      return false;
     }
   }
 }

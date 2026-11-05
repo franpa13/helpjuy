@@ -1,4 +1,4 @@
-import type { FamilyGroupDto } from '@helpjuy/contracts';
+import type { FamilyGroupDto, MeResponse } from '@helpjuy/contracts';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { LogoutButton } from '@/features/auth/components/AccountActions';
@@ -9,7 +9,7 @@ import { apiServer } from '@/shared/api/server';
 export const metadata = { title: 'Familia — HelpJuy' };
 
 export default async function FamiliaPage() {
-  const me = await apiServer('/auth/me');
+  const me = await apiServer<MeResponse>('/auth/me');
   if (!me) redirect('/ingresar?next=/panel/familia');
   const groups = (await apiServer<FamilyGroupDto[]>('/family-groups')) ?? [];
 
@@ -27,7 +27,7 @@ export default async function FamiliaPage() {
             Nadie ve los datos médicos de los demás.
           </p>
         </div>
-        <FamilyGroups initial={groups} />
+        <FamilyGroups initial={groups} emailVerified={me.emailVerified} />
       </main>
     </>
   );

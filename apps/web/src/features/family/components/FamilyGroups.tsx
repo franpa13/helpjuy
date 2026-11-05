@@ -66,7 +66,15 @@ function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChang
   const [copied, setCopied] = useState(false);
 
   const fail = (err: unknown) =>
-    setNotice({ tone: 'error', text: err instanceof ApiError && err.status === 403 ? 'Solo quien administra el grupo puede hacer eso.' : 'Algo salió mal. Probá de nuevo.' });
+    setNotice({
+      tone: 'error',
+      text:
+        err instanceof ApiError && err.code === 'test_alert_cooldown'
+          ? 'Ya mandaste una prueba hace poco. Esperá unos minutos para mandar otra.'
+          : err instanceof ApiError && err.status === 403
+            ? 'Solo quien administra el grupo puede hacer eso.'
+            : 'Algo salió mal. Probá de nuevo.',
+    });
 
   async function createInvite() {
     try {
@@ -106,7 +114,13 @@ function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChang
   async function testAlert() {
     try {
       const r = await postJson<EmergencyAlertResultDto>(`/family-groups/${group.id}/test-alert`);
-      setNotice({ tone: 'success', text: `Mandamos un aviso de prueba a ${r.notified} ${r.notified === 1 ? 'persona' : 'personas'}. Revisen su email.` });
+      setNotice({
+        tone: 'success',
+        text:
+          r.notified === 0
+            ? 'No se mandó ninguna prueba: nadie del grupo tiene el email confirmado todavía.'
+            : `Mandamos un aviso de prueba a ${r.notified} ${r.notified === 1 ? 'persona' : 'personas'}. Revisen su email.`,
+      });
     } catch (err) {
       fail(err);
     }
@@ -227,12 +241,17 @@ function GroupCard({ group, onChange, onGone }: { group: FamilyGroupDto; onChang
   );
 }
 
-export function FamilyGroups({ initial }: { initial: FamilyGroupDto[] }) {
+export function FamilyGroups({ initial, emailVerified = true }: { initial: FamilyGroupDto[]; emailVerified?: boolean }) {
   const [groups, setGroups] = useState(initial);
   const replace = (g: FamilyGroupDto) => setGroups((gs) => gs.map((x) => (x.id === g.id ? g : x)));
 
   return (
     <div className="stack">
+      {!emailVerified && (
+        <Alert tone="warning">
+          Confirmá tu email para recibir los avisos de emergencia. Te mandamos un link cuando creaste la cuenta; podés pedir otro desde Tus fichas.
+        </Alert>
+      )}
       {groups.length === 0 && (
         <section className={styles.empty}>
           <h2>Todavía no tenés un grupo familiar</h2>

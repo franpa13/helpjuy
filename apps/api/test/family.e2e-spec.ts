@@ -83,11 +83,23 @@ describe('grupos familiares (e2e)', () => {
     expect((await ana.get(`/family-groups/${g.id}/invites`)).body).toHaveLength(0);
   });
 
-  it('aceptar estando ya en el grupo no duplica al miembro', async () => {
+  it('aceptar estando ya en el grupo no duplica al miembro ni gasta la invitación', async () => {
     const g = (await ana.post('/family-groups').send({ name: 'F' })).body;
     await beto.post(`/family-invites/${await invite(ana, g.id)}/accept`).expect(200);
-    const again = await beto.post(`/family-invites/${await invite(ana, g.id)}/accept`).expect(200);
+    const t = await invite(ana, g.id);
+    const again = await beto.post(`/family-invites/${t}/accept`).expect(200);
     expect(again.body.members).toHaveLength(2);
+    await caro.post(`/family-invites/${t}/accept`).expect(200);
+  });
+
+  it('a los demás no se les muestra el nombre de un hijo ni el email', async () => {
+    const g = (await ana.post('/family-groups').send({ name: 'F' })).body;
+    const sinFicha = request.agent(server);
+    await sinFicha.post('/auth/register').send({ email: 'juan.perez1985@mail.com', password: 'claveSegura1' });
+    await sinFicha.post('/profiles').send({ ...profileBody('Sofía'), relationship: 'CHILD', isMinor: true, consent: { version: '2026-11-05', accepted: true, guardianDeclared: true } });
+    await sinFicha.post(`/family-invites/${await invite(ana, g.id)}/accept`).expect(200);
+    const names = (await ana.get('/family-groups')).body[0].members.map((m: { name: string }) => m.name);
+    expect(names).toEqual(['Ana Paredes', 'Miembro sin ficha propia']);
   });
 
   it('estar en el grupo NO da acceso a la ficha de otro miembro', async () => {
