@@ -3,7 +3,8 @@ import { RegisterForm } from '@/features/auth/components/RegisterForm';
 
 export const metadata = { title: 'Creá tu ficha — HelpJuy' };
 
-export default function RegistroPage() {
+export default async function RegistroPage({ searchParams }: PageProps<'/registro'>) {
+  const { next } = await searchParams;
   return (
     <AuthShell
       variant="register"
@@ -11,7 +12,10 @@ export default function RegistroPage() {
       title="Creá tu cuenta"
       subtitle="Es gratis. Después cargás tu ficha y te llevás tu QR."
     >
-      <RegisterForm googleEnabled={process.env.GOOGLE_AUTH_ENABLED === 'true'} />
+      <RegisterForm
+        googleEnabled={process.env.GOOGLE_AUTH_ENABLED === 'true'}
+        next={typeof next === 'string' ? next : undefined}
+      />
     </AuthShell>
   );
 }

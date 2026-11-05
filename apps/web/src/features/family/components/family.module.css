@@ -1,0 +1,265 @@
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.empty {
+  padding: 18px;
+  background: var(--white);
+  border-left: 8px solid var(--red);
+}
+
+.empty h2 {
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.group {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--night);
+}
+
+.groupHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.groupHead h2 {
+  font-size: 30px;
+}
+
+.meta {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.groupIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius);
+  background: var(--night);
+  color: var(--white);
+}
+
+.members {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.members li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--night);
+  color: var(--white);
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.memberName {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  font-weight: 700;
+}
+
+.badges {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badgeAdmin {
+  background: var(--blue-tint);
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.iconBtn {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.iconBtn:hover {
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.inviteBox {
+  display: grid;
+  gap: 10px;
+}
+
+.inviteHelp {
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.linkRow {
+  display: flex;
+  gap: 8px;
+}
+
+.linkInput {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font: inherit;
+  font-size: 14px;
+}
+
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 14px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--white);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  border-radius: var(--radius);
+  background: #1d8a4a;
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.linkBtn {
+  justify-self: start;
+  padding: 4px 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.pending ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.pending li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+}
+
+.groupActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.action:hover {
+  border-color: var(--ink);
+}
+
+.danger {
+  color: var(--red);
+}
+
+.danger:hover {
+  border-color: var(--red);
+}
+
+.createWrap {
+  display: grid;
+  gap: 10px;
+  padding-top: 8px;
+}
+
+.create {
+  display: grid;
+  gap: 10px;
+}
+
+@media (min-width: 640px) {
+  .create {
+    grid-template-columns: 1fr auto;
+    align-items: end;
+  }
+}
