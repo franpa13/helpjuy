@@ -6,3 +6,4 @@ export * from './auth';
 export * from './consent';
 export * from './profiles';
 export * from './medical';
+export * from './public-card';
