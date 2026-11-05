@@ -5,3 +5,4 @@ export type HealthResponse = z.infer<typeof healthResponseSchema>;
 export * from './auth';
 export * from './consent';
 export * from './profiles';
+export * from './medical';

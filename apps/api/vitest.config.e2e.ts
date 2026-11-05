@@ -15,6 +15,7 @@ export default defineConfig({
       WEB_URL: 'http://localhost:3000',
       RESEND_API_KEY: '',
       PROXY_SECRET: 'test-proxy-secret',
+      MEDICAL_DATA_KEY: 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=',
     },
   },
 });
