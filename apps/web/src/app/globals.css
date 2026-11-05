@@ -3,6 +3,11 @@
   --paper: #f7f5f0;
   --white: #ffffff;
   --ink: #141414;
+  /* Superficies oscuras: calma y confianza. El rojo queda como señal. */
+  --night: #0f2236;
+  --night-deep: #0a1a2b;
+  /* Rojo para acciones sobre azul noche: 3,4:1 contra el fondo y 4,7:1 con texto blanco. */
+  --red-bright: #e0253f;
   --muted: #6b6b6b;
   --line: #d9d6ce;
   --red: #c8102e;
@@ -82,13 +87,13 @@ h2 {
   gap: 16px;
 }
 
-/* Franja superior roja, como en la ficha */
+/* Barra superior de la app */
 .strip {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px 16px;
-  background: var(--red);
+  background: var(--night);
   color: var(--white);
   font-family: var(--font-head), 'Arial Narrow', sans-serif;
   font-weight: 700;

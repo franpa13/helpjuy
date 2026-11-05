@@ -7,7 +7,7 @@ export function AppStrip({ right }: { right?: ReactNode }) {
   return (
     <header className="strip">
       <Link href="/" aria-label="HelpJuy, inicio">
-        <Logo size={26} />
+        <Logo size={26} crossColor="var(--red-bright)" />
       </Link>
       <span>{right ?? 'Jujuy'}</span>
     </header>

@@ -8,7 +8,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px clamp(16px, 4vw, 48px);
-  background: var(--red);
+  background: var(--night);
   color: var(--white);
   border-bottom: 1px solid rgb(255 255 255 / 0.18);
 }
@@ -38,15 +38,15 @@
 .navLinks .navCta {
   white-space: nowrap;
   padding: 8px 14px;
-  background: var(--white);
-  color: var(--red);
+  background: var(--red-bright);
+  color: var(--white);
   text-decoration: none;
   border-radius: var(--radius);
 }
 
 /* ---------- Hero ---------- */
 .hero {
-  background: var(--red);
+  background: var(--night);
   color: var(--white);
   overflow: hidden;
 }
@@ -119,15 +119,15 @@
 }
 
 .ctaPrimary {
-  background: var(--ink);
+  background: var(--red);
   color: var(--white);
-  border: 2px solid var(--ink);
+  border: 2px solid var(--red);
 }
 
 .hero .ctaPrimary {
-  background: var(--white);
-  color: var(--ink);
-  border-color: var(--white);
+  background: var(--red-bright);
+  color: var(--white);
+  border-color: var(--red-bright);
 }
 
 .ctaGhost {
@@ -170,6 +170,7 @@
   will-change: transform;
   border-radius: 34px;
   background: var(--ink);
+  outline: 1px solid rgb(255 255 255 / 0.14);
   box-shadow: 0 30px 60px -30px rgb(0 0 0 / 0.55);
 }
 
@@ -488,7 +489,7 @@
 
 /* ---------- Franja de datos clave ---------- */
 .facts {
-  background: var(--ink);
+  background: var(--night-deep);
   color: var(--white);
 }
 
@@ -707,7 +708,7 @@
 
 /* Privacidad: bloque en tinta para cortar el ritmo */
 .privacy {
-  background: var(--ink);
+  background: var(--night);
   color: var(--white);
 }
 
@@ -804,7 +805,7 @@
 /* Pie */
 .footer {
   padding: 32px clamp(16px, 4vw, 48px) 40px;
-  background: var(--red);
+  background: var(--night);
   color: var(--white);
   display: grid;
   gap: 8px;
@@ -812,7 +813,7 @@
 }
 
 .footer a {
-  color: var(--white);
+  color: var(--red-bright);
   font-weight: 700;
 }
 

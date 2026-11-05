@@ -125,7 +125,7 @@ export function Landing() {
     <>
       <header className={styles.nav}>
         <Link href="/" className={styles.brand} aria-label="HelpJuy, inicio">
-          <Logo size={32} />
+          <Logo size={32} crossColor="var(--red-bright)" />
         </Link>
         <nav className={styles.navLinks} aria-label="Cuenta">
           <Link href="/ingresar">Ingresar</Link>
