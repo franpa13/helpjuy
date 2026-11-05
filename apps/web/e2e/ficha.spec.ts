@@ -33,7 +33,7 @@ test('cargar la ficha, verla como paramédico y ocultar una sección', async ({ 
   await card.goto(href!);
   await expect(card.getByRole('region', { name: 'Alergias' })).toContainText('Penicilina');
   await expect(card.getByText('Warfarina')).toBeVisible();
-  await expect(card.getByRole('link', { name: /Jorge/ }).first()).toHaveAttribute('href', 'tel:3884123456');
+  await expect(card.getByRole('link', { name: /Llamar a Jorge/ }).first()).toHaveAttribute('href', 'tel:3884123456');
 
   // Ocultar la medicación y confirmar que desaparece de la ficha pública
   await page.getByRole('radiogroup', { name: /Medicación: ¿quién lo ve?/ }).getByRole('radio', { name: /Solo yo/ }).click();

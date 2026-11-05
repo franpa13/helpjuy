@@ -1,5 +1,6 @@
 import type { PublicCardDto } from '@helpjuy/contracts';
 import { LogoSymbol } from '@/shared/brand/Logo';
+import { EmergencyActions } from './EmergencyActions';
 import styles from './emergency-card.module.css';
 
 const SEX: Record<'F' | 'M' | 'X', string> = { F: 'Femenino', M: 'Masculino', X: 'Otro' };
@@ -39,7 +40,7 @@ function CallButtons({ card, variant }: { card: PublicCardDto; variant: 'bar' | 
   );
 }
 
-export function EmergencyCard({ card }: { card: PublicCardDto }) {
+export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: string }) {
   const meta = [card.identity?.sex ? SEX[card.identity.sex] : null, card.identity?.language ? `Habla ${card.identity.language}` : null]
     .filter(Boolean)
     .join(' · ');
@@ -104,6 +105,14 @@ export function EmergencyCard({ card }: { card: PublicCardDto }) {
 
       <div className={styles.layout}>
         <main className={styles.content}>
+          {token && (
+            <EmergencyActions
+              token={token}
+              firstName={card.firstName}
+              lastName={card.lastName}
+              contact={card.contacts?.[0] ? { name: card.contacts[0].name.split(' ')[0], phone: card.contacts[0].phone } : undefined}
+            />
+          )}
           {nothingVisible && (
             <section className={`${styles.sec} ${styles.inactive}`}>
               <h2>Esta persona eligió no mostrar sus datos médicos</h2>

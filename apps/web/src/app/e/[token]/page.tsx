@@ -23,5 +23,5 @@ export default async function EmergencyCardPage({ params }: PageProps<'/e/[token
   if (!PUBLIC_TOKEN_RE.test(token)) notFound();
   const card = await getPublicCard(token);
   if (!card) notFound();
-  return <EmergencyCard card={card} />;
+  return <EmergencyCard card={card} token={token} />;
 }

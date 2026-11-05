@@ -456,3 +456,111 @@ details[open].sec summary::after {
     padding: 16px 32px 32px;
   }
 }
+
+/* Avisar a la familia */
+.actions {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--white);
+}
+
+@media (min-width: 760px) {
+  .actions {
+    padding-left: 32px;
+    padding-right: 32px;
+  }
+}
+
+.alertBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: var(--radius);
+  background: var(--red);
+  color: var(--white);
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.alertBtn:disabled {
+  opacity: 0.6;
+}
+
+.confirm {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 2px solid var(--red);
+  background: var(--red-tint);
+}
+
+.locCheck {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+}
+
+.locCheck input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--red);
+}
+
+.confirmRow {
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 560px) {
+  .confirmRow {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.cancelBtn {
+  min-height: 56px;
+  padding: 0 18px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--white);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.doneMsg {
+  padding: 14px;
+  border-left: 8px solid var(--green);
+  background: var(--green-tint);
+  font-weight: 700;
+}
+
+.errorMsg {
+  padding: 14px;
+  border-left: 8px solid var(--red);
+  background: var(--red-tint);
+  font-weight: 700;
+}
+
+.waBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 52px;
+  border-radius: var(--radius);
+  background: #1d8a4a;
+  color: var(--white);
+  font-weight: 700;
+  text-decoration: none;
+}
