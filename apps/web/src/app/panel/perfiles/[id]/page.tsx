@@ -1,8 +1,6 @@
 import type { MedicalRecordResponse, ProfileDto } from '@helpjuy/contracts';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
-import { LogoutButton } from '@/features/auth/components/AccountActions';
-import { AppStrip } from '@/features/auth/components/AuthShell';
 import { RecordEditor } from '@/features/medical-record/components/RecordEditor';
 import { apiServer } from '@/shared/api/server';
 
@@ -20,10 +18,9 @@ export default async function EditarFichaPage({ params }: PageProps<'/panel/perf
 
   return (
     <>
-      <AppStrip right={<LogoutButton />} />
       <main className="page page-wide">
         <p style={{ marginBottom: 12 }}>
-          <Link href="/panel">← Tus fichas</Link>
+          <Link href="/panel">← Mis fichas</Link>
         </p>
         <div className="page-title">
           <h1>

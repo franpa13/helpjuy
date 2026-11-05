@@ -1,0 +1,232 @@
+.shell {
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+@media (min-width: 900px) {
+  .shell {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+  }
+}
+
+/* ---------- Barra lateral (escritorio) ---------- */
+.side {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .side {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    padding: 24px 16px;
+    background: var(--night);
+    color: var(--white);
+  }
+}
+
+.brand {
+  color: var(--white);
+  text-decoration: none;
+  padding: 0 8px;
+}
+
+.sideNav {
+  display: grid;
+  gap: 6px;
+}
+
+.sideNav .navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--radius);
+  color: rgb(255 255 255 / 0.82);
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sideNav .navItem:hover {
+  background: rgb(255 255 255 / 0.06);
+  color: var(--white);
+}
+
+.sideNav .navItem[aria-current='page'] {
+  background: rgb(255 255 255 / 0.1);
+  color: var(--white);
+}
+
+.sideNav .navItem[aria-current='page']::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 8px;
+  bottom: 8px;
+  width: 5px;
+  background: var(--red-bright);
+}
+
+.navIcon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: var(--radius);
+  background: rgb(255 255 255 / 0.08);
+}
+
+.sideNav .navItem[aria-current='page'] .navIcon {
+  background: var(--red-bright);
+}
+
+.navText {
+  display: grid;
+  gap: 2px;
+}
+
+.navLabel {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 21px;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.navHint {
+  font-size: 14px;
+  color: rgb(255 255 255 / 0.65);
+}
+
+.sideFoot {
+  margin-top: auto;
+  display: grid;
+  gap: 12px;
+  padding: 16px 8px 0;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  font-size: 14px;
+}
+
+.account {
+  display: grid;
+  gap: 2px;
+  word-break: break-all;
+  color: rgb(255 255 255 / 0.85);
+}
+
+.accountLabel {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 0.55);
+}
+
+.logout {
+  justify-self: start;
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--white);
+}
+
+.sos {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+  color: var(--red-bright);
+  text-decoration: none;
+}
+
+/* ---------- Barra superior (celular) ---------- */
+.top {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 16px;
+  background: var(--night);
+  color: var(--white);
+}
+
+@media (min-width: 900px) {
+  .top {
+    display: none;
+  }
+}
+
+/* ---------- Contenido ---------- */
+.content {
+  padding-bottom: 88px; /* lugar para las pestañas en celular */
+}
+
+@media (min-width: 900px) {
+  .content {
+    padding: 8px clamp(16px, 4vw, 48px) 32px;
+  }
+}
+
+/* ---------- Pestañas abajo (celular) ---------- */
+.tabsWrap {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  background: var(--night);
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (min-width: 900px) {
+  .tabsWrap {
+    display: none;
+  }
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.tabs .navItem {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 8px 8px 10px;
+  color: rgb(255 255 255 / 0.7);
+  text-decoration: none;
+  border-top: 3px solid transparent;
+}
+
+.tabs .navItem[aria-current='page'] {
+  color: var(--white);
+  border-top-color: var(--red-bright);
+}
+
+.tabs .navIcon {
+  width: 34px;
+  height: 34px;
+  background: transparent;
+}
+
+.tabs .navItem[aria-current='page'] .navIcon {
+  background: var(--red-bright);
+}
+
+.tabs .navLabel {
+  font-size: 15px;
+}

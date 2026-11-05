@@ -2,14 +2,13 @@ import type { FamilyGroupDto, MeResponse, ProfileDto } from '@helpjuy/contracts'
 import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { LogoutButton, ResendVerificationBanner } from '@/features/auth/components/AccountActions';
-import { AppStrip } from '@/features/auth/components/AuthShell';
+import { ResendVerificationBanner } from '@/features/auth/components/AccountActions';
 import { ProfileList } from '@/features/profiles/components/ProfileList';
 import { apiServer } from '@/shared/api/server';
 import { buttonClass } from '@/shared/ui/Button';
 import styles from './panel.module.css';
 
-export const metadata = { title: 'Tus fichas — HelpJuy' };
+export const metadata = { title: 'Mis fichas — HelpJuy' };
 
 export default async function PanelPage() {
   const me = await apiServer<MeResponse>('/auth/me');
@@ -23,11 +22,10 @@ export default async function PanelPage() {
 
   return (
     <>
-      <AppStrip right={<LogoutButton />} />
       <main className="page stack">
         <div className="page-title">
-          <h1>Tus fichas</h1>
-          <p>{me.email}</p>
+          <h1>Mis fichas</h1>
+          <p>Cada ficha tiene su propio QR. Revisala cada tanto: un remedio nuevo o un teléfono que cambió hacen la diferencia.</p>
         </div>
         {!me.emailVerified && <ResendVerificationBanner />}
         <ProfileList profiles={profiles} />

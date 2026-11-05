@@ -1,7 +1,5 @@
 import type { ConsentDto, ProfileDto } from '@helpjuy/contracts';
 import { redirect } from 'next/navigation';
-import { LogoutButton } from '@/features/auth/components/AccountActions';
-import { AppStrip } from '@/features/auth/components/AuthShell';
 import { NewProfileForm } from '@/features/profiles/components/NewProfileForm';
 import { apiServer } from '@/shared/api/server';
 
@@ -15,7 +13,6 @@ export default async function NuevoPerfilPage() {
 
   return (
     <>
-      <AppStrip right={<LogoutButton />} />
       <main className="page">
         <div className="page-title">
           <h1>Nueva ficha</h1>

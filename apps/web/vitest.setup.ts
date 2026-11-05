@@ -30,7 +30,9 @@ window.matchMedia ??= ((q: string) => ({
 
 // next/navigation no existe fuera de Next: lo simulamos para los componentes cliente.
 export const routerPush = vi.fn();
+export const navState = { pathname: '/' };
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: routerPush, replace: routerPush, refresh: vi.fn() }),
   useSearchParams: () => new URLSearchParams(),
+  usePathname: () => navState.pathname,
 }));
