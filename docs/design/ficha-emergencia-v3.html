@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ficha de emergencia — boceto v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Condensed:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f7f5f0; --white:#fff; --ink:#141414; --muted:#6b6b6b; --rule:#141414; --line:#d9d6ce;
+    --red:#c8102e; --red-tint:#fbe9ec;
+    --amber:#b45309; --amber-tint:#fdf3e1;
+    --blue:#1f4e8c; --blue-tint:#e8eef7;
+    --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+    --head:"Barlow Condensed","Arial Narrow",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{font-family:var(--body);background:#cfccc4;color:var(--ink)}
+  /* barra del boceto */
+  .demo-bar{position:sticky;top:0;z-index:50;display:flex;gap:6px;justify-content:center;align-items:center;padding:8px;background:var(--ink);color:#fff;font:600 13px var(--body);flex-wrap:wrap}
+  .demo-bar button{border:1px solid #555;border-radius:3px;padding:6px 12px;background:transparent;color:#fff;font:inherit;cursor:pointer}
+  .demo-bar button.on{background:#fff;color:var(--ink)}
+  .stage{display:flex;justify-content:center;padding:24px 12px 60px}
+  .viewport{width:100%;max-width:390px;transition:max-width .3s;container-type:inline-size;background:var(--paper);position:relative;border:1px solid #999}
+
+  /* producto */
+  .strip{background:var(--red);color:#fff;display:flex;justify-content:space-between;align-items:center;padding:8px 16px;font:700 14px/1 var(--head);letter-spacing:.14em;text-transform:uppercase}
+  .strip .cross{display:inline-block;width:14px;height:14px;background:
+     linear-gradient(#fff,#fff) center/4px 100% no-repeat,
+     linear-gradient(#fff,#fff) center/100% 4px no-repeat;margin-right:8px;vertical-align:-1px}
+  .id{padding:18px 16px 14px;border-bottom:3px solid var(--rule)}
+  .id h1{font:800 40px/0.95 var(--head);text-transform:uppercase;letter-spacing:.005em}
+  .id p{margin-top:6px;font-size:15px;color:var(--muted)}
+  .vitals{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:3px solid var(--rule)}
+  .vital{padding:10px 8px 12px;border-right:1px solid var(--line)}
+  .vital:last-child{border-right:0}
+  .vital small,.lbl{font:700 12px/1 var(--head);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .vital b{display:block;font:800 34px/1 var(--head);margin-top:6px}
+  .vital b em{font-style:normal;font-size:15px;font-weight:600;margin-left:1px}
+  .vital.blood{background:var(--red);color:#fff}
+  .vital.blood small{color:#fff;opacity:.85}
+
+  .content{display:grid}
+  .sec{padding:16px;border-bottom:1px solid var(--line)}
+  .sec h2{font:800 15px/1 var(--head);letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .sec h2::before{content:"";width:10px;height:10px;background:currentColor}
+  .alert{background:var(--red-tint);border-left:8px solid var(--red)}
+  .alert h2{color:var(--red)}
+  .alg{display:grid;gap:6px}
+  .alg div{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed #e4b3bc;padding-bottom:6px}
+  .alg div:last-child{border:0;padding:0}
+  .alg b{font:800 30px/1 var(--head);text-transform:uppercase;color:var(--red)}
+  .alg span{font-size:14px;font-weight:700}
+  .cond{border-left:8px solid var(--amber);background:var(--amber-tint)} .cond h2{color:var(--amber)}
+  .meds{border-left:8px solid var(--blue);background:var(--blue-tint)} .meds h2{color:var(--blue)}
+  .rows{list-style:none;padding:0;display:grid;gap:8px}
+  .rows li{display:flex;justify-content:space-between;gap:12px;align-items:baseline;font-size:18px;font-weight:700}
+  .rows li span{font-size:14px;font-weight:400;color:var(--muted);white-space:nowrap}
+  .flag{display:inline-block;font:700 12px/1 var(--head);letter-spacing:.1em;background:var(--ink);color:#fff;padding:3px 6px;margin-left:6px;vertical-align:3px}
+  .notes{list-style:none;padding:0;display:grid;gap:10px}
+  .notes li{font-size:16px;padding-left:14px;border-left:3px solid var(--ink)}
+  .notes li span{display:block;font-size:14px;color:var(--muted)}
+  details.sec summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;font:800 15px/1 var(--head);letter-spacing:.14em;text-transform:uppercase}
+  details.sec summary::after{content:"VER +";color:var(--muted)}
+  details[open].sec summary::after{content:"CERRAR"}
+  .kv{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;font-size:15px}
+  .kv .lbl{display:block;margin-bottom:3px}
+
+  .foot{font-size:13px;color:var(--muted);padding:14px 16px 120px;line-height:1.5}
+  .callbar{position:sticky;bottom:0;display:grid;grid-template-columns:1fr 1fr;border-top:3px solid var(--rule)}
+  .btn{display:block;padding:14px 16px;text-decoration:none;color:#fff}
+  .btn small{display:block;font:700 12px/1 var(--head);letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+  .btn b{display:block;font:800 28px/1 var(--head);margin-top:4px;text-transform:uppercase}
+  .btn.sos{background:var(--red)} .btn.fam{background:var(--ink)}
+  .side{display:none}
+
+  @container (min-width:700px){
+    .strip,.id,.sec{padding-left:28px;padding-right:28px}
+    .id h1{font-size:60px}
+    .vital{padding:14px 28px}
+    .vital b{font-size:48px}
+    .layout{display:grid;grid-template-columns:1fr 280px}
+    .content{border-right:3px solid var(--rule)}
+    .two{display:grid;grid-template-columns:1fr 1fr}
+    .two .sec:first-child{border-right:1px solid var(--line)}
+    .callbar{display:none}
+    .side{display:block}
+    .side .btn{padding:20px 22px;border-bottom:1px solid #000}
+    .side .btn b{font-size:34px}
+    .side .extra{padding:16px 22px;font-size:15px}
+    .foot{padding:16px 28px 28px}
+  }
+</style>
+</head>
+<body>
+<div class="demo-bar">
+  <span style="opacity:.6">Vista previa:</span>
+  <button class="on" onclick="setW(390,this)">Celular</button>
+  <button onclick="setW(820,this)">Tablet</button>
+  <button onclick="setW(1200,this)">Escritorio</button>
+</div>
+
+<div class="stage"><div class="viewport" id="vp">
+
+  <div class="strip"><span><i class="cross"></i>Ficha de emergencia</span><span>Jujuy</span></div>
+
+  <header class="id">
+    <h1>Juan<br>Pérez</h1>
+    <p>Masculino · nació el 14/03/1992 · habla español</p>
+  </header>
+
+  <section class="vitals">
+    <div class="vital"><small>Edad</small><b>34</b></div>
+    <div class="vital blood"><small>Sangre</small><b>O+</b></div>
+    <div class="vital"><small>Peso</small><b>78<em>kg</em></b></div>
+    <div class="vital"><small>Altura</small><b>175<em>cm</em></b></div>
+  </section>
+
+  <div class="layout">
+    <main class="content">
+      <section class="sec alert">
+        <h2>Alergias</h2>
+        <div class="alg">
+          <div><b>Penicilina</b><span>anafilaxia</span></div>
+          <div><b>Látex</b><span>urticaria</span></div>
+        </div>
+      </section>
+
+      <div class="two">
+        <section class="sec cond">
+          <h2>Condiciones</h2>
+          <ul class="rows">
+            <li>Diabetes tipo 1 <span>desde 2010</span></li>
+            <li>Hipoacusia <span>oído izq.</span></li>
+          </ul>
+        </section>
+        <section class="sec meds">
+          <h2>Medicación</h2>
+          <ul class="rows">
+            <li><div>Acenocumarol<span class="flag">ANTICOAG.</span></div><span>4 mg/día</span></li>
+            <li>Insulina glargina <span>20 UI noche</span></li>
+          </ul>
+        </section>
+      </div>
+
+      <section class="sec">
+        <h2>Para tener en cuenta</h2>
+        <ul class="notes">
+          <li>Hablarle de frente y despacio<span>Lee los labios</span></li>
+          <li>Acepta transfusiones<span>Sin restricciones</span></li>
+          <li>Donante de órganos<span>Registrado en INCUCAI</span></li>
+        </ul>
+      </section>
+
+      <details class="sec">
+        <summary>Más información</summary>
+        <div class="kv">
+          <div><span class="lbl">Cirugías</span>Apendicectomía (2015)</div>
+          <div><span class="lbl">Implantes</span>Placa de titanio, tibia der.</div>
+          <div><span class="lbl">Obra social</span>ISJ · 1234567</div>
+          <div><span class="lbl">Médico</span>Dra. López · 388 4xx-xxxx</div>
+        </div>
+      </details>
+    </main>
+
+    <aside class="side">
+      <a class="btn sos" href="#"><small>Emergencias · SAME</small><b>Llamar 107</b></a>
+      <a class="btn fam" href="#"><small>Contacto · esposa</small><b>María Gómez</b></a>
+      <div class="extra"><span class="lbl">Contacto 2</span><br>Carlos Pérez (hermano)</div>
+    </aside>
+  </div>
+
+  <p class="foot">Datos cargados por el titular y <strong>no verificados por un médico</strong>. Actualizado el 02/11/2026. Este escaneo quedó registrado y se le avisó al titular.</p>
+
+  <nav class="callbar">
+    <a class="btn sos" href="#"><small>SAME Jujuy</small><b>107</b></a>
+    <a class="btn fam" href="#"><small>Esposa</small><b>María</b></a>
+  </nav>
+
+</div></div>
+<script>
+function setW(w,b){document.getElementById('vp').style.maxWidth=w+'px';document.querySelectorAll('.demo-bar button').forEach(x=>x.classList.remove('on'));b.classList.add('on')}
+</script>
+</body>
+</html>

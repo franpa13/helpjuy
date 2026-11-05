@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Builds
+.next/
+dist/
+out/
+coverage/
+.turbo/
+
+# Entorno y secretos
+.env
+.env.*
+!.env.example
+
+# Herramientas
+.superpowers/
+.vercel/
+*.log
+.DS_Store
+Thumbs.db
