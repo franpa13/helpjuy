@@ -5,7 +5,7 @@ Permitir que una persona cree su cuenta e ingrese de forma simple y segura, para
 
 ## Alcance
 - Incluye: registro e ingreso con email y contraseña, sesión por cookie, cierre de sesión, consulta del usuario actual, verificación de email y recuperación de contraseña.
-- Fuera de alcance (Plan 4): ingreso con Google.
+- Incluye también: ingreso y registro con Google (OAuth 2.0 + OpenID Connect con PKCE).
 
 ## Reglas
 - Email normalizado (`trim` + minúsculas) antes de guardar o buscar.
@@ -44,3 +44,21 @@ Permitir que una persona cree su cuenta e ingrese de forma simple y segura, para
 - **Dado** un email existente o inexistente, **cuando** pide recuperar la contraseña, **entonces** recibe 204 en los dos casos (solo el existente recibe email).
 - **Dado** un reset exitoso, **entonces** todas las sesiones anteriores quedan cerradas y puede ingresar con la contraseña nueva.
 - Los links vencen: verificación en 24 h, restablecimiento en 1 h.
+
+### Google
+- `GET /auth/google?next=…`: genera `state` y un verificador PKCE, los guarda en la cookie temporal `hj_oauth` (httpOnly, 10 min) y redirige a Google con `scope=openid email`.
+- `GET /auth/google/callback`: compara el `state` en tiempo constante, canjea el código con el verificador, **verifica la firma y la audiencia del id_token** y exige `email_verified`.
+- `redirect_uri` = `{WEB_URL}/api/auth/google/callback`, así la sesión queda en el dominio de la web.
+- Vinculación por email:
+  - si no existe cuenta, se crea ya verificada y sin contraseña;
+  - si existe y su email estaba verificado, se le suma Google y la contraseña sigue sirviendo;
+  - si existe y su email **nunca se verificó**, se borra esa contraseña y se cierran sus sesiones: cualquiera pudo haberla creado con un email ajeno, y Google acaba de probar quién es el dueño.
+- `next` solo acepta rutas internas. Cualquier error vuelve a `/ingresar?error=google|google_email|google_disabled`.
+- Sin `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` en la API, Google queda desactivado. La web muestra el botón solo con `GOOGLE_AUTH_ENABLED=true`.
+
+#### Criterios
+- **Dado** un usuario nuevo, **cuando** vuelve de Google con el email verificado, **entonces** se crea la cuenta verificada, queda con sesión y va a `next` (o `/panel`).
+- **Dado** un `state` distinto o sin la cookie temporal, **entonces** vuelve a `/ingresar?error=google` sin sesión.
+- **Dado** un email de Google no verificado, **entonces** `/ingresar?error=google_email`.
+- **Dada** una cuenta existente sin verificar con ese email, **cuando** entra con Google, **entonces** la contraseña anterior deja de servir y sus sesiones se cierran.
+- **Dado** `next=//evil.com`, **entonces** va a `/panel`.

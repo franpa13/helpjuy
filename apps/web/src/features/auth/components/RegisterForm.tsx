@@ -10,8 +10,9 @@ import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
 import { Field } from '@/shared/ui/Field';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
+import { GoogleButton } from './GoogleButton';
 
-export function RegisterForm() {
+export function RegisterForm({ googleEnabled = false }: { googleEnabled?: boolean }) {
   const router = useRouter();
   const [errors, setErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -40,6 +41,7 @@ export function RegisterForm() {
   return (
     <form className="stack" onSubmit={onSubmit} noValidate>
       {formError && <Alert tone="error">{formError}</Alert>}
+      {googleEnabled && <GoogleButton next="/panel" />}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
       <Field
         label="Contraseña"

@@ -10,11 +10,12 @@ import { Alert } from '@/shared/ui/Alert';
 import { Button } from '@/shared/ui/Button';
 import { Field } from '@/shared/ui/Field';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
+import { GoogleButton } from './GoogleButton';
 
-export function LoginForm({ next }: { next?: string }) {
+export function LoginForm({ next, googleEnabled = false, error }: { next?: string; googleEnabled?: boolean; error?: string }) {
   const router = useRouter();
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<string | null>(error ? authErrorMessage(error) : null);
   const [sending, setSending] = useState(false);
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -39,6 +40,7 @@ export function LoginForm({ next }: { next?: string }) {
   return (
     <form className="stack" onSubmit={onSubmit} noValidate>
       {formError && <Alert tone="error">{formError}</Alert>}
+      {googleEnabled && <GoogleButton next={safeNext(next, '/panel')} />}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
       <Field label="Contraseña" name="password" type="password" autoComplete="current-password" error={errors.password} />
       <Button type="submit" disabled={sending}>

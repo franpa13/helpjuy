@@ -37,6 +37,7 @@
     "@prisma/client": "7.10.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^18.0.9",
+    "google-auth-library": "^11.3.3",
     "reflect-metadata": "^0.2.2",
     "resend": "^6.37.0",
     "rxjs": "^7.8.1",
