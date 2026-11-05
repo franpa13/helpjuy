@@ -1,5 +1,5 @@
 import { DEFAULT_VISIBILITY, medicalRecordSchema, type ProfileDto } from '@helpjuy/contracts';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RecordEditor } from './RecordEditor';
 
@@ -46,20 +46,22 @@ describe('RecordEditor', () => {
     expect(screen.getByRole('button', { name: 'Agregar alergia' })).toBeDisabled();
   });
 
-  it('la obra social arranca privada (no se ve en el QR)', () => {
+  it('la obra social arranca en "Solo yo" y las alergias en "Se ve en el QR"', () => {
     render(<RecordEditor profile={profile} initial={initial} />);
-    expect(screen.getByRole('switch', { name: /Obra social.*Mostrar en mi QR/ })).not.toBeChecked();
-    expect(screen.getByRole('switch', { name: /Alergias.*Mostrar en mi QR/ })).toBeChecked();
+    const insurance = screen.getByRole('radiogroup', { name: /Obra social: ¿quién lo ve?/ });
+    expect(within(insurance).getByRole('radio', { name: /Solo yo/ })).toBeChecked();
+    const allergies = screen.getByRole('radiogroup', { name: /Alergias: ¿quién lo ve?/ });
+    expect(within(allergies).getByRole('radio', { name: /Se ve en el QR/ })).toBeChecked();
   });
 
-  it('el interruptor muestra su estado con palabras, sin depender del color', async () => {
+  it('elegir "Solo yo" oculta la sección y lo refleja en el resumen', async () => {
     const user = userEvent.setup();
     render(<RecordEditor profile={profile} initial={initial} />);
-    const sw = screen.getByRole('switch', { name: /Alergias.*Mostrar en mi QR/ });
-    expect(sw).toHaveTextContent('Visible');
-    await user.click(sw);
-    expect(sw).toHaveTextContent('Oculto');
-    expect(sw).not.toBeChecked();
+    const allergies = screen.getByRole('radiogroup', { name: /Alergias: ¿quién lo ve?/ });
+    await user.click(within(allergies).getByRole('radio', { name: /Solo yo/ }));
+    expect(within(allergies).getByRole('radio', { name: /Solo yo/ })).toBeChecked();
+    expect(within(allergies).getByRole('radio', { name: /Se ve en el QR/ })).not.toBeChecked();
+    expect(screen.getByText(/Quien escanee tu QR va a ver:/).closest('p')).not.toHaveTextContent('Alergias');
   });
 
   it('resume qué va a ver quien escanee el QR', () => {

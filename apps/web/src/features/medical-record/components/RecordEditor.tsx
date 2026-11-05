@@ -8,7 +8,8 @@ import {
   type Section,
   type Visibility,
 } from '@helpjuy/contracts';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, Lock } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { ApiError, apiFetch } from '@/shared/api/client';
 import { Alert } from '@/shared/ui/Alert';
@@ -31,25 +32,57 @@ const SECTION_LABEL: Record<Section, string> = {
   notes: 'Notas',
 };
 
-function VisibilityToggle({ section, on, onChange }: { section: Section; on: boolean; onChange: (v: boolean) => void }) {
+/** "¿Quién ve esto?": dos opciones escritas, más claro que un interruptor de prendido/apagado. */
+function VisibilityChoice({
+  section,
+  on,
+  onChange,
+  named = false,
+}: {
+  section: Section;
+  on: boolean;
+  onChange: (v: boolean) => void;
+  /** Si el bloque tiene más de un selector, el título dice a qué sección corresponde. */
+  named?: boolean;
+}) {
+  const name = `vis-${section}`;
+  const options = [
+    { value: true, label: 'Se ve en el QR', icon: Eye, cls: styles.optPublic },
+    { value: false, label: 'Solo yo', icon: Lock, cls: styles.optPrivate },
+  ];
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={on}
-      className={`${styles.toggle} ${on ? styles.toggleOn : ''}`}
-      onClick={() => onChange(!on)}
-    >
-      <span className={styles.srOnly}>{SECTION_LABEL[section]}: </span>
-      <span className={styles.toggleLabel}>Mostrar en mi QR</span>
-      <span className={styles.track} aria-hidden="true">
-        <span className={styles.knob} />
+    <div className={styles.choiceWrap}>
+      <span className={styles.choiceCaption} aria-hidden="true">
+        {named ? `¿Quién ve: ${SECTION_LABEL[section].toLowerCase()}?` : '¿Quién ve esto?'}
       </span>
-      <span className={styles.toggleState}>
-        {on ? <Eye size={16} aria-hidden="true" /> : <EyeOff size={16} aria-hidden="true" />}
-        {on ? 'Visible' : 'Oculto'}
-      </span>
-    </button>
+      <div role="radiogroup" aria-label={`${SECTION_LABEL[section]}: ¿quién lo ve?`} className={styles.choice}>
+        {options.map(({ value, label, icon: Icon, cls }) => {
+          const selected = on === value;
+          return (
+            <label key={label} className={`${styles.option} ${selected ? cls : ''}`}>
+              <input
+                type="radio"
+                name={name}
+                className={styles.srOnly}
+                checked={selected}
+                onChange={() => onChange(value)}
+              />
+              {selected && (
+                <motion.span
+                  layoutId={`indicator-${section}`}
+                  className={styles.indicator}
+                  transition={{ type: 'spring', stiffness: 500, damping: 36 }}
+                />
+              )}
+              <span className={styles.optionContent}>
+                <Icon size={16} aria-hidden="true" />
+                {label}
+              </span>
+            </label>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -79,7 +112,13 @@ function Block({
         </div>
         <div className={styles.toggles}>
           {sections.map((s) => (
-            <VisibilityToggle key={s} section={s} on={visibility[s]} onChange={(v) => setVisible(s, v)} />
+            <VisibilityChoice
+              key={s}
+              section={s}
+              named={sections.length > 1}
+              on={visibility[s]}
+              onChange={(v) => setVisible(s, v)}
+            />
           ))}
         </div>
       </header>

@@ -70,27 +70,6 @@
   gap: 8px;
 }
 
-.toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 40px;
-  padding: 6px 12px;
-  border: 2px solid var(--line);
-  border-radius: var(--radius);
-  background: var(--paper);
-  color: var(--muted);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.toggleOn {
-  border-color: var(--green);
-  background: var(--green-tint);
-  color: var(--green);
-}
 
 
 .blockBody {
@@ -216,49 +195,90 @@
   white-space: nowrap;
 }
 
-.toggleLabel {
-  color: var(--ink);
-}
-
-.track {
-  position: relative;
-  display: inline-block;
-  width: 40px;
-  height: 22px;
-  border-radius: 999px;
-  background: var(--line);
-  transition: background 0.2s ease;
-}
-
-.track .knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  background: var(--white);
-  transition: transform 0.2s ease;
-}
-
-.toggleOn .track {
-  background: var(--green);
-}
-
-.toggleOn .track .knob {
-  transform: translateX(18px);
-  background: var(--white);
-}
-
-.toggleState {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-width: 70px;
-}
 
 .summary p {
   padding: 12px 14px;
   background: var(--white);
   border-left: 6px solid var(--green);
   font-size: 16px;
+}
+
+/* Selector "¿Quién ve esto?" */
+.choiceWrap {
+  display: grid;
+  gap: 4px;
+  justify-items: start;
+}
+
+.choiceCaption {
+  font-family: var(--font-head), "Arial Narrow", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.choice {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  gap: 4px;
+  border: 2px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+}
+
+.option {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.option:hover {
+  color: var(--ink);
+}
+
+.option:has(input:focus-visible) {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.optionContent {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.indicator {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+}
+
+.optPublic {
+  color: var(--white);
+}
+
+.optPublic .indicator {
+  background: var(--green);
+}
+
+.optPrivate {
+  color: var(--white);
+}
+
+.optPrivate .indicator {
+  background: var(--ink);
 }
