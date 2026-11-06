@@ -19,7 +19,13 @@ export default defineConfig({
     {
       command: 'pnpm exec next build && pnpm exec next start -p 3100',
       url: 'http://localhost:3100',
-      env: { API_URL: 'http://localhost:4100', PROXY_SECRET: 'e2e-secret', REVALIDATE_SECRET: 'e2e-revalidate' },
+      env: {
+        API_URL: 'http://localhost:4100',
+        PROXY_SECRET: 'e2e-secret',
+        REVALIDATE_SECRET: 'e2e-revalidate',
+        // Producción exige una URL pública https para el QR impreso
+        SITE_URL: 'https://helpjuy.e2e.example',
+      },
       reuseExistingServer: false,
       timeout: 300_000,
     },

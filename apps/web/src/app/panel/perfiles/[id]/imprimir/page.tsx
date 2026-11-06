@@ -1,17 +1,16 @@
-import { printableData, type MedicalRecordResponse, type ProfileDto } from '@helpjuy/contracts';
+import { printFingerprintInput, printableData, type MedicalRecordResponse, type ProfileDto } from '@helpjuy/contracts';
 import Link from 'next/link';
+import { createHash } from 'node:crypto';
 import { notFound, redirect } from 'next/navigation';
 import QRCode from 'qrcode';
 import { PrintActions } from '@/features/print/components/PrintActions';
 import { PrintSheet } from '@/features/print/components/PrintSheet';
+import { resolveSiteUrl } from '@/features/print/site-url';
 import { apiServer } from '@/shared/api/server';
 import { Alert } from '@/shared/ui/Alert';
 import styles from './imprimir.module.css';
 
 export const metadata = { title: 'Imprimir mi QR — HelpJuy' };
-
-/** Dirección pública del sitio. Para probar con el celular en tu Wi-Fi: SITE_URL=http://<IP-de-tu-compu>:3000 */
-const siteUrl = () => (process.env.SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 
 export default async function ImprimirPage({ params }: PageProps<'/panel/perfiles/[id]/imprimir'>) {
   const { id } = await params;
@@ -23,7 +22,7 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
   ]);
   if (!profile || !record) notFound();
 
-  const url = `${siteUrl()}/e/${profile.publicToken}`;
+  const url = `${resolveSiteUrl()}/e/${profile.publicToken}`;
   const qrSvg = await QRCode.toString(url, {
     type: 'svg',
     errorCorrectionLevel: 'M',
@@ -31,6 +30,8 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
     color: { dark: '#141414', light: '#ffffff' },
   });
   const data = printableData(profile, record.data, record.visibility);
+  // Huella de exactamente lo que muestra esta hoja (misma fórmula que la API).
+  const fingerprint = createHash('sha256').update(printFingerprintInput(profile.publicToken, data)).digest('hex');
 
   return (
     <main className="page page-wide stack">
@@ -52,8 +53,9 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
       )}
 
       <div className={styles.toolbar}>
-        <PrintActions profileId={id} />
-        <a className={styles.preview} href={`/e/${profile.publicToken}`} target="_blank" rel="noreferrer">
+        <PrintActions profileId={id} fingerprint={fingerprint} />
+        {/* La misma dirección que va dentro del QR: si está mal configurada, se nota acá antes de imprimir. */}
+        <a className={styles.preview} href={url} target="_blank" rel="noreferrer">
           Probar el QR: ver como el paramédico
         </a>
       </div>

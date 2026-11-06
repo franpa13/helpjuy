@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import {
   createProfileSchema,
+  markPrintedSchema,
   updateProfileSchema,
   type CreateProfileInput,
   type ProfileDto,
@@ -52,8 +53,12 @@ export class ProfilesController {
 
   @Post(':id/printed')
   @HttpCode(200)
-  printed(@CurrentUser() user: User, @Param('id') id: string) {
-    return this.profiles.markPrinted(user.id, id);
+  printed(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(markPrintedSchema)) body: { fingerprint: string },
+  ) {
+    return this.profiles.markPrinted(user.id, id, body.fingerprint);
   }
 
   @Post(':id/rotate-token')

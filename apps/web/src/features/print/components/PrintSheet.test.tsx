@@ -57,16 +57,43 @@ describe('PrintSheet', () => {
 });
 
 describe('PrintActions', () => {
-  it('marca como impreso y abre el diálogo de impresión', async () => {
+  const ok = (status: number, body: unknown) =>
+    new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+  const FP = 'a'.repeat(64);
+
+  it('abre la impresión y solo marca como impreso cuando la persona confirma', async () => {
     const user = userEvent.setup();
     const print = vi.fn();
     window.print = print;
-    const fetchSpy = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(new Response(JSON.stringify({ printStatus: 'ok', printedAt: '2026-11-06T00:00:00Z' }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
-    render(<PrintActions profileId="p1" />);
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(ok(200, { printStatus: 'ok', printedAt: '2026-11-06T00:00:00Z' }));
+    render(<PrintActions profileId="p1" fingerprint={FP} />);
     await user.click(screen.getByRole('button', { name: 'Imprimir' }));
+    expect(print).toHaveBeenCalled();
+    expect(fetchSpy).not.toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: 'Sí, ya lo tengo impreso' }));
     expect(fetchSpy.mock.calls[0][0]).toBe('/api/profiles/p1/printed');
-    await vi.waitFor(() => expect(print).toHaveBeenCalled());
+    expect(JSON.parse(String(fetchSpy.mock.calls[0][1]?.body))).toEqual({ fingerprint: FP });
+    expect(await screen.findByText(/Listo/)).toBeInTheDocument();
+  });
+
+  it('si dice que no se imprimió, no marca nada y deja reintentar', async () => {
+    const user = userEvent.setup();
+    window.print = vi.fn();
+    const fetchSpy = vi.spyOn(globalThis, 'fetch');
+    render(<PrintActions profileId="p1" fingerprint={FP} />);
+    await user.click(screen.getByRole('button', { name: 'Imprimir' }));
+    await user.click(screen.getByRole('button', { name: 'No, lo intento de nuevo' }));
+    expect(fetchSpy).not.toHaveBeenCalled();
+    expect(window.print).toHaveBeenCalledTimes(2);
+  });
+
+  it('si los datos cambiaron mientras imprimía, avisa que hay que reimprimir', async () => {
+    const user = userEvent.setup();
+    window.print = vi.fn();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(ok(409, { error: 'print_outdated' }));
+    render(<PrintActions profileId="p1" fingerprint={FP} />);
+    await user.click(screen.getByRole('button', { name: 'Imprimir' }));
+    await user.click(screen.getByRole('button', { name: 'Sí, ya lo tengo impreso' }));
+    expect(await screen.findByText(/cambiaron mientras imprimías/)).toBeInTheDocument();
   });
 });

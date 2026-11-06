@@ -46,3 +46,5 @@ export type ProfileDto = {
   printStatus: 'never' | 'ok' | 'outdated';
   printedAt: string | null;
 };
+
+export const markPrintedSchema = z.object({ fingerprint: z.string().regex(/^[0-9a-f]{64}$/) });

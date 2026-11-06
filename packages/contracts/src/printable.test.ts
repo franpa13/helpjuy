@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_VISIBILITY, medicalRecordSchema } from './medical';
-import { printableData } from './printable';
+import { printFingerprintInput, printableData } from './printable';
 
 const profile = { firstName: 'Lucía', lastName: 'Mamani' };
 const record = medicalRecordSchema.parse({
@@ -43,5 +43,18 @@ describe('printableData', () => {
 
   it('sin ficha imprime solo el nombre', () => {
     expect(printableData(profile, null, DEFAULT_VISIBILITY).name).toBe('Lucía Mamani');
+  });
+
+  it("recorta cada alergia a 22 caracteres para que entre en la tarjeta", () => {
+    const r = medicalRecordSchema.parse({ allergies: [{ substance: "Antiinflamatorios no esteroideos (AINE)" }] });
+    const [a] = printableData(profile, r, DEFAULT_VISIBILITY).allergies;
+    expect(a).toBe("Antiinflamatorios no …");
+    expect(a.length).toBeLessThanOrEqual(22);
+  });
+
+  it("la huella es estable y cambia si cambia el token", () => {
+    const p = printableData(profile, record, DEFAULT_VISIBILITY);
+    expect(printFingerprintInput("tok1", p)).toBe(printFingerprintInput("tok1", p));
+    expect(printFingerprintInput("tok1", p)).not.toBe(printFingerprintInput("tok2", p));
   });
 });

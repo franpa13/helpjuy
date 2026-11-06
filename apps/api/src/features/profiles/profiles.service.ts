@@ -1,8 +1,9 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import {
   DEFAULT_VISIBILITY,
   completion,
   isActive,
+  printFingerprintInput,
   printableData,
   visibilitySchema,
   type CreateProfileInput,
@@ -60,7 +61,7 @@ export class ProfilesService {
 
   /** Huella de lo que va impreso (token + datos impresos). Si cambia, hay que reimprimir. */
   printFingerprint(p: ProfileWithRecord, record: Record_ | null): string {
-    return sha256Hex(JSON.stringify({ token: p.publicToken, printable: printableData(p, record, this.visibilityOf(p)) }));
+    return sha256Hex(printFingerprintInput(p.publicToken, printableData(p, record, this.visibilityOf(p))));
   }
 
   toDto(p: ProfileWithRecord): ProfileDto {
@@ -76,11 +77,14 @@ export class ProfilesService {
   }
 
   /** "Ya lo imprimí": guarda la huella calculada en el servidor (no se confía en el cliente). */
-  async markPrinted(ownerId: string, id: string): Promise<{ printStatus: PrintStatus; printedAt: string }> {
+  async markPrinted(ownerId: string, id: string, shown: string): Promise<{ printStatus: PrintStatus; printedAt: string }> {
     const p = await this.getOwned(ownerId, id);
     const record = p.medicalRecord ? this.cipher.decrypt(p.medicalRecord.ciphertext) : null;
+    const current = this.printFingerprint(p, record);
+    // La página manda la huella de lo que mostró: si los datos cambiaron mientras imprimía, el papel quedó viejo.
+    if (shown !== current) throw new ConflictException({ error: 'print_outdated' });
     const printedAt = new Date();
-    await this.prisma.profile.update({ where: { id }, data: { printedHash: this.printFingerprint(p, record), printedAt } });
+    await this.prisma.profile.update({ where: { id }, data: { printedHash: current, printedAt } });
     return { printStatus: 'ok', printedAt: printedAt.toISOString() };
   }
 

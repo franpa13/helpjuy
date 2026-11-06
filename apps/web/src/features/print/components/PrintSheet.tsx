@@ -6,7 +6,14 @@ type Props = { data: PrintableData; qrSvg: string; url: string };
 
 /** El SVG lo genera la librería `qrcode` en el servidor a partir de nuestra URL: es contenido confiable. */
 function Qr({ svg, className }: { svg: string; className?: string }) {
-  return <div className={`${styles.qr} ${className ?? ''}`} dangerouslySetInnerHTML={{ __html: svg }} />;
+  return (
+    <div
+      role="img"
+      aria-label="Código QR de la ficha de emergencia"
+      className={`${styles.qr} ${className ?? ''}`}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
+  );
 }
 
 function Head({ small = false }: { small?: boolean }) {
@@ -21,6 +28,7 @@ function Head({ small = false }: { small?: boolean }) {
 function Critical({ data }: { data: PrintableData }) {
   return (
     <dl className={styles.critical}>
+      {data.anticoagulant && <p className={styles.flag}>ANTICOAGULADO</p>}
       {(data.allergies.length > 0 || data.noAllergies) && (
         <div className={styles.row}>
           <dt>Alergias</dt>
@@ -44,7 +52,6 @@ function Critical({ data }: { data: PrintableData }) {
           </dd>
         </div>
       )}
-      {data.anticoagulant && <p className={styles.flag}>ANTICOAGULADO</p>}
     </dl>
   );
 }
