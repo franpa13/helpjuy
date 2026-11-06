@@ -13,7 +13,7 @@ test('cargar la ficha, verla como paramédico y ocultar una sección', async ({ 
   await page.getByRole('button', { name: 'Aceptar y crear perfil' }).click();
 
   // Editor de la ficha
-  await expect(page).toHaveURL(/\/panel\/perfiles\/[\w-]+$/);
+  await expect(page).toHaveURL(/\/panel\/perfiles\/[0-9a-f-]{36}$/);
   await page.getByRole('button', { name: 'Agregar alergia' }).click();
   await page.getByLabel('Alergia 1').fill('Penicilina');
   await page.getByRole('button', { name: 'Agregar remedio' }).click();

@@ -20,7 +20,7 @@ test('grupo familiar: invitar por link, unirse y recibir el aviso de emergencia'
   await page.getByRole('button', { name: 'Seguir' }).click();
   await page.getByRole('checkbox', { name: /Leí y acepto/ }).check();
   await page.getByRole('button', { name: 'Aceptar y crear perfil' }).click();
-  await expect(page).toHaveURL(/\/panel\/perfiles\/[\w-]+$/);
+  await expect(page).toHaveURL(/\/panel\/perfiles\/[0-9a-f-]{36}$/);
   await page.getByRole('button', { name: 'Agregar contacto' }).click();
   await page.getByLabel('Nombre del contacto 1').fill('Ana');
   await page.getByLabel('Teléfono del contacto 1').fill('3884123456');

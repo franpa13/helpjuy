@@ -17,7 +17,7 @@ test('registro → alta de perfil → aparece en el panel', async ({ page }) => 
   await accept.click();
 
   // Después de crear el perfil va directo al editor de la ficha
-  await expect(page).toHaveURL(/\/panel\/perfiles\/[\w-]+$/);
+  await expect(page).toHaveURL(/\/panel\/perfiles\/[0-9a-f-]{36}$/);
   await page.goto('/panel');
   await expect(page.getByText('Juan Pérez')).toBeVisible();
   await expect(page.getByText('Falta un contacto de emergencia')).toBeVisible();

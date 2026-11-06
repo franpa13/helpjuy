@@ -19,8 +19,13 @@ export function ProfileList({ profiles }: { profiles: ProfileDto[] }) {
                 {p.active ? 'QR activo' : 'Falta un contacto de emergencia'}
               </span>
             </div>
+            {p.printStatus === 'outdated' && (
+              <p className={styles.reprint}>Cambiaron datos de tu QR impreso: reimprimilo.</p>
+            )}
+            {p.printStatus === 'never' && p.active && <p className={styles.reprint}>Tu QR está listo: imprimilo.</p>}
             <div className={styles.links}>
               <Link href={`/panel/perfiles/${p.id}`}>Editar ficha</Link>
+              <Link href={`/panel/perfiles/${p.id}/imprimir`}>Imprimir QR</Link>
               <a href={`/e/${p.publicToken}`} target="_blank" rel="noreferrer">
                 Ver como el paramédico
               </a>

@@ -558,6 +558,9 @@ export function RecordEditor({ profile, initial }: Props) {
           <a className={styles.preview} href={`/e/${profile.publicToken}`} target="_blank" rel="noreferrer">
             Ver como el paramédico
           </a>
+          <a className={styles.preview} href={`/panel/perfiles/${profile.id}/imprimir`}>
+            Imprimir mi QR
+          </a>
           <Button type="button" onClick={save} disabled={status === 'saving'}>
             {status === 'saving' ? 'Guardando…' : 'Guardar ficha'}
           </Button>

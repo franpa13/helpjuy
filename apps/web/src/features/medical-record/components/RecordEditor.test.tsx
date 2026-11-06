@@ -13,6 +13,8 @@ const profile: ProfileDto = {
   createdAt: '2026-11-05T00:00:00.000Z',
   completion: 0,
   active: false,
+  printStatus: 'never',
+  printedAt: null,
 };
 const initial = { data: medicalRecordSchema.parse({}), visibility: DEFAULT_VISIBILITY };
 
