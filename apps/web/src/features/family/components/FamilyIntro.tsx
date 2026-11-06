@@ -25,9 +25,9 @@ export function IntroLead() {
 }
 
 /** Cómo funciona (3 pasos) y qué garantías tiene, para quien todavía no tiene grupo. */
-export function FamilyIntro() {
+export function FamilyIntro({ compact = false }: { compact?: boolean }) {
   return (
-    <div className={`${styles.intro} ${styles.areaSteps}`}>
+    <div className={`${styles.intro} ${compact ? styles.introCompact : styles.areaSteps}`}>
       <ol className={styles.steps} aria-label="Cómo funciona">
         {STEPS.map((s, i) => (
           <li key={s.title}>

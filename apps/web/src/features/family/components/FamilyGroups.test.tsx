@@ -97,4 +97,12 @@ describe('FamilyGroups', () => {
     render(<FamilyGroups initial={[group()]} emailVerified={false} />);
     expect(screen.getByText(/Confirmá tu email para recibir los avisos/)).toBeInTheDocument();
   });
+
+  it("con grupo, al costado muestra el aviso de ejemplo, cómo funciona y crear otro grupo", () => {
+    render(<FamilyGroups initial={[group()]} myName="Francisco Paredes" />);
+    const side = screen.getByRole("complementary", { name: "Sobre los avisos" });
+    expect(within(side).getByLabelText("Ejemplo del email que recibe tu familia")).toHaveTextContent("Francisco Paredes");
+    expect(within(side).getByRole("list", { name: "Cómo funciona" })).toBeInTheDocument();
+    expect(within(side).getByText("Crear otro grupo")).toBeInTheDocument();
+  });
 });

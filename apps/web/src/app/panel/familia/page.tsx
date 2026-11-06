@@ -1,6 +1,7 @@
 import type { FamilyGroupDto, MeResponse, ProfileDto } from '@helpjuy/contracts';
 import { redirect } from 'next/navigation';
 import { FamilyGroups } from '@/features/family/components/FamilyGroups';
+import dash from '@/features/panel/components/dashboard.module.css';
 import { apiServer } from '@/shared/api/server';
 
 export const metadata = { title: 'Familia — HelpJuy' };
@@ -16,8 +17,8 @@ export default async function FamiliaPage() {
 
   return (
     <>
-      <main className="page page-wide stack">
-        <div className="page-title">
+      <main className={dash.wrap}>
+        <div className={dash.head}>
           <h1>Mi familia</h1>
           <p>Las personas que se enteran si te pasa algo.</p>
         </div>

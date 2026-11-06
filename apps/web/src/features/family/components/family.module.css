@@ -456,3 +456,70 @@
   background: var(--amber-tint);
   font-weight: 700;
 }
+
+/* ---------- Con grupos: grupos a la izquierda, ayuda a la derecha ---------- */
+.withGroups {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 1100px) {
+  .withGroups {
+    grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+.groupsSide {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1100px) {
+  .groupsSide {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.howBox {
+  padding: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--night);
+}
+
+.howTitle {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.introCompact .steps {
+  border-top: 0;
+}
+
+.introCompact .steps li {
+  padding: 10px 0;
+}
+
+.introCompact .steps strong {
+  font-size: 17px;
+}
+
+.introCompact .stepNum {
+  font-size: 32px;
+}
+
+.introCompact .stepText {
+  font-size: 14px;
+}
+
+.introCompact .promises li {
+  font-size: 14px;
+}
+
+/* Las piezas reutilizadas del estado vacío traen grid-area: acá van en una sola columna */
+.groupsSide > * {
+  grid-area: auto;
+}

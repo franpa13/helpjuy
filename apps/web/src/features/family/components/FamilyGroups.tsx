@@ -313,20 +313,31 @@ export function FamilyGroups({
   return (
     <div className="stack">
       {verifyNotice}
-      {groups.map((g) => (
-        <GroupCard
-          key={g.id}
-          group={g}
-          autoInvite={g.id === justCreated}
-          onChange={replace}
-          onGone={() => setGroups((gs) => gs.filter((x) => x.id !== g.id))}
-        />
-      ))}
-      <details className={styles.more}>
-        <summary>Crear otro grupo</summary>
-        <p className={styles.meta}>Por ejemplo, uno con tu familia y otro con amigos o compañeros de trabajo.</p>
-        <CreateGroup first={false} onCreated={created} />
-      </details>
+      <div className={styles.withGroups}>
+        <div className="stack">
+          {groups.map((g) => (
+            <GroupCard
+              key={g.id}
+              group={g}
+              autoInvite={g.id === justCreated}
+              onChange={replace}
+              onGone={() => setGroups((gs) => gs.filter((x) => x.id !== g.id))}
+            />
+          ))}
+        </div>
+        <aside className={styles.groupsSide} aria-label="Sobre los avisos">
+          <AlertPreview name={myName} />
+          <section className={styles.howBox}>
+            <h2 className={styles.howTitle}>Cómo funciona</h2>
+            <FamilyIntro compact />
+          </section>
+          <details className={styles.more}>
+            <summary>Crear otro grupo</summary>
+            <p className={styles.meta}>Por ejemplo, uno con tu familia y otro con amigos o compañeros de trabajo.</p>
+            <CreateGroup first={false} onCreated={created} />
+          </details>
+        </aside>
+      </div>
     </div>
   );
 }
