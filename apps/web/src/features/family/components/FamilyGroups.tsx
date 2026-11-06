@@ -8,7 +8,15 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { AlertPreview, FamilyIntro, IntroLead } from './FamilyIntro';
-import styles from './family.module.css';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+
+const textBtn = 'cursor-pointer justify-self-start bg-transparent py-1 font-bold text-ink underline';
+const action =
+  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md border-2 border-line bg-paper px-3.5 text-[15px] font-bold text-ink hover:border-ink';
+const meta = 'mt-1 text-[15px] text-muted-foreground';
 
 const initials = (name: string) =>
   name
@@ -21,7 +29,16 @@ const initials = (name: string) =>
 const waText = (groupName: string, url: string) =>
   `Te invito a "${groupName}" en HelpJuy. Si alguien escanea el QR de emergencia de uno de nosotros y marca que pasó algo, te llega un aviso. No ves datos médicos de nadie. Unite acá: ${url}`;
 
-function CreateGroup({ onCreated, first }: { onCreated: (g: FamilyGroupDto) => void; first: boolean }) {
+function CreateGroup({
+  onCreated,
+  first,
+  stacked = false,
+}: {
+  onCreated: (g: FamilyGroupDto) => void;
+  first: boolean;
+  /** En una columna angosta, el botón va abajo del campo. */
+  stacked?: boolean;
+}) {
   const [name, setName] = useState(first ? 'Mi familia' : '');
   const [error, setError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
@@ -42,7 +59,7 @@ function CreateGroup({ onCreated, first }: { onCreated: (g: FamilyGroupDto) => v
   }
 
   return (
-    <form className={styles.create} onSubmit={submit} noValidate>
+    <form className={cn('grid gap-2.5', !stacked && 'sm:grid-cols-[1fr_auto] sm:items-end')} onSubmit={submit} noValidate>
       <Field
         label="Nombre del grupo"
         value={name}
@@ -154,39 +171,51 @@ function GroupCard({
   }
 
   return (
-    <article className={styles.group}>
-      <header className={styles.groupHead}>
+    <Card asChild rule="thin" className="grid gap-3.5 p-[18px]">
+      <article>
+      <header className="flex items-start justify-between gap-3">
         <div>
-          <h2>{group.name}</h2>
-          <p className={styles.meta}>
+          <h2 className="text-[30px]">{group.name}</h2>
+          <p className={meta}>
             {group.members.length} {group.members.length === 1 ? 'miembro' : 'miembros'}
             {group.muted ? ' · avisos silenciados' : ''}
           </p>
         </div>
-        <span className={styles.groupIcon} aria-hidden="true">
+        <span className="grid size-11 place-items-center rounded-md bg-night text-white" aria-hidden="true">
           <Users size={22} />
         </span>
       </header>
 
       {notice && <Alert variant={notice.tone}>{notice.text}</Alert>}
 
-      <ul className={styles.members} aria-label={`Miembros de ${group.name}`}>
+      <ul className="grid list-none border-t border-line p-0" aria-label={`Miembros de ${group.name}`}>
         {group.members.map((m) => (
-          <li key={m.userId}>
-            <span className={styles.avatar} aria-hidden="true">
+          <li key={m.userId} className="flex items-center gap-3 border-b border-line py-2.5">
+            <span
+              className="grid size-10 shrink-0 place-items-center rounded-full bg-night font-head text-[17px] font-extrabold text-white"
+              aria-hidden="true"
+            >
               {initials(m.name)}
             </span>
-            <span className={styles.memberName}>
+            <span className="flex flex-1 flex-wrap items-center gap-x-2.5 gap-y-1 font-bold">
               {m.name}
-              <span className={styles.badges}>
-                {m.isMe && <span className={styles.badge}>Vos</span>}
-                {m.role === 'ADMIN' && <span className={`${styles.badge} ${styles.badgeAdmin}`}>Administra</span>}
+              <span className="inline-flex gap-1.5">
+                {m.isMe && (
+                  <Badge variant="outline" className="rounded-full bg-paper normal-case tracking-normal">
+                    Vos
+                  </Badge>
+                )}
+                {m.role === 'ADMIN' && (
+                  <Badge variant="blue" className="rounded-full border border-blue normal-case tracking-normal">
+                    Administra
+                  </Badge>
+                )}
               </span>
             </span>
             {admin && !m.isMe && (
-              <button type="button" className={styles.iconBtn} onClick={() => removeMember(m.userId, m.name, false)}>
+              <button type="button" className="grid size-10 cursor-pointer place-items-center rounded-md border-2 border-line bg-transparent text-muted-foreground hover:border-red hover:text-red" onClick={() => removeMember(m.userId, m.name, false)}>
                 <UserMinus size={18} aria-hidden="true" />
-                <span className={styles.srOnly}>Sacar a {m.name}</span>
+                <span className="sr-only">Sacar a {m.name}</span>
               </button>
             )}
           </li>
@@ -194,31 +223,31 @@ function GroupCard({
       </ul>
 
       {group.members.length === 1 && (
-        <p className={styles.alone}>
+        <p className="border-l-6 border-amber bg-amber-tint px-3.5 py-2.5 font-bold">
           Todavía sos la única persona del grupo. Mandá el link a quienes querés que se enteren si te pasa algo.
         </p>
       )}
 
       {admin && (
-        <div className={styles.inviteBox}>
+        <div className="grid gap-2.5">
           {!invite ? (
             <Button type="button" variant="outline" onClick={createInvite}>
               Invitar a alguien
             </Button>
           ) : (
             <>
-              <p className={styles.inviteHelp}>
+              <p className="text-[15px] text-muted-foreground">
                 Mandale este link a la persona. Sirve una sola vez y vence en 7 días. Si no tiene cuenta, la crea al abrirlo.
               </p>
-              <div className={styles.linkRow}>
-                <input className={styles.linkInput} readOnly value={invite.url} aria-label="Link de invitación" onFocus={(e) => e.target.select()} />
-                <button type="button" className={styles.copyBtn} onClick={copy}>
+              <div className="flex gap-2">
+                <Input className="min-h-12 flex-1 bg-paper px-3 py-2.5 text-sm" readOnly value={invite.url} aria-label="Link de invitación" onFocus={(e) => e.target.select()} />
+                <button type="button" className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-ink bg-white px-3.5 font-bold" onClick={copy}>
                   <Copy size={18} aria-hidden="true" />
                   {copied ? 'Copiado' : 'Copiar'}
                 </button>
               </div>
               <a
-                className={styles.whatsapp}
+                className="inline-flex min-h-13 items-center justify-center gap-2 rounded-md bg-[#1d8a4a] font-bold text-white no-underline"
                 href={`https://wa.me/?text=${encodeURIComponent(waText(group.name, invite.url))}`}
                 target="_blank"
                 rel="noreferrer"
@@ -226,19 +255,19 @@ function GroupCard({
                 <Send size={18} aria-hidden="true" />
                 Compartir por WhatsApp
               </a>
-              <button type="button" className={styles.linkBtn} onClick={createInvite}>
+              <button type="button" className={textBtn} onClick={createInvite}>
                 Generar otro link
               </button>
             </>
           )}
           {pending && pending.length > 0 && (
-            <div className={styles.pending}>
+            <div>
               <p className="label">Invitaciones pendientes</p>
-              <ul>
+              <ul className="mt-1.5 grid list-none gap-1.5 p-0">
                 {pending.map((i) => (
-                  <li key={i.id}>
+                  <li key={i.id} className="flex items-center justify-between text-[15px]">
                     Vence el {new Date(i.expiresAt).toLocaleDateString('es-AR')}
-                    <button type="button" className={styles.linkBtn} onClick={() => revoke(i.id)}>
+                    <button type="button" className={textBtn} onClick={() => revoke(i.id)}>
                       Cancelar
                     </button>
                   </li>
@@ -249,22 +278,23 @@ function GroupCard({
         </div>
       )}
 
-      <footer className={styles.groupActions}>
+      <footer className="flex flex-wrap gap-2 border-t border-line pt-3">
         {admin && (
-          <button type="button" className={styles.action} onClick={testAlert}>
+          <button type="button" className={action} onClick={testAlert}>
             <BellRing size={18} aria-hidden="true" />
             Probar aviso
           </button>
         )}
-        <button type="button" className={styles.action} onClick={toggleMute} aria-pressed={group.muted}>
+        <button type="button" className={action} onClick={toggleMute} aria-pressed={group.muted}>
           <BellOff size={18} aria-hidden="true" />
           {group.muted ? 'Volver a recibir avisos' : 'Silenciar avisos'}
         </button>
-        <button type="button" className={`${styles.action} ${styles.danger}`} onClick={() => removeMember(me.userId, me.name, true)}>
+        <button type="button" className={cn(action, 'text-red hover:border-red')} onClick={() => removeMember(me.userId, me.name, true)}>
           Salir del grupo
         </button>
       </footer>
-    </article>
+      </article>
+    </Card>
   );
 }
 
@@ -293,15 +323,17 @@ export function FamilyGroups({
     return (
       <div className="stack">
         {verifyNotice}
-        <div className={styles.emptyLayout}>
-          <IntroLead />
-          <section className={`${styles.createCard} ${styles.areaCreate}`}>
-            <h2>Creá tu grupo</h2>
-            <p className={styles.meta}>Después te damos el link para invitar a tu familia.</p>
-            <CreateGroup first onCreated={created} />
-          </section>
-          <FamilyIntro />
-          <AlertPreview />
+        <div className="grid gap-6 [grid-template-areas:'lead'_'create'_'steps'_'preview'] min-[1000px]:grid-cols-[1.1fr_1fr] min-[1000px]:grid-rows-[auto_auto_1fr] min-[1000px]:items-start min-[1000px]:gap-x-10 min-[1000px]:[grid-template-areas:'lead_create'_'steps_create'_'steps_preview']">
+          <IntroLead className="[grid-area:lead]" />
+          <Card rule="red" className="grid gap-2 p-5 [grid-area:create]">
+            <h2 className="text-[30px]">Creá tu grupo</h2>
+            <p className={meta}>Después te damos el link para invitar a tu familia.</p>
+            <div className="mt-2">
+              <CreateGroup first stacked onCreated={created} />
+            </div>
+          </Card>
+          <FamilyIntro className="[grid-area:steps]" />
+          <AlertPreview className="[grid-area:preview]" />
         </div>
       </div>
     );
@@ -310,7 +342,7 @@ export function FamilyGroups({
   return (
     <div className="stack">
       {verifyNotice}
-      <div className={styles.withGroups}>
+      <div className="grid gap-5 wide:grid-cols-[minmax(0,1.7fr)_minmax(300px,1fr)] wide:items-start wide:gap-7">
         <div className="stack">
           {groups.map((g) => (
             <GroupCard
@@ -322,19 +354,21 @@ export function FamilyGroups({
             />
           ))}
         </div>
-        <aside className={styles.groupsSide} aria-label="Sobre los avisos">
-          <section className={styles.howBox}>
-            <h2 className={styles.howTitle}>Cómo funciona</h2>
+        <aside className="grid gap-4 wide:sticky wide:top-6" aria-label="Sobre los avisos">
+          <Card className="p-[18px]">
+            <CardTitle>Cómo funciona</CardTitle>
             <FamilyIntro compact />
-            <details className={styles.exampleDetails}>
-              <summary>Ver un ejemplo del aviso</summary>
+            <details className="mt-3.5 border-t border-line pt-3">
+              <summary className="mb-2.5 cursor-pointer font-bold">Ver un ejemplo del aviso</summary>
               <AlertPreview compact />
             </details>
-          </section>
-          <details className={styles.more}>
-            <summary>Crear otro grupo</summary>
-            <p className={styles.meta}>Por ejemplo, uno con tu familia y otro con amigos o compañeros de trabajo.</p>
-            <CreateGroup first={false} onCreated={created} />
+          </Card>
+          <details className="border border-line bg-white px-4 py-3.5">
+            <summary className="cursor-pointer font-bold">Crear otro grupo</summary>
+            <p className={meta}>Por ejemplo, uno con tu familia y otro con amigos o compañeros de trabajo.</p>
+            <div className="mt-2.5">
+              <CreateGroup first={false} stacked onCreated={created} />
+            </div>
           </details>
         </aside>
       </div>

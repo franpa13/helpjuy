@@ -1,6 +1,5 @@
 import { ShieldCheck } from 'lucide-react';
 import { PanelBox } from '@/features/panel/components/PanelPage';
-import styles from './profiles.module.css';
 
 const NEXT = [
   { title: 'Datos de la persona', text: 'Nombre y quién es para vos.' },
@@ -14,21 +13,21 @@ export function NewProfileNext() {
   return (
     <>
       <PanelBox title="Qué sigue">
-        <ol className={styles.nextList}>
+        <ol className="grid list-none p-0">
           {NEXT.map((n, i) => (
-            <li key={n.title}>
-              <span className={styles.nextNum} aria-hidden="true">
+            <li key={n.title} className="flex gap-3 border-t border-line py-2.5">
+              <span className="min-w-5 font-head text-[28px]/[0.9] font-extrabold text-red" aria-hidden="true">
                 {i + 1}
               </span>
               <span>
                 <strong>{n.title}</strong>
-                <span className={styles.nextText}>{n.text}</span>
+                <span className="mt-0.5 block text-sm text-muted-foreground">{n.text}</span>
               </span>
             </li>
           ))}
         </ol>
       </PanelBox>
-      <p className={styles.privacyNote}>
+      <p className="flex items-start gap-2.5 text-[15px] font-bold [&_svg]:shrink-0 [&_svg]:text-green">
         <ShieldCheck size={20} aria-hidden="true" />
         Tus datos de salud se guardan cifrados y vos elegís qué se ve en el QR.
       </p>

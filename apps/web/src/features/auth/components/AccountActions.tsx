@@ -17,7 +17,7 @@ export function ResendVerificationBanner() {
           await postJson('/auth/resend-verification').catch(() => undefined);
           setSent(true);
         }}
-        style={{ font: 'inherit', fontWeight: 700, textDecoration: 'underline', background: 'none', border: 0, cursor: 'pointer', padding: 0 }}
+        className="cursor-pointer bg-transparent p-0 font-bold underline"
       >
         Reenviar
       </button>
@@ -35,7 +35,7 @@ export function LogoutButton() {
         router.push('/ingresar');
         router.refresh();
       }}
-      style={{ font: 'inherit', color: 'inherit', background: 'none', border: 0, cursor: 'pointer', letterSpacing: 'inherit', textTransform: 'inherit' }}
+      className="cursor-pointer bg-transparent p-0 uppercase"
     >
       Salir
     </button>

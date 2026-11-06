@@ -17,7 +17,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { ConsentStep } from './ConsentStep';
-import styles from './profiles.module.css';
+import { checkCard, radioCard } from '@/components/ui/choice';
 
 type Draft = { firstName: string; lastName: string; relationship: Relationship; isMinor: boolean };
 
@@ -101,12 +101,12 @@ export function NewProfileForm({ consent: initialConsent, isFirst }: { consent: 
         onChange={(e) => setDraft({ ...draft, lastName: e.target.value })}
         error={errors.lastName}
       />
-      <fieldset className={styles.radios}>
-        <legend className="label" style={{ marginBottom: 6 }}>
+      <fieldset className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2 border-0 p-0">
+        <legend className="label mb-1.5">
           ¿Quién es?
         </legend>
         {relationshipSchema.options.map((r) => (
-          <label key={r} className={styles.radio}>
+          <label key={r} className={radioCard}>
             <input
               type="radio"
               name="relationship"
@@ -118,7 +118,7 @@ export function NewProfileForm({ consent: initialConsent, isFirst }: { consent: 
           </label>
         ))}
       </fieldset>
-      <label className={styles.check}>
+      <label className={checkCard}>
         <input
           type="checkbox"
           checked={draft.isMinor}

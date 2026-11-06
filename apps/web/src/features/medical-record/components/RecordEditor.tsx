@@ -16,7 +16,16 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { draftCompletion, fromRecord, validate, type Draft, type EditorErrors } from '../draft';
-import styles from './record-editor.module.css';
+import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { cn } from '@/lib/utils';
+
+const removeBtn =
+  'min-h-13 cursor-pointer rounded-md border-2 border-line bg-transparent px-3.5 font-bold text-muted-foreground';
+const row =
+  'grid gap-2.5 border border-line bg-paper p-3 min-[720px]:grid-cols-[1fr_1fr_auto] min-[720px]:items-end min-[720px]:has-[>:nth-child(4)]:grid-cols-[1fr_1fr_1fr_auto]';
+const previewLink = 'inline-flex min-h-13 items-center justify-center rounded-md border-2 border-ink font-bold no-underline';
+const grid2 = 'grid gap-3.5 sm:grid-cols-2';
 
 const SECTION_LABEL: Record<Section, string> = {
   identity: 'Edad, sexo e idioma',
@@ -47,34 +56,40 @@ function VisibilityChoice({
 }) {
   const name = `vis-${section}`;
   const options = [
-    { value: true, label: 'Se ve en el QR', icon: Eye, cls: styles.optPublic },
-    { value: false, label: 'Solo yo', icon: Lock, cls: styles.optPrivate },
+    { value: true, label: 'Se ve en el QR', icon: Eye, cls: 'bg-green' },
+    { value: false, label: 'Solo yo', icon: Lock, cls: 'bg-ink' },
   ];
   return (
-    <div className={styles.choiceWrap}>
-      <span className={styles.choiceCaption} aria-hidden="true">
+    <div className="grid justify-items-start gap-1">
+      <span className="font-head text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground" aria-hidden="true">
         {named ? `¿Quién ve: ${SECTION_LABEL[section].toLowerCase()}?` : '¿Quién ve esto?'}
       </span>
-      <div role="radiogroup" aria-label={`${SECTION_LABEL[section]}: ¿quién lo ve?`} className={styles.choice}>
+      <div role="radiogroup" aria-label={`${SECTION_LABEL[section]}: ¿quién lo ve?`} className="inline-grid grid-cols-2 gap-1 rounded-full border-2 border-line bg-paper p-1">
         {options.map(({ value, label, icon: Icon, cls }) => {
           const selected = on === value;
           return (
-            <label key={label} className={`${styles.option} ${selected ? cls : ''}`}>
+            <label
+              key={label}
+              className={cn(
+                'relative grid min-h-10 cursor-pointer place-items-center whitespace-nowrap rounded-full px-3.5 text-sm font-bold text-muted-foreground transition-colors hover:text-ink has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-blue',
+                selected && 'text-white hover:text-white',
+              )}
+            >
               <input
                 type="radio"
                 name={name}
-                className={styles.optionInput}
+                className="absolute inset-0 z-2 m-0 size-full cursor-pointer opacity-0"
                 checked={selected}
                 onChange={() => onChange(value)}
               />
               {selected && (
                 <motion.span
                   layoutId={`indicator-${section}`}
-                  className={styles.indicator}
+                  className={cn('absolute inset-0 rounded-full', cls)}
                   transition={{ type: 'spring', stiffness: 500, damping: 36 }}
                 />
               )}
-              <span className={styles.optionContent}>
+              <span className="relative z-1 inline-flex items-center gap-1.5">
                 <Icon size={16} aria-hidden="true" />
                 {label}
               </span>
@@ -104,13 +119,19 @@ function Block({
   children: ReactNode;
 }) {
   return (
-    <section className={`${styles.block} ${tone ? styles[tone] : ''}`}>
-      <header className={styles.blockHead}>
+    <Card
+      rule="none"
+      className={cn(
+        'border-t-3',
+        tone === 'red' ? 'border-t-red' : tone === 'amber' ? 'border-t-amber' : tone === 'blue' ? 'border-t-blue' : 'border-t-ink',
+      )}
+    >
+      <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2.5 px-4 pt-3.5">
         <div>
-          <h2>{title}</h2>
-          {question && <p className={styles.question}>{question}</p>}
+          <h2 className="text-[26px]">{title}</h2>
+          {question && <p className="mt-1 max-w-[34em] text-base text-muted-foreground">{question}</p>}
         </div>
-        <div className={styles.toggles}>
+        <div className="flex flex-wrap gap-2">
           {sections.map((s) => (
             <VisibilityChoice
               key={s}
@@ -122,8 +143,8 @@ function Block({
           ))}
         </div>
       </header>
-      <div className={styles.blockBody}>{children}</div>
-    </section>
+      <div className="grid gap-3.5 px-4 pt-3.5 pb-4">{children}</div>
+    </Card>
   );
 }
 
@@ -139,9 +160,11 @@ function Select<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <label className={styles.select}>
+    <label className="grid gap-1.5">
       <span className="label">{label}</span>
-      <select value={value} onChange={(e) => onChange(e.target.value as T)}>
+      <select
+        className="min-h-13 rounded-md border-2 border-ink bg-white px-3 py-2.5 text-ink"
+       value={value} onChange={(e) => onChange(e.target.value as T)}>
         {options.map(([v, l]) => (
           <option key={v} value={v}>
             {l}
@@ -154,7 +177,7 @@ function Select<T extends string>({
 
 function NoneCheck({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className={styles.none}>
+    <label className="flex cursor-pointer items-center gap-2.5 font-bold [&_input]:size-[22px] [&_input]:accent-ink">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
       {label}
     </label>
@@ -211,15 +234,15 @@ export function RecordEditor({ profile, initial }: Props) {
   const err = (k: string) => errors[k];
 
   return (
-    <div className={styles.editorLayout}>
-      <div className={styles.blocks}>
+    <div className="grid gap-4 [grid-template-areas:'progress'_'blocks'_'summary'_'links'_'save'] wide:grid-cols-[minmax(0,1.7fr)_minmax(300px,1fr)] wide:items-start wide:gap-7 wide:[grid-template-areas:'blocks_side']">
+      <div className="grid min-w-0 gap-4 [grid-area:blocks]">
       <Block
         title="Datos básicos"
         sections={['identity', 'vitals']}
         visibility={visibility}
         setVisible={setVisible}
       >
-        <div className={styles.grid3}>
+        <div className="grid gap-3.5 sm:grid-cols-3">
           <Select
             label="Sexo"
             value={draft.sex}
@@ -276,7 +299,7 @@ export function RecordEditor({ profile, initial }: Props) {
         <NoneCheck label="No tengo alergias" checked={draft.allergiesNone} onChange={(v) => set('allergiesNone', v)} />
         {!draft.allergiesNone &&
           draft.allergies.map((a, i) => (
-            <div key={i} className={styles.row}>
+            <div key={i} className={row}>
               <Field
                 label={`Alergia ${i + 1}`}
                 maxLength={80}
@@ -293,7 +316,7 @@ export function RecordEditor({ profile, initial }: Props) {
                 onChange={(e) => setRow('allergies', i, { reaction: e.target.value })}
                 placeholder="Me hincho, me cuesta respirar"
               />
-              <button type="button" className={styles.remove} onClick={() => removeRow('allergies', i)}>
+              <button type="button" className={removeBtn} onClick={() => removeRow('allergies', i)}>
                 Quitar
               </button>
             </div>
@@ -319,7 +342,7 @@ export function RecordEditor({ profile, initial }: Props) {
         <NoneCheck label="No tengo enfermedades" checked={draft.conditionsNone} onChange={(v) => set('conditionsNone', v)} />
         {!draft.conditionsNone &&
           draft.conditions.map((c, i) => (
-            <div key={i} className={styles.row}>
+            <div key={i} className={row}>
               <Field
                 label={`Enfermedad ${i + 1}`}
                 maxLength={80}
@@ -331,7 +354,7 @@ export function RecordEditor({ profile, initial }: Props) {
               <Field label={`Detalle ${i + 1}`}
                 maxLength={120}
                 error={err(`conditions.${i}.note`)} value={c.note} onChange={(e) => setRow('conditions', i, { note: e.target.value })} />
-              <button type="button" className={styles.remove} onClick={() => removeRow('conditions', i)}>
+              <button type="button" className={removeBtn} onClick={() => removeRow('conditions', i)}>
                 Quitar
               </button>
             </div>
@@ -357,7 +380,7 @@ export function RecordEditor({ profile, initial }: Props) {
         <NoneCheck label="No tomo remedios" checked={draft.medicationsNone} onChange={(v) => set('medicationsNone', v)} />
         {!draft.medicationsNone &&
           draft.medications.map((m, i) => (
-            <div key={i} className={styles.row}>
+            <div key={i} className={row}>
               <Field
                 label={`Remedio ${i + 1}`}
                 maxLength={80}
@@ -369,7 +392,7 @@ export function RecordEditor({ profile, initial }: Props) {
               <Field label={`Dosis ${i + 1}`}
                 maxLength={60}
                 error={err(`medications.${i}.dose`)} value={m.dose} onChange={(e) => setRow('medications', i, { dose: e.target.value })} placeholder="50 mg a la mañana" />
-              <label className={styles.none}>
+              <label className="flex cursor-pointer items-center gap-2.5 font-bold [&_input]:size-[22px] [&_input]:accent-ink">
                 <input
                   type="checkbox"
                   checked={m.anticoagulant}
@@ -377,7 +400,7 @@ export function RecordEditor({ profile, initial }: Props) {
                 />
                 Es anticoagulante (para la sangre)
               </label>
-              <button type="button" className={styles.remove} onClick={() => removeRow('medications', i)}>
+              <button type="button" className={removeBtn} onClick={() => removeRow('medications', i)}>
                 Quitar
               </button>
             </div>
@@ -400,7 +423,7 @@ export function RecordEditor({ profile, initial }: Props) {
         setVisible={setVisible}
       >
         {draft.contacts.map((c, i) => (
-          <div key={i} className={styles.row}>
+          <div key={i} className={row}>
             <Field
               label={`Nombre del contacto ${i + 1}`}
                 maxLength={60}
@@ -426,7 +449,7 @@ export function RecordEditor({ profile, initial }: Props) {
               placeholder="388 412-3456"
               error={err(`contacts.${i}.phone`)}
             />
-            <button type="button" className={styles.remove} onClick={() => removeRow('contacts', i)}>
+            <button type="button" className={removeBtn} onClick={() => removeRow('contacts', i)}>
               Quitar
             </button>
           </div>
@@ -450,7 +473,7 @@ export function RecordEditor({ profile, initial }: Props) {
           onChange={(e) => set('communication', e.target.value)}
           placeholder="Soy sordo, leo los labios"
         />
-        <div className={styles.grid2}>
+        <div className={grid2}>
           <Select
             label="Transfusiones de sangre"
             value={draft.transfusion}
@@ -483,7 +506,7 @@ export function RecordEditor({ profile, initial }: Props) {
       </Block>
 
       <Block title="Cirugías e implantes" sections={['history']} visibility={visibility} setVisible={setVisible}>
-        <div className={styles.grid2}>
+        <div className={grid2}>
           <Field label="Cirugías"
                 maxLength={300}
                 error={err('surgeries')} value={draft.surgeries} onChange={(e) => set('surgeries', e.target.value)} />
@@ -499,7 +522,7 @@ export function RecordEditor({ profile, initial }: Props) {
       </Block>
 
       <Block title="Obra social" sections={['insurance']} visibility={visibility} setVisible={setVisible}>
-        <div className={styles.grid2}>
+        <div className={grid2}>
           <Field label="Obra social o prepaga"
                 maxLength={60}
                 error={err('insurance.name')} value={draft.insuranceName} onChange={(e) => set('insuranceName', e.target.value)} />
@@ -510,7 +533,7 @@ export function RecordEditor({ profile, initial }: Props) {
       </Block>
 
       <Block title="Médico de cabecera" sections={['doctor']} visibility={visibility} setVisible={setVisible}>
-        <div className={styles.grid2}>
+        <div className={grid2}>
           <Field label="Nombre del médico"
                 maxLength={60}
                 error={err('doctor.name')} value={draft.doctorName} onChange={(e) => set('doctorName', e.target.value)} />
@@ -533,17 +556,15 @@ export function RecordEditor({ profile, initial }: Props) {
       </div>
 
       {/* Columna lateral en escritorio; en celular sus piezas se reparten (progreso arriba, guardar fijo abajo). */}
-      <div className={styles.side}>
-      <div className={styles.progress} aria-live="polite">
+      <div className="contents wide:sticky wide:top-6 wide:grid wide:gap-4 wide:border wide:border-t-4 wide:border-line wide:border-t-night wide:bg-white wide:p-[18px] wide:[grid-area:side]">
+      <div className="grid gap-1.5 font-head text-xl font-extrabold uppercase max-wide:[grid-area:progress]" aria-live="polite">
         <span>Ficha al {percent}%</span>
-        <span className={styles.bar}>
-          <span style={{ width: `${percent}%` }} />
-        </span>
+        <Progress value={percent} aria-hidden="true" className="[&>span]:transition-[width] [&>span]:duration-400" />
       </div>
 
-      <div className={styles.summary} aria-live="polite">
+      <div className="max-wide:[grid-area:summary]" aria-live="polite">
         {visibleSections.length > 0 ? (
-          <p>
+          <p className="border-l-6 border-green bg-white px-3.5 py-3 text-base">
             <strong>Quien escanee tu QR va a ver:</strong> {visibleSections.map((s) => SECTION_LABEL[s]).join(', ')}.
           </p>
         ) : (
@@ -553,16 +574,16 @@ export function RecordEditor({ profile, initial }: Props) {
         )}
       </div>
 
-      <div className={styles.links}>
-        <a className={styles.preview} href={`/e/${profile.publicToken}`} target="_blank" rel="noreferrer">
+      <div className="grid gap-2.5 max-wide:[grid-area:links]">
+        <a className={previewLink} href={`/e/${profile.publicToken}`} target="_blank" rel="noreferrer">
           Ver como el paramédico
         </a>
-        <a className={styles.preview} href={`/panel/perfiles/${profile.id}/imprimir`}>
+        <a className={previewLink} href={`/panel/perfiles/${profile.id}/imprimir`}>
           Imprimir mi QR
         </a>
       </div>
 
-      <div className={styles.saveBar}>
+      <div className="sticky bottom-0 grid gap-2.5 bg-linear-to-t from-paper from-75% to-transparent pt-3 pb-4 max-panel:bottom-[calc(70px+env(safe-area-inset-bottom))] max-wide:[grid-area:save] wide:static wide:bg-none wide:p-0">
         {status === 'saved' && <Alert variant="success">Guardado. Tu QR ya muestra estos datos.</Alert>}
         {status === 'error' && (
           <Alert variant="error">{errors._form ?? 'Hay datos para revisar. Están marcados en rojo.'}</Alert>

@@ -44,7 +44,7 @@ export function LoginForm({ next, googleEnabled = false, error }: { next?: strin
       {googleEnabled && <GoogleButton next={safeNext(next, '/panel')} />}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
       <PasswordField label="Contraseña" name="password" autoComplete="current-password" error={errors.password} />
-      <p style={{ marginTop: -6, textAlign: 'right', fontSize: 15 }}>
+      <p className="-mt-1.5 text-right text-[15px]">
         <Link href="/recuperar">Me olvidé la contraseña</Link>
       </p>
       <Button type="submit" disabled={sending}>

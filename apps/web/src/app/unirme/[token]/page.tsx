@@ -51,20 +51,20 @@ export default async function UnirmePage({ params }: PageProps<'/unirme/[token]'
       subtitle={`${preview.inviterName} quiere que te enteres si le pasa algo. Ya ${preview.memberCount === 1 ? 'hay 1 persona' : `hay ${preview.memberCount} personas`} en el grupo.`}
     >
       <div className="stack">
-        <ul className="stack" style={{ listStyle: 'none', padding: 0 }}>
-          <li style={{ display: 'flex', gap: 12 }}>
+        <ul className="stack list-none p-0 [&_li]:flex [&_li]:gap-3 [&_svg]:shrink-0">
+          <li>
             <BellRing aria-hidden="true" />
             <span>
               <strong>Vas a recibir un aviso por email</strong> si alguien escanea el QR de un miembro y marca una emergencia.
             </span>
           </li>
-          <li style={{ display: 'flex', gap: 12 }}>
+          <li>
             <EyeOff aria-hidden="true" />
             <span>
               <strong>No vas a ver datos médicos</strong> de nadie, y nadie ve los tuyos.
             </span>
           </li>
-          <li style={{ display: 'flex', gap: 12 }}>
+          <li>
             <LogOut aria-hidden="true" />
             <span>
               <strong>Podés silenciar o salir</strong> del grupo cuando quieras.

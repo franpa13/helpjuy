@@ -9,7 +9,6 @@ import { resolveSiteUrl } from '@/features/print/site-url';
 import { apiServer } from '@/shared/api/server';
 import { Alert } from '@/components/ui/alert';
 import { PanelBox, PanelPage } from '@/features/panel/components/PanelPage';
-import styles from './imprimir.module.css';
 
 export const metadata = { title: 'Imprimir mi QR — HelpJuy' };
 
@@ -54,12 +53,12 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
           <PanelBox title="Imprimir">
             <PrintActions profileId={id} fingerprint={fingerprint} />
             {/* La misma dirección que va dentro del QR: si está mal configurada, se nota acá antes de imprimir. */}
-            <a className={styles.preview} href={url} target="_blank" rel="noreferrer">
+            <a className="mt-3 inline-block font-bold" href={url} target="_blank" rel="noreferrer">
               Probar el QR: ver como el paramédico
             </a>
           </PanelBox>
           <PanelBox title="Consejos">
-            <ul className={styles.tips}>
+            <ul className="grid gap-1.5 pl-5 text-muted-foreground">
               <li>
                 Para el casco o la moto, usá <strong>papel autoadhesivo</strong> y cubrilo con <strong>cinta transparente</strong> para que
                 aguante el sol y la lluvia.
@@ -73,7 +72,7 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
         </>
       }
     >
-      <div className={styles.sheetWrap}>
+      <div className="overflow-x-auto pb-2 print:overflow-visible">
         <PrintSheet data={data} qrSvg={qrSvg} url={url} />
       </div>
     </PanelPage>

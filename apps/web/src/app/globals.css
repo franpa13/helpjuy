@@ -48,6 +48,16 @@
   /* Panel: barra lateral desde 900px; columna lateral de contenido desde 1100px */
   --breakpoint-panel: 56.25rem;
   --breakpoint-wide: 68.75rem;
+  /* Pantallas partidas (cuenta, landing): dos columnas desde 960px */
+  --breakpoint-split: 60rem;
+
+  /* Todo el texto corrido usa interlineado 1.5, como antes de Tailwind */
+  --text-xs--line-height: 1.5;
+  --text-sm--line-height: 1.5;
+  --text-base--line-height: 1.5;
+  --text-lg--line-height: 1.5;
+  --text-xl--line-height: 1.5;
+  --text-2xl--line-height: 1.5;
 
   --font-sans: var(--font-atkinson), system-ui, sans-serif;
   --font-head: var(--font-barlow), 'Arial Narrow', sans-serif;
@@ -146,4 +156,27 @@
 
 @utility stack {
   @apply grid gap-4;
+}
+
+/* ---------- Impresión de la hoja del QR ---------- */
+@page {
+  size: A4;
+  margin: 10mm;
+}
+
+@media print {
+  /* Solo afecta a la página que tiene la hoja: el resto de la app imprime normal. */
+  body:has(#hoja-imprimible) * {
+    visibility: hidden;
+  }
+
+  #hoja-imprimible,
+  #hoja-imprimible * {
+    visibility: visible;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
 }

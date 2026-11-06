@@ -6,7 +6,6 @@ import { useState } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import styles from './print.module.css';
 
 type Step = 'idle' | 'confirm' | 'saving' | 'done' | 'outdated' | 'error';
 
@@ -41,7 +40,7 @@ export function PrintActions({ profileId, fingerprint }: { profileId: string; fi
   }
 
   return (
-    <div className={styles.actions}>
+    <div className="grid gap-2.5">
       {(step === 'idle' || step === 'done' || step === 'outdated' || step === 'error') && (
         <Button type="button" onClick={print}>
           <Printer size={20} aria-hidden="true" />
@@ -50,11 +49,11 @@ export function PrintActions({ profileId, fingerprint }: { profileId: string; fi
       )}
 
       {(step === 'confirm' || step === 'saving') && (
-        <div className={styles.confirm} role="group" aria-label="Confirmar impresión">
+        <div className="grid gap-2.5 border-2 border-ink bg-white p-3.5" role="group" aria-label="Confirmar impresión">
           <p>
             <strong>¿Se imprimió bien?</strong> Así te avisamos si algún día hay que reimprimirlo.
           </p>
-          <div className={styles.confirmRow}>
+          <div className="grid gap-2 sm:grid-cols-2">
             <Button type="button" onClick={confirm} disabled={step === 'saving'}>
               Sí, ya lo tengo impreso
             </Button>
