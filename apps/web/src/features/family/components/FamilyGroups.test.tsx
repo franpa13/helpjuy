@@ -98,11 +98,22 @@ describe('FamilyGroups', () => {
     expect(screen.getByText(/Confirmá tu email para recibir los avisos/)).toBeInTheDocument();
   });
 
-  it("con grupo, al costado muestra el aviso de ejemplo, cómo funciona y crear otro grupo", () => {
-    render(<FamilyGroups initial={[group()]} myName="Francisco Paredes" />);
+  it("con grupo, el ejemplo del aviso queda plegado dentro de Cómo funciona y se nota que es un ejemplo", () => {
+    render(<FamilyGroups initial={[group()]} />);
     const side = screen.getByRole("complementary", { name: "Sobre los avisos" });
-    expect(within(side).getByLabelText("Ejemplo del email que recibe tu familia")).toHaveTextContent("Francisco Paredes");
+    const example = within(side).getByLabelText("Ejemplo del email que recibe tu familia");
+    expect(example.closest("details")).not.toHaveAttribute("open");
+    expect(example).toHaveTextContent("EJEMPLO");
+    expect(example).not.toHaveTextContent("Francisco Paredes");
+    expect(within(side).getByText("Ver un ejemplo del aviso")).toBeInTheDocument();
     expect(within(side).getByRole("list", { name: "Cómo funciona" })).toBeInTheDocument();
     expect(within(side).getByText("Crear otro grupo")).toBeInTheDocument();
+  });
+
+  it("sin grupo, el ejemplo está a la vista pero marcado como ejemplo", () => {
+    render(<FamilyGroups initial={[]} />);
+    const example = screen.getByLabelText("Ejemplo del email que recibe tu familia");
+    expect(example).toHaveTextContent("EJEMPLO");
+    expect(example).toHaveTextContent("Así se vería si alguien escanea un QR y marca una emergencia");
   });
 });

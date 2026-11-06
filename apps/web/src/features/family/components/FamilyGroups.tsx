@@ -271,12 +271,9 @@ function GroupCard({
 export function FamilyGroups({
   initial,
   emailVerified = true,
-  myName,
 }: {
   initial: FamilyGroupDto[];
   emailVerified?: boolean;
-  /** Para la vista previa del aviso: "Posible emergencia: {tu nombre}". */
-  myName?: string;
 }) {
   const [groups, setGroups] = useState(initial);
   const [justCreated, setJustCreated] = useState<string | null>(null);
@@ -304,7 +301,7 @@ export function FamilyGroups({
             <CreateGroup first onCreated={created} />
           </section>
           <FamilyIntro />
-          <AlertPreview name={myName} />
+          <AlertPreview />
         </div>
       </div>
     );
@@ -326,10 +323,13 @@ export function FamilyGroups({
           ))}
         </div>
         <aside className={styles.groupsSide} aria-label="Sobre los avisos">
-          <AlertPreview name={myName} />
           <section className={styles.howBox}>
             <h2 className={styles.howTitle}>Cómo funciona</h2>
             <FamilyIntro compact />
+            <details className={styles.exampleDetails}>
+              <summary>Ver un ejemplo del aviso</summary>
+              <AlertPreview compact />
+            </details>
           </section>
           <details className={styles.more}>
             <summary>Crear otro grupo</summary>

@@ -53,13 +53,21 @@ export function FamilyIntro({ compact = false }: { compact?: boolean }) {
   );
 }
 
-/** Vista previa del email real que recibe la familia. */
-export function AlertPreview({ name = 'Francisco Paredes' }: { name?: string }) {
-  const first = name.split(' ')[0];
+/**
+ * Ejemplo del email que recibe la familia. Va con un nombre inventado y la etiqueta EJEMPLO
+ * para que nadie piense que ya escanearon su QR.
+ */
+export function AlertPreview({ compact = false }: { compact?: boolean }) {
+  const name = 'Lucía Mamani';
   return (
-    <figure className={`${styles.preview} ${styles.areaPreview}`} aria-label="Ejemplo del email que recibe tu familia">
-      <figcaption className={styles.previewCaption}>Así le llega a tu familia</figcaption>
+    <figure
+      className={`${styles.preview} ${compact ? '' : styles.areaPreview}`}
+      aria-label="Ejemplo del email que recibe tu familia"
+    >
+      {!compact && <figcaption className={styles.previewCaption}>Así le llega a tu familia</figcaption>}
       <div className={styles.mail}>
+        <span className={styles.exampleTag}>EJEMPLO</span>
+        <p className={styles.exampleNote}>Así se vería si alguien escanea un QR y marca una emergencia (nombre inventado).</p>
         <div className={styles.mailFrom}>
           <span>HelpJuy</span>
           <span>14:32</span>
@@ -70,7 +78,7 @@ export function AlertPreview({ name = 'Francisco Paredes' }: { name?: string }) 
         </p>
         <p className={styles.mailLink}>Ver ubicación aproximada en el mapa</p>
         <p>
-          <strong>Puede no ser real.</strong> Intentá comunicarte con {first}. Si no responde, llamá al 107.
+          <strong>Puede no ser real.</strong> Intentá comunicarte con Lucía. Si no responde, llamá al 107.
         </p>
       </div>
     </figure>
