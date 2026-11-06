@@ -42,4 +42,7 @@ export type ProfileDto = {
   completion: number;
   /** El QR está activo: tiene al menos un contacto de emergencia. */
   active: boolean;
+  /** never: nunca se imprimió · ok: lo impreso está al día · outdated: cambió algo impreso o el QR. */
+  printStatus: 'never' | 'ok' | 'outdated';
+  printedAt: string | null;
 };

@@ -1,8 +1,20 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { completion, isActive, type CreateProfileInput, type ProfileDto, type UpdateProfileInput } from '@helpjuy/contracts';
+import {
+  DEFAULT_VISIBILITY,
+  completion,
+  isActive,
+  printableData,
+  visibilitySchema,
+  type CreateProfileInput,
+  type MedicalRecord as Record_,
+  type PrintStatus,
+  type ProfileDto,
+  type UpdateProfileInput,
+  type Visibility,
+} from '@helpjuy/contracts';
 import type { MedicalRecord, Profile } from '../../generated/prisma/client.js';
 import { MedicalCipher } from '../../shared/crypto/medical-cipher.js';
-import { randomToken } from '../../shared/crypto/tokens.js';
+import { randomToken, sha256Hex } from '../../shared/crypto/tokens.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { ConsentService } from '../consent/consent.service.js';
 import { CardCache } from '../emergency-card/card-cache.js';
@@ -11,7 +23,7 @@ export const newPublicToken = () => randomToken(16);
 
 export type ProfileWithRecord = Profile & { medicalRecord?: MedicalRecord | null };
 
-function baseDto(p: Profile): Omit<ProfileDto, 'completion' | 'active'> {
+function baseDto(p: Profile): Omit<ProfileDto, 'completion' | 'active' | 'printStatus' | 'printedAt'> {
   return {
     id: p.id,
     firstName: p.firstName,
@@ -41,9 +53,35 @@ export class ProfilesService {
     });
   }
 
+  private visibilityOf(p: ProfileWithRecord): Visibility {
+    const parsed = visibilitySchema.safeParse({ ...DEFAULT_VISIBILITY, ...((p.medicalRecord?.visibility as object) ?? {}) });
+    return parsed.success ? parsed.data : DEFAULT_VISIBILITY;
+  }
+
+  /** Huella de lo que va impreso (token + datos impresos). Si cambia, hay que reimprimir. */
+  printFingerprint(p: ProfileWithRecord, record: Record_ | null): string {
+    return sha256Hex(JSON.stringify({ token: p.publicToken, printable: printableData(p, record, this.visibilityOf(p)) }));
+  }
+
   toDto(p: ProfileWithRecord): ProfileDto {
     const record = p.medicalRecord ? this.cipher.decrypt(p.medicalRecord.ciphertext) : null;
-    return { ...baseDto(p), completion: record ? completion(record) : 0, active: record ? isActive(record) : false };
+    const printStatus: PrintStatus = !p.printedHash ? 'never' : p.printedHash === this.printFingerprint(p, record) ? 'ok' : 'outdated';
+    return {
+      ...baseDto(p),
+      completion: record ? completion(record) : 0,
+      active: record ? isActive(record) : false,
+      printStatus,
+      printedAt: p.printedAt ? p.printedAt.toISOString() : null,
+    };
+  }
+
+  /** "Ya lo imprimí": guarda la huella calculada en el servidor (no se confía en el cliente). */
+  async markPrinted(ownerId: string, id: string): Promise<{ printStatus: PrintStatus; printedAt: string }> {
+    const p = await this.getOwned(ownerId, id);
+    const record = p.medicalRecord ? this.cipher.decrypt(p.medicalRecord.ciphertext) : null;
+    const printedAt = new Date();
+    await this.prisma.profile.update({ where: { id }, data: { printedHash: this.printFingerprint(p, record), printedAt } });
+    return { printStatus: 'ok', printedAt: printedAt.toISOString() };
   }
 
   async list(ownerId: string): Promise<ProfileWithRecord[]> {

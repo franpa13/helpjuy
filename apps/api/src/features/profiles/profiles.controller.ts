@@ -50,6 +50,12 @@ export class ProfilesController {
     await this.profiles.remove(user.id, id);
   }
 
+  @Post(':id/printed')
+  @HttpCode(200)
+  printed(@CurrentUser() user: User, @Param('id') id: string) {
+    return this.profiles.markPrinted(user.id, id);
+  }
+
   @Post(':id/rotate-token')
   @HttpCode(200)
   async rotate(@CurrentUser() user: User, @Param('id') id: string): Promise<{ publicToken: string }> {

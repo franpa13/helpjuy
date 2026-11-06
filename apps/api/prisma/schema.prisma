@@ -69,6 +69,9 @@ model Profile {
   isMinor        Boolean         @default(false)
   publicToken    String          @unique
   tokenRotatedAt DateTime        @default(now())
+  /// Huella de lo último impreso (sha256 del token + datos impresos), para avisar cuándo reimprimir.
+  printedHash    String?
+  printedAt      DateTime?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   consents       ConsentRecord[]

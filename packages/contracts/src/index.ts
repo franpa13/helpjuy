@@ -8,3 +8,4 @@ export * from './profiles';
 export * from './medical';
 export * from './public-card';
 export * from './family';
+export * from './printable';
