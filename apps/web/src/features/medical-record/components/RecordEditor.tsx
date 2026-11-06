@@ -12,8 +12,8 @@ import { Eye, Lock } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useMemo, useState, type ReactNode } from 'react';
 import { ApiError, apiFetch } from '@/shared/api/client';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { draftCompletion, fromRecord, validate, type Draft, type EditorErrors } from '../draft';
 import styles from './record-editor.module.css';
@@ -300,7 +300,7 @@ export function RecordEditor({ profile, initial }: Props) {
           ))}
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           disabled={draft.allergiesNone || draft.allergies.length >= 20}
           onClick={() => set('allergies', [...draft.allergies, { substance: '', reaction: '' }])}
         >
@@ -338,7 +338,7 @@ export function RecordEditor({ profile, initial }: Props) {
           ))}
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           disabled={draft.conditionsNone || draft.conditions.length >= 20}
           onClick={() => set('conditions', [...draft.conditions, { name: '', note: '' }])}
         >
@@ -384,7 +384,7 @@ export function RecordEditor({ profile, initial }: Props) {
           ))}
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           disabled={draft.medicationsNone || draft.medications.length >= 30}
           onClick={() => set('medications', [...draft.medications, { name: '', dose: '', anticoagulant: false }])}
         >
@@ -433,7 +433,7 @@ export function RecordEditor({ profile, initial }: Props) {
         ))}
         <Button
           type="button"
-          variant="secondary"
+          variant="outline"
           disabled={draft.contacts.length >= 3}
           onClick={() => set('contacts', [...draft.contacts, { name: '', relation: '', phone: '' }])}
         >
@@ -547,7 +547,7 @@ export function RecordEditor({ profile, initial }: Props) {
             <strong>Quien escanee tu QR va a ver:</strong> {visibleSections.map((s) => SECTION_LABEL[s]).join(', ')}.
           </p>
         ) : (
-          <Alert tone="warning">
+          <Alert variant="warning">
             Quien escanee tu QR solo va a ver tu nombre. Activá al menos alergias, medicación y contactos.
           </Alert>
         )}
@@ -563,9 +563,9 @@ export function RecordEditor({ profile, initial }: Props) {
       </div>
 
       <div className={styles.saveBar}>
-        {status === 'saved' && <Alert tone="success">Guardado. Tu QR ya muestra estos datos.</Alert>}
+        {status === 'saved' && <Alert variant="success">Guardado. Tu QR ya muestra estos datos.</Alert>}
         {status === 'error' && (
-          <Alert tone="error">{errors._form ?? 'Hay datos para revisar. Están marcados en rojo.'}</Alert>
+          <Alert variant="error">{errors._form ?? 'Hay datos para revisar. Están marcados en rojo.'}</Alert>
         )}
         <Button type="button" onClick={save} disabled={status === 'saving'}>
           {status === 'saving' ? 'Guardando…' : 'Guardar ficha'}

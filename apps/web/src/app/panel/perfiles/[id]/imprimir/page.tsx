@@ -7,9 +7,8 @@ import { PrintActions } from '@/features/print/components/PrintActions';
 import { PrintSheet } from '@/features/print/components/PrintSheet';
 import { resolveSiteUrl } from '@/features/print/site-url';
 import { apiServer } from '@/shared/api/server';
-import { Alert } from '@/shared/ui/Alert';
-import { PanelPage } from '@/features/panel/components/PanelPage';
-import box from '@/features/panel/components/panel-page.module.css';
+import { Alert } from '@/components/ui/alert';
+import { PanelBox, PanelPage } from '@/features/panel/components/PanelPage';
 import styles from './imprimir.module.css';
 
 export const metadata = { title: 'Imprimir mi QR — HelpJuy' };
@@ -44,24 +43,22 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
       aside={
         <>
           {profile.printStatus === 'outdated' && (
-            <Alert tone="warning">Cambiaron datos de lo que tenés impreso (o generaste un QR nuevo). Volvé a imprimirlo y reemplazá el viejo.</Alert>
+            <Alert variant="warning">Cambiaron datos de lo que tenés impreso (o generaste un QR nuevo). Volvé a imprimirlo y reemplazá el viejo.</Alert>
           )}
           {!profile.active && (
-            <Alert tone="warning">
+            <Alert variant="warning">
               Todavía no cargaste un contacto de emergencia. Podés imprimir igual, pero conviene{' '}
               <Link href={`/panel/perfiles/${id}`}>agregarlo</Link> antes.
             </Alert>
           )}
-          <section className={box.box}>
-            <h2 className={box.boxTitle}>Imprimir</h2>
+          <PanelBox title="Imprimir">
             <PrintActions profileId={id} fingerprint={fingerprint} />
             {/* La misma dirección que va dentro del QR: si está mal configurada, se nota acá antes de imprimir. */}
             <a className={styles.preview} href={url} target="_blank" rel="noreferrer">
               Probar el QR: ver como el paramédico
             </a>
-          </section>
-          <section className={box.box}>
-            <h2 className={box.boxTitle}>Consejos</h2>
+          </PanelBox>
+          <PanelBox title="Consejos">
             <ul className={styles.tips}>
               <li>
                 Para el casco o la moto, usá <strong>papel autoadhesivo</strong> y cubrilo con <strong>cinta transparente</strong> para que
@@ -72,7 +69,7 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
               </li>
               <li>Lo impreso muestra solo lo que elegiste que se vea. Si cambiás algo, te avisamos para reimprimir.</li>
             </ul>
-          </section>
+          </PanelBox>
         </>
       }
     >

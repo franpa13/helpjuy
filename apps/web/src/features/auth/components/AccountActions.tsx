@@ -3,13 +3,13 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { postJson } from '@/shared/api/client';
-import { Alert } from '@/shared/ui/Alert';
+import { Alert } from '@/components/ui/alert';
 
 export function ResendVerificationBanner() {
   const [sent, setSent] = useState(false);
-  if (sent) return <Alert tone="success">Te mandamos el link de nuevo. Revisá tu correo.</Alert>;
+  if (sent) return <Alert variant="success">Te mandamos el link de nuevo. Revisá tu correo.</Alert>;
   return (
-    <Alert tone="warning">
+    <Alert variant="warning">
       Confirmá tu email para recibir avisos.{' '}
       <button
         type="button"

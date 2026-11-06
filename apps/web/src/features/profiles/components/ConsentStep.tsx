@@ -3,7 +3,7 @@
 import type { ConsentAcceptance, ConsentDto } from '@helpjuy/contracts';
 import { useState } from 'react';
 import Markdown from 'react-markdown';
-import { Button } from '@/shared/ui/Button';
+import { Button } from '@/components/ui/button';
 import styles from './profiles.module.css';
 
 type Props = {
@@ -41,7 +41,7 @@ export function ConsentStep({ consent, isMinor, sending = false, onAccept }: Pro
       >
         {sending ? 'Creando…' : 'Aceptar y crear perfil'}
       </Button>
-      <p className="muted" style={{ fontSize: 14 }}>
+      <p className="text-sm text-muted-foreground">
         Versión del consentimiento: {consent.version}
       </p>
     </div>

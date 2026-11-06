@@ -18,7 +18,7 @@
 .vital small,
 .btn small,
 .kv dt {
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.12em;
@@ -32,7 +32,7 @@
   padding: 10px 16px;
   background: var(--red);
   color: var(--white);
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.14em;
@@ -58,7 +58,7 @@
 .meta {
   margin-top: 6px;
   font-size: 16px;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .vitals {
@@ -77,13 +77,13 @@
 }
 
 .vital small {
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .vital b {
   display: block;
   margin-top: 4px;
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 36px;
   line-height: 1;
@@ -165,7 +165,7 @@
 
 .alg b,
 .none {
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 32px;
   line-height: 1;
@@ -214,7 +214,7 @@
 .rows li span {
   font-size: 15px;
   font-weight: 400;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .rows li .flag {
@@ -223,7 +223,7 @@
   padding: 3px 6px;
   background: var(--ink);
   color: var(--white);
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.1em;
@@ -253,7 +253,7 @@
   display: block;
   font-size: 14px;
   font-weight: 400;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .notes li.critical {
@@ -280,7 +280,7 @@ details.sec summary {
   justify-content: space-between;
   cursor: pointer;
   list-style: none;
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 16px;
   letter-spacing: 0.14em;
@@ -293,7 +293,7 @@ details.sec summary::-webkit-details-marker {
 
 details.sec summary::after {
   content: 'Ver +';
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 details[open].sec summary::after {
@@ -315,7 +315,7 @@ details[open].sec summary::after {
 }
 
 .kv dt {
-  color: var(--muted);
+  color: var(--muted-foreground);
   margin-bottom: 2px;
 }
 
@@ -327,7 +327,7 @@ details[open].sec summary::after {
   padding: 14px 16px 130px;
   font-size: 14px;
   line-height: 1.5;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 /* Llamadas: barra fija abajo en celular, al alcance del pulgar */
@@ -364,7 +364,7 @@ details[open].sec summary::after {
 .btn b {
   display: block;
   margin-top: 4px;
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 28px;
   line-height: 1;
@@ -402,7 +402,7 @@ details[open].sec summary::after {
 
 .extra .label {
   display: block;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-weight: 700;
 }
 
@@ -484,7 +484,7 @@ details[open].sec summary::after {
   border-radius: var(--radius);
   background: var(--red);
   color: var(--white);
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 20px;
   text-transform: uppercase;

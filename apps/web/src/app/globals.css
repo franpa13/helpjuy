@@ -1,3 +1,7 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
 /* HelpJuy — estética de ficha médica: papel, tinta, reglas gruesas, colores planos. */
 :root {
   --paper: #f7f5f0;
@@ -8,7 +12,6 @@
   --night-deep: #0a1a2b;
   /* Rojo para acciones sobre azul noche: 3,4:1 contra el fondo y 4,7:1 con texto blanco. */
   --red-bright: #e0253f;
-  --muted: #6b6b6b;
   --line: #d9d6ce;
   --red: #c8102e;
   --red-tint: #fbe9ec;
@@ -19,114 +22,128 @@
   --green: #1d6b3a;
   --green-tint: #e6f2ea;
   --radius: 3px;
+
+  /* Tokens de shadcn, apuntando a la paleta de HelpJuy */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--white);
+  --card-foreground: var(--ink);
+  --popover: var(--white);
+  --popover-foreground: var(--ink);
+  --primary: var(--red);
+  --primary-foreground: var(--white);
+  --secondary: var(--night);
+  --secondary-foreground: var(--white);
+  --muted: #efece5;
+  --muted-foreground: #6b6b6b;
+  --accent: var(--blue-tint);
+  --accent-foreground: var(--blue);
+  --destructive: var(--red);
+  --border: var(--line);
+  --input: var(--ink);
+  --ring: var(--blue);
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
+@theme inline {
+  /* Panel: barra lateral desde 900px; columna lateral de contenido desde 1100px */
+  --breakpoint-panel: 56.25rem;
+  --breakpoint-wide: 68.75rem;
+
+  --font-sans: var(--font-atkinson), system-ui, sans-serif;
+  --font-head: var(--font-barlow), 'Arial Narrow', sans-serif;
+
+  --color-paper: var(--paper);
+  --color-white: var(--white);
+  --color-ink: var(--ink);
+  --color-night: var(--night);
+  --color-night-deep: var(--night-deep);
+  --color-red: var(--red);
+  --color-red-bright: var(--red-bright);
+  --color-red-tint: var(--red-tint);
+  --color-line: var(--line);
+  --color-amber: var(--amber);
+  --color-amber-tint: var(--amber-tint);
+  --color-blue: var(--blue);
+  --color-blue-tint: var(--blue-tint);
+  --color-green: var(--green);
+  --color-green-tint: var(--green-tint);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Esquinas casi rectas en todo: es una ficha, no una app de chat. */
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 2);
 }
 
-html {
-  -webkit-text-size-adjust: 100%;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans min-h-dvh;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  /* Los links se subrayan como en el navegador; los que son botones o tarjetas usan no-underline. */
+  a {
+    color: var(--ink);
+    text-decoration-line: underline;
+    text-underline-offset: 3px;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--blue);
+    outline-offset: 2px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-head font-extrabold uppercase leading-none;
+  }
+
+  h1 {
+    font-size: 40px;
+  }
+
+  h2 {
+    font-size: 24px;
+  }
+
+  /* Las listas con estilo propio usan list-none; el texto corrido conserva viñetas y números. */
+  ul,
+  ol {
+    list-style: revert;
+    padding-left: revert;
+  }
 }
 
-body {
-  font-family: var(--font-body), system-ui, sans-serif;
-  font-size: 17px;
-  line-height: 1.5;
-  background: var(--paper);
-  color: var(--ink);
-  min-height: 100dvh;
+/* Etiqueta chica en mayúsculas (rótulos de campos y secciones) */
+@utility label {
+  @apply font-head text-[13px] font-bold uppercase tracking-[0.12em] text-muted-foreground;
 }
 
-a {
-  color: var(--ink);
-  text-underline-offset: 3px;
-}
-
-:focus-visible {
-  outline: 3px solid var(--blue);
-  outline-offset: 2px;
-}
-
-h1,
-h2,
-h3,
-.head {
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
-  font-weight: 800;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-h1 {
-  font-size: 40px;
-}
-
-h2 {
-  font-size: 24px;
-}
-
-.label {
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.muted {
-  color: var(--muted);
-}
-
-.stack {
-  display: grid;
-  gap: 16px;
-}
-
-/* Barra superior de la app */
-.strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 16px;
-  background: var(--night);
-  color: var(--white);
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
-  font-weight: 700;
-  font-size: 15px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-decoration: none;
-}
-
-.strip a {
-  color: var(--white);
-  text-decoration: none;
-}
-
-
-.page {
-  width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 24px 16px 48px;
-}
-
-.page-wide {
-  max-width: 880px;
-}
-
-.page-title {
-  padding-bottom: 14px;
-  margin-bottom: 20px;
-  border-bottom: 3px solid var(--ink);
-}
-
-.page-title p {
-  margin-top: 8px;
-  color: var(--muted);
+@utility stack {
+  @apply grid gap-4;
 }

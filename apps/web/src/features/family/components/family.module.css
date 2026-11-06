@@ -40,7 +40,7 @@
 
 .meta {
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: 15px;
 }
 
@@ -78,7 +78,7 @@
   border-radius: 50%;
   background: var(--night);
   color: var(--white);
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 17px;
 }
@@ -102,7 +102,7 @@
   border-radius: 999px;
   background: var(--paper);
   border: 1px solid var(--line);
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: 12px;
   font-weight: 700;
 }
@@ -121,7 +121,7 @@
   border: 2px solid var(--line);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--muted);
+  color: var(--muted-foreground);
   cursor: pointer;
 }
 
@@ -137,7 +137,7 @@
 
 .inviteHelp {
   font-size: 15px;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .linkRow {
@@ -327,7 +327,7 @@
 
 .steps strong {
   display: block;
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 22px;
   line-height: 1.05;
@@ -335,7 +335,7 @@
 }
 
 .stepNum {
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 48px;
   line-height: 0.85;
@@ -346,7 +346,7 @@
 .stepText {
   display: block;
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .promises {
@@ -394,12 +394,12 @@
 }
 
 .previewCaption {
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .mail {
@@ -416,7 +416,7 @@
 .mailFrom {
   display: flex;
   justify-content: space-between;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: 13px;
   font-weight: 700;
 }
@@ -535,7 +535,7 @@
   padding: 2px 8px;
   border: 2px solid var(--ink);
   border-radius: var(--radius);
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 13px;
   letter-spacing: 0.14em;
@@ -543,7 +543,7 @@
 
 .exampleNote {
   font-size: 13px;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .exampleDetails {

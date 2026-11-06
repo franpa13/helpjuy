@@ -4,8 +4,8 @@ import type { CreatedInviteDto, EmergencyAlertResultDto, FamilyGroupDto, FamilyI
 import { BellOff, BellRing, Copy, Send, UserMinus, Users } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiFetch, postJson } from '@/shared/api/client';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { AlertPreview, FamilyIntro, IntroLead } from './FamilyIntro';
 import styles from './family.module.css';
@@ -168,7 +168,7 @@ function GroupCard({
         </span>
       </header>
 
-      {notice && <Alert tone={notice.tone}>{notice.text}</Alert>}
+      {notice && <Alert variant={notice.tone}>{notice.text}</Alert>}
 
       <ul className={styles.members} aria-label={`Miembros de ${group.name}`}>
         {group.members.map((m) => (
@@ -202,7 +202,7 @@ function GroupCard({
       {admin && (
         <div className={styles.inviteBox}>
           {!invite ? (
-            <Button type="button" variant="secondary" onClick={createInvite}>
+            <Button type="button" variant="outline" onClick={createInvite}>
               Invitar a alguien
             </Button>
           ) : (
@@ -284,7 +284,7 @@ export function FamilyGroups({
   };
 
   const verifyNotice = !emailVerified && (
-    <Alert tone="warning">
+    <Alert variant="warning">
       Confirmá tu email para recibir los avisos de emergencia. Te mandamos un link cuando creaste la cuenta; podés pedir otro desde Mis fichas.
     </Alert>
   );

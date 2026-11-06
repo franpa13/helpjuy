@@ -4,13 +4,13 @@ import { MotionProvider } from '@/shared/motion/MotionProvider';
 import './globals.css';
 
 const body = Atkinson_Hyperlegible({
-  variable: '--font-body',
+  variable: '--font-atkinson',
   subsets: ['latin'],
   weight: ['400', '700'],
 });
 
 const head = Barlow_Condensed({
-  variable: '--font-head',
+  variable: '--font-barlow',
   subsets: ['latin'],
   weight: ['600', '700', '800'],
 });

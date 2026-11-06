@@ -13,8 +13,8 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { ApiError, apiFetch, postJson } from '@/shared/api/client';
 import { type FieldErrors } from '@/shared/forms/errors';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { ConsentStep } from './ConsentStep';
 import styles from './profiles.module.css';
@@ -73,9 +73,9 @@ export function NewProfileForm({ consent: initialConsent, isFirst }: { consent: 
     return (
       <div className="stack">
         <p className="label">Paso 2 de 2 · Consentimiento</p>
-        {formError && <Alert tone={formError.startsWith('Actualizamos') ? 'warning' : 'error'}>{formError}</Alert>}
+        {formError && <Alert variant={formError.startsWith('Actualizamos') ? 'warning' : 'error'}>{formError}</Alert>}
         <ConsentStep key={consent.version} consent={consent} isMinor={draft.isMinor} sending={sending} onAccept={onAccept} />
-        <Button type="button" variant="secondary" onClick={() => setStep(1)} disabled={sending}>
+        <Button type="button" variant="outline" onClick={() => setStep(1)} disabled={sending}>
           Volver
         </Button>
       </div>

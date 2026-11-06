@@ -9,7 +9,7 @@
   display: grid;
   gap: 6px;
   padding-left: 20px;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .sheetWrap {

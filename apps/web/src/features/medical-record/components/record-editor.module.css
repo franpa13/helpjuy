@@ -1,7 +1,7 @@
 .progress {
   display: grid;
   gap: 6px;
-  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-family: var(--font-barlow), 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: 20px;
   text-transform: uppercase;
@@ -53,7 +53,7 @@
 
 .question {
   margin-top: 4px;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-size: 16px;
   max-width: 34em;
 }
@@ -113,7 +113,7 @@
   border: 2px solid var(--line);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -205,12 +205,12 @@
 }
 
 .choiceCaption {
-  font-family: var(--font-head), "Arial Narrow", sans-serif;
+  font-family: var(--font-barlow), "Arial Narrow", sans-serif;
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--muted-foreground);
 }
 
 .choice {
@@ -230,7 +230,7 @@
   min-height: 40px;
   padding: 0 14px;
   border-radius: 999px;
-  color: var(--muted);
+  color: var(--muted-foreground);
   font-weight: 700;
   font-size: 14px;
   white-space: nowrap;

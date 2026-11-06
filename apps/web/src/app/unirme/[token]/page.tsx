@@ -6,8 +6,8 @@ import { AcceptInvite } from '@/features/family/components/AcceptInvite';
 import { headers } from 'next/headers';
 import { clientIpHeaders } from '@/shared/api/client-ip';
 import { apiServer } from '@/shared/api/server';
-import { Alert } from '@/shared/ui/Alert';
-import { buttonClass } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { buttonVariants } from '@/components/ui/button';
 
 export const metadata = { title: 'Invitación a un grupo familiar — HelpJuy', robots: { index: false, follow: false } };
 
@@ -32,14 +32,14 @@ export default async function UnirmePage({ params }: PageProps<'/unirme/[token]'
   if (preview === 'error') {
     return (
       <AuthShell variant="recover" title="No pudimos abrir la invitación">
-        <Alert tone="warning">Puede ser la conexión. Esperá un momento y volvé a abrir el link.</Alert>
+        <Alert variant="warning">Puede ser la conexión. Esperá un momento y volvé a abrir el link.</Alert>
       </AuthShell>
     );
   }
   if (preview === 'invalid') {
     return (
       <AuthShell variant="recover" title="Esta invitación no sirve">
-        <Alert tone="error">La invitación venció, se canceló o ya se usó. Pedile a quien te invitó un link nuevo.</Alert>
+        <Alert variant="error">La invitación venció, se canceló o ya se usó. Pedile a quien te invitó un link nuevo.</Alert>
       </AuthShell>
     );
   }
@@ -76,10 +76,10 @@ export default async function UnirmePage({ params }: PageProps<'/unirme/[token]'
           <AcceptInvite token={token} groupName={preview.groupName} />
         ) : (
           <>
-            <Link className={buttonClass()} href={`/registro?next=${encodeURIComponent(next)}`}>
+            <Link className={buttonVariants()} href={`/registro?next=${encodeURIComponent(next)}`}>
               Crear mi cuenta y unirme
             </Link>
-            <Link className={buttonClass('secondary')} href={`/ingresar?next=${encodeURIComponent(next)}`}>
+            <Link className={buttonVariants({ variant: 'outline' })} href={`/ingresar?next=${encodeURIComponent(next)}`}>
               Ya tengo cuenta
             </Link>
           </>

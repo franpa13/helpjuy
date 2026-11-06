@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
 import { toFieldErrors, type FieldErrors } from '@/shared/forms/errors';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 
@@ -38,7 +38,7 @@ export function ForgotForm() {
   if (done) {
     return (
       <div className="stack">
-        <Alert tone="success">Si hay una cuenta con ese email, te mandamos un link para elegir una contraseña nueva. Revisá también el correo no deseado.</Alert>
+        <Alert variant="success">Si hay una cuenta con ese email, te mandamos un link para elegir una contraseña nueva. Revisá también el correo no deseado.</Alert>
         <Link href="/ingresar">Volver a ingresar</Link>
       </div>
     );
@@ -46,7 +46,7 @@ export function ForgotForm() {
 
   return (
     <form className="stack" onSubmit={onSubmit} noValidate>
-      {formError && <Alert tone="error">{formError}</Alert>}
+      {formError && <Alert variant="error">{formError}</Alert>}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
       <Button type="submit" disabled={sending}>
         Mandarme el link

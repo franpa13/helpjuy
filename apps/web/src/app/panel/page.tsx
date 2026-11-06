@@ -7,7 +7,6 @@ import { NextSteps } from '@/features/panel/components/NextSteps';
 import { ProfileCards } from '@/features/panel/components/ProfileCards';
 import { PanelPage } from '@/features/panel/components/PanelPage';
 import { apiServer } from '@/shared/api/server';
-import styles from './panel.module.css';
 
 export const metadata = { title: 'Mis fichas — HelpJuy' };
 
@@ -30,13 +29,15 @@ export default async function MisFichasPage() {
         <>
           {!me.emailVerified && <ResendVerificationBanner />}
           <NextSteps emailVerified={me.emailVerified} profiles={profiles} familyMembers={members} />
-          <Link href="/panel/familia" className={styles.familyCard}>
-            <span className={styles.familyIcon} aria-hidden="true">
+          <Link href="/panel/familia" className="flex items-center gap-3.5 rounded-md bg-night p-4 text-white no-underline">
+            <span className="grid size-12 shrink-0 place-items-center rounded-md bg-red-bright" aria-hidden="true">
               <Users size={24} />
             </span>
             <span>
-              <strong>{groups.length === 0 ? '¿Querés que tu familia se entere si te pasa algo?' : 'Tu grupo familiar'}</strong>
-              <span className={styles.familyText}>
+              <strong className="block text-lg">
+                {groups.length === 0 ? '¿Querés que tu familia se entere si te pasa algo?' : 'Tu grupo familiar'}
+              </strong>
+              <span className="mt-1 block text-[15px] text-white/85">
                 {groups.length === 0
                   ? 'Armá tu grupo familiar: si alguien marca una emergencia en tu QR, les llega un aviso.'
                   : `${members} ${members === 1 ? 'persona recibe' : 'personas reciben'} tus avisos de emergencia.`}

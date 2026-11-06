@@ -51,7 +51,7 @@ export function Logo({ size = 28, color = 'currentColor', crossColor, className 
       <LogoSymbol size={size} crossColor={crossColor ?? color} />
       <span
         style={{
-          fontFamily: 'var(--font-head), "Arial Narrow", sans-serif',
+          fontFamily: 'var(--font-barlow), "Arial Narrow", sans-serif',
           fontWeight: 800,
           fontSize: size * 1.02,
           letterSpacing: '0.02em',

@@ -5,8 +5,8 @@ import Link from 'next/link';
 import { useState, type FormEvent } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
 import { toFieldErrors, type FieldErrors } from '@/shared/forms/errors';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 
@@ -19,7 +19,7 @@ export function ResetForm({ token }: { token: string }) {
   if (!token) {
     return (
       <div className="stack">
-        <Alert tone="error">{authErrorMessage('invalid_token')}</Alert>
+        <Alert variant="error">{authErrorMessage('invalid_token')}</Alert>
         <Link href="/recuperar">Pedir otro link</Link>
       </div>
     );
@@ -48,7 +48,7 @@ export function ResetForm({ token }: { token: string }) {
   if (done) {
     return (
       <div className="stack">
-        <Alert tone="success">Contraseña cambiada. Ingresá de nuevo.</Alert>
+        <Alert variant="success">Contraseña cambiada. Ingresá de nuevo.</Alert>
         <Link href="/ingresar">Ir a ingresar</Link>
       </div>
     );
@@ -57,7 +57,7 @@ export function ResetForm({ token }: { token: string }) {
   return (
     <form className="stack" onSubmit={onSubmit} noValidate>
       {formError && (
-        <Alert tone="error">
+        <Alert variant="error">
           {formError} <Link href="/recuperar">Pedir otro link</Link>
         </Alert>
       )}

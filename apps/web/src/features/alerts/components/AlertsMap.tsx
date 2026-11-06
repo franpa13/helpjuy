@@ -3,7 +3,6 @@
 import 'leaflet/dist/leaflet.css';
 import type { Circle, Map as LeafletMap } from 'leaflet';
 import { useEffect, useRef } from 'react';
-import styles from './alerts.module.css';
 
 export type MapPoint = { id: string; lat: number; lng: number; label: string };
 
@@ -62,5 +61,5 @@ export function AlertsMap({ points, selectedId }: { points: MapPoint[]; selected
     el.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [selectedId]);
 
-  return <div ref={el} className={styles.map} role="region" aria-label="Mapa con la zona aproximada de cada aviso" />;
+  return <div ref={el} className="relative z-0 h-[clamp(260px,42vh,420px)] w-full" role="region" aria-label="Mapa con la zona aproximada de cada aviso" />;
 }

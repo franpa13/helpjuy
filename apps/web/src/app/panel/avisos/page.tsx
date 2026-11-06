@@ -2,9 +2,7 @@ import type { ReceivedAlertDto } from '@helpjuy/contracts';
 import { Clock, MapPin, ShieldCheck, Users } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { AlertsHistory } from '@/features/alerts/components/AlertsHistory';
-import styles from '@/features/alerts/components/alerts.module.css';
-import { PanelPage } from '@/features/panel/components/PanelPage';
-import box from '@/features/panel/components/panel-page.module.css';
+import { PanelBox, PanelPage } from '@/features/panel/components/PanelPage';
 import { apiServer } from '@/shared/api/server';
 
 export const metadata = { title: 'Avisos — HelpJuy' };
@@ -19,9 +17,8 @@ export default async function AvisosPage() {
       subtitle="Cuando alguien escanea un QR tuyo o de tu familia y marca una emergencia, queda acá con la zona en el mapa."
       asideLabel="Sobre los avisos"
       aside={
-        <section className={box.box}>
-          <h2 className={box.boxTitle}>Qué se guarda</h2>
-          <ul className={styles.facts}>
+        <PanelBox title="Qué se guarda">
+          <ul className="grid list-none gap-2.5 p-0 text-[15px] [&_li]:flex [&_li]:items-start [&_li]:gap-2.5 [&_svg]:mt-0.5 [&_svg]:shrink-0 [&_svg]:text-night">
             <li>
               <MapPin size={18} aria-hidden="true" />
               <span>
@@ -46,7 +43,7 @@ export default async function AvisosPage() {
               </span>
             </li>
           </ul>
-        </section>
+        </PanelBox>
       }
     >
       <AlertsHistory alerts={alerts} />

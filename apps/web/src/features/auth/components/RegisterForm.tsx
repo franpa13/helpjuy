@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
 import { safeNext, toFieldErrors, type FieldErrors } from '@/shared/forms/errors';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
@@ -42,17 +42,17 @@ export function RegisterForm({ googleEnabled = false, next }: { googleEnabled?: 
 
   return (
     <form className="stack" onSubmit={onSubmit} noValidate>
-      {formError && <Alert tone="error">{formError}</Alert>}
+      {formError && <Alert variant="error">{formError}</Alert>}
       {googleEnabled && <GoogleButton next={safeNext(next, '/panel')} />}
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
       <PasswordField label="Contraseña" name="password" autoComplete="new-password" minLength={8} error={errors.password} />
       <Button type="submit" disabled={sending}>
         {sending ? 'Creando…' : 'Crear cuenta'}
       </Button>
-      <p className="muted" style={{ fontSize: 14 }}>
+      <p className="text-sm text-muted-foreground">
         Todavía no guardamos nada de tu salud. Eso lo cargás vos en el paso siguiente, después de leer y aceptar cómo cuidamos tus datos.
       </p>
-      <p className="muted">
+      <p className="text-muted-foreground">
         ¿Ya tenés cuenta? <Link href={next ? `/ingresar?next=${encodeURIComponent(next)}` : '/ingresar'}>Ingresá</Link>
       </p>
     </form>

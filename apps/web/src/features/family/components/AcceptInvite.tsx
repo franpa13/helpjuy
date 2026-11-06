@@ -3,8 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 export function AcceptInvite({ token, groupName }: { token: string; groupName: string }) {
   const router = useRouter();
@@ -29,7 +29,7 @@ export function AcceptInvite({ token, groupName }: { token: string; groupName: s
 
   return (
     <div className="stack">
-      {error && <Alert tone="error">{error}</Alert>}
+      {error && <Alert variant="error">{error}</Alert>}
       <Button type="button" onClick={accept} disabled={sending}>
         {sending ? 'Uniéndote…' : `Unirme a ${groupName}`}
       </Button>

@@ -4,8 +4,8 @@ import { Printer } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
-import { Alert } from '@/shared/ui/Alert';
-import { Button } from '@/shared/ui/Button';
+import { Alert } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import styles from './print.module.css';
 
 type Step = 'idle' | 'confirm' | 'saving' | 'done' | 'outdated' | 'error';
@@ -58,18 +58,18 @@ export function PrintActions({ profileId, fingerprint }: { profileId: string; fi
             <Button type="button" onClick={confirm} disabled={step === 'saving'}>
               Sí, ya lo tengo impreso
             </Button>
-            <Button type="button" variant="secondary" onClick={print} disabled={step === 'saving'}>
+            <Button type="button" variant="outline" onClick={print} disabled={step === 'saving'}>
               No, lo intento de nuevo
             </Button>
           </div>
         </div>
       )}
 
-      {step === 'done' && <Alert tone="success">Listo. Si cambiás algo de lo impreso, te avisamos para reimprimirlo.</Alert>}
+      {step === 'done' && <Alert variant="success">Listo. Si cambiás algo de lo impreso, te avisamos para reimprimirlo.</Alert>}
       {step === 'outdated' && (
-        <Alert tone="warning">Tus datos cambiaron mientras imprimías. Actualizamos la hoja: imprimila de nuevo.</Alert>
+        <Alert variant="warning">Tus datos cambiaron mientras imprimías. Actualizamos la hoja: imprimila de nuevo.</Alert>
       )}
-      {step === 'error' && <Alert tone="error">No pudimos guardar que lo imprimiste. Tu hoja está bien; probá confirmar de nuevo.</Alert>}
+      {step === 'error' && <Alert variant="error">No pudimos guardar que lo imprimiste. Tu hoja está bien; probá confirmar de nuevo.</Alert>}
     </div>
   );
 }
