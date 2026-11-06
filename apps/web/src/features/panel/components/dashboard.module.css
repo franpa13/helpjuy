@@ -1,0 +1,337 @@
+/* "Mis fichas": usa el ancho de la pantalla. Fichas a la izquierda, próximos pasos a la derecha. */
+.wrap {
+  width: 100%;
+  max-width: 1180px;
+  padding: 24px 16px 48px;
+}
+
+@media (min-width: 900px) {
+  .wrap {
+    padding: 32px 0 48px;
+  }
+}
+
+.head {
+  padding-bottom: 14px;
+  margin-bottom: 22px;
+  border-bottom: 3px solid var(--ink);
+}
+
+.head h1 {
+  font-size: clamp(36px, 5vw, 52px);
+}
+
+.head p {
+  margin-top: 8px;
+  max-width: 44em;
+  color: var(--muted);
+}
+
+.layout {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 1100px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+/* En celular, primero las fichas (lo principal) y después los próximos pasos */
+.side {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1100px) {
+  .side {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+.main {
+  display: grid;
+  gap: 16px;
+}
+
+/* ---------- Tarjetas de ficha ---------- */
+.cards {
+  display: grid;
+  gap: 16px;
+}
+
+.card {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--red);
+}
+
+.cardHead {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 14px;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .cardHead {
+    grid-template-columns: auto 1fr auto;
+  }
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--night);
+  color: var(--white);
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.who {
+  min-width: 0;
+}
+
+.name {
+  font-size: 28px;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  margin-top: 4px;
+  color: var(--muted);
+}
+
+.chipOk,
+.chipWarn {
+  grid-column: 1 / -1;
+  justify-self: start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+@media (min-width: 640px) {
+  .chipOk,
+  .chipWarn {
+    grid-column: auto;
+  }
+}
+
+.chipOk {
+  background: var(--green-tint);
+  color: var(--green);
+}
+
+.chipWarn {
+  background: var(--amber-tint);
+  color: var(--amber);
+}
+
+.progressRow {
+  display: grid;
+  gap: 6px;
+}
+
+.progressLabel {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.bar {
+  display: block;
+  height: 10px;
+  background: var(--line);
+}
+
+.bar > span {
+  display: block;
+  height: 100%;
+  background: var(--green);
+}
+
+.noteWarn,
+.noteOk {
+  padding: 8px 12px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.noteWarn {
+  border-left: 5px solid var(--amber);
+  background: var(--amber-tint);
+}
+
+.noteOk {
+  border-left: 5px solid var(--green);
+  background: var(--green-tint);
+  color: var(--green);
+}
+
+.actions {
+  display: grid;
+  gap: 8px;
+}
+
+@media (min-width: 640px) {
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.action,
+.actionPrimary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.action {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.actionPrimary {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.addCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  border: 2px dashed var(--line);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+.addCard:hover {
+  border-color: var(--ink);
+}
+
+.addCard strong {
+  display: block;
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+.addText {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.addIcon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 2px solid var(--ink);
+}
+
+/* ---------- Columna derecha ---------- */
+.panelBox {
+  padding: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--night);
+}
+
+.boxHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.boxHead h2 {
+  font-size: 22px;
+}
+
+.count {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  display: grid;
+}
+
+.steps li {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.check {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+}
+
+.steps li[data-done='true'] .check {
+  background: var(--green);
+  border-color: var(--green);
+  color: var(--white);
+}
+
+.steps li[data-done='true'] strong {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.stepLink {
+  font-weight: 700;
+}
+
+.stepText {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--muted);
+}

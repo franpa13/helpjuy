@@ -3,9 +3,10 @@ import { Users } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ResendVerificationBanner } from '@/features/auth/components/AccountActions';
-import { ProfileList } from '@/features/profiles/components/ProfileList';
+import { NextSteps } from '@/features/panel/components/NextSteps';
+import { ProfileCards } from '@/features/panel/components/ProfileCards';
+import dash from '@/features/panel/components/dashboard.module.css';
 import { apiServer } from '@/shared/api/server';
-import { buttonClass } from '@/shared/ui/Button';
 import styles from './panel.module.css';
 
 export const metadata = { title: 'Mis fichas — HelpJuy' };
@@ -21,32 +22,35 @@ export default async function PanelPage() {
   const members = new Set(groups.flatMap((g) => g.members.filter((m) => !m.isMe).map((m) => m.userId))).size;
 
   return (
-    <>
-      <main className="page stack">
-        <div className="page-title">
-          <h1>Mis fichas</h1>
-          <p>Cada ficha tiene su propio QR. Revisala cada tanto: un remedio nuevo o un teléfono que cambió hacen la diferencia.</p>
-        </div>
-        {!me.emailVerified && <ResendVerificationBanner />}
-        <ProfileList profiles={profiles} />
-        <Link className={buttonClass('secondary')} href="/panel/perfiles/nuevo">
-          Agregar otra persona
-        </Link>
+    <main className={dash.wrap}>
+      <div className={dash.head}>
+        <h1>Mis fichas</h1>
+        <p>Cada ficha tiene su propio QR. Revisala cada tanto: un remedio nuevo o un teléfono que cambió hacen la diferencia.</p>
+      </div>
 
-        <Link href="/panel/familia" className={styles.familyCard}>
-          <span className={styles.familyIcon} aria-hidden="true">
-            <Users size={24} />
-          </span>
-          <span>
-            <strong>{groups.length === 0 ? '¿Querés que tu familia se entere si te pasa algo?' : 'Tu grupo familiar'}</strong>
-            <span className={styles.familyText}>
-              {groups.length === 0
-                ? 'Armá tu grupo familiar: si alguien marca una emergencia en tu QR, les llega un aviso.'
-                : `${members} ${members === 1 ? 'persona recibe' : 'personas reciben'} tus avisos de emergencia.`}
+      <div className={dash.layout}>
+        <div className={dash.main}>
+          <ProfileCards profiles={profiles} />
+        </div>
+
+        <aside className={dash.side}>
+          {!me.emailVerified && <ResendVerificationBanner />}
+          <NextSteps emailVerified={me.emailVerified} profiles={profiles} familyMembers={members} />
+          <Link href="/panel/familia" className={styles.familyCard}>
+            <span className={styles.familyIcon} aria-hidden="true">
+              <Users size={24} />
             </span>
-          </span>
-        </Link>
-      </main>
-    </>
+            <span>
+              <strong>{groups.length === 0 ? '¿Querés que tu familia se entere si te pasa algo?' : 'Tu grupo familiar'}</strong>
+              <span className={styles.familyText}>
+                {groups.length === 0
+                  ? 'Armá tu grupo familiar: si alguien marca una emergencia en tu QR, les llega un aviso.'
+                  : `${members} ${members === 1 ? 'persona recibe' : 'personas reciben'} tus avisos de emergencia.`}
+              </span>
+            </span>
+          </Link>
+        </aside>
+      </div>
+    </main>
   );
 }
