@@ -31,7 +31,6 @@ import { Faq } from './Faq';
 import { HeroText } from './HeroText';
 import { HeroVisual } from './HeroVisual';
 import { StepNumber } from './StepNumber';
-import styles from './landing.module.css';
 
 const STEPS = [
   {
@@ -150,54 +149,54 @@ const FAQ = [
 export function Landing() {
   return (
     <>
-      <header className={styles.nav}>
-        <Link href="/" className={styles.brand} aria-label="HelpJuy, inicio">
+      <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-white/18 bg-night px-[clamp(16px,4vw,48px)] py-2.5 text-white">
+        <Link href="/" className="font-head text-[22px] font-extrabold tracking-[0.06em] text-white uppercase no-underline max-[559px]:[&_svg]:size-6 max-[559px]:[&>span>span]:text-[24px]!" aria-label="HelpJuy, inicio">
           <Logo size={32} crossColor="var(--red-bright)" />
         </Link>
-        <nav className={styles.navLinks} aria-label="Cuenta">
+        <nav className="flex items-center gap-[18px] text-base font-bold max-[559px]:gap-3 max-[559px]:text-[15px] [&_a]:text-white" aria-label="Cuenta">
           <Link href="/ingresar">Ingresar</Link>
-          <Link href="/registro" className={styles.navCta}>
+          <Link href="/registro" className="rounded-md bg-red-bright px-3.5 py-2 whitespace-nowrap text-white! no-underline max-[559px]:px-2.5 max-[559px]:py-[7px]">
             Crear mi ficha
           </Link>
         </nav>
       </header>
 
       <main>
-        <section className={styles.hero}>
-          <div className={styles.heroInner}>
+        <section className="overflow-hidden bg-night text-white">
+          <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-12 px-[clamp(16px,4vw,48px)] pt-[clamp(32px,6vw,80px)] pb-[clamp(48px,7vw,96px)] split:grid-cols-[1.15fr_1fr] split:gap-10">
             <HeroText />
             <HeroVisual />
           </div>
         </section>
 
-        <section className={styles.facts} aria-label="En pocas palabras">
-          <StaggerList as="ul" className={styles.factsList}>
+        <section className="bg-night-deep text-white" aria-label="En pocas palabras">
+          <StaggerList as="ul" className="mx-auto grid max-w-[1240px] list-none grid-cols-1 gap-x-8 gap-y-4 px-[clamp(16px,4vw,48px)] py-[22px] sm:grid-cols-2 wide:grid-cols-4">
             {FACTS.map(({ icon: Icon, text }) => (
-              <StaggerItem as="li" key={text} className={styles.fact}>
-                <Icon className={styles.factIcon} aria-hidden="true" strokeWidth={2.2} />
+              <StaggerItem as="li" key={text} className="flex items-center gap-3 text-base/[1.3] font-bold">
+                <Icon className="size-[26px] shrink-0 text-[#ff5a6e]" aria-hidden="true" strokeWidth={2.2} />
                 <span>{text}</span>
               </StaggerItem>
             ))}
           </StaggerList>
         </section>
 
-        <section className={styles.section} aria-labelledby="como-funciona">
+        <section className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]" aria-labelledby="como-funciona">
           <Reveal>
-            <h2 id="como-funciona" className={styles.h2}>
+            <h2 id="como-funciona" className="max-w-[16ch] text-[clamp(36px,5vw,64px)]/[0.92]">
               Cómo funciona
             </h2>
           </Reveal>
-          <ol className={styles.steps}>
+          <ol className="mt-10 grid list-none gap-0 border-t-3 border-ink p-0 min-[860px]:grid-cols-3">
             {STEPS.map((s, i) => (
-              <li key={s.title} className={styles.step}>
-                <div className={styles.stepHead}>
+              <li key={s.title} className="border-b border-line py-6 pr-6 min-[860px]:border-b-0 min-[860px]:pt-7 min-[860px]:pr-7 min-[860px]:pb-0 min-[860px]:not-first:border-l min-[860px]:not-first:pl-7 [&_p]:max-w-[32em]">
+                <div className="mb-4 flex items-end justify-between">
                   <StepNumber n={i + 1} />
-                  <span className={styles.iconTileRed}>
+                  <span className="inline-grid size-11 shrink-0 place-items-center rounded-md [&_svg]:size-6 bg-red text-white">
                     <s.icon aria-hidden="true" strokeWidth={2.2} />
                   </span>
                 </div>
                 <Reveal delay={0.1 + i * 0.12} y={16}>
-                  <h3 className={styles.h3}>{s.title}</h3>
+                  <h3 className="mb-2 text-[26px]/none">{s.title}</h3>
                   <p>{s.text}</p>
                 </Reveal>
               </li>
@@ -205,22 +204,25 @@ export function Landing() {
           </ol>
         </section>
 
-        <section className={`${styles.section} ${styles.sectionPaper}`} aria-labelledby="que-ve">
-          <div className={styles.split}>
+        <section
+          className="border-y-3 border-ink bg-white px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]"
+          aria-labelledby="que-ve"
+        >
+          <div className="mx-auto max-w-[1144px] grid gap-10 panel:grid-cols-[0.9fr_1.1fr] panel:items-start panel:gap-16">
             <Reveal>
-              <h2 id="que-ve" className={styles.h2}>
+              <h2 id="que-ve" className="max-w-[16ch] text-[clamp(36px,5vw,64px)]/[0.92]">
                 Lo que ve el paramédico en los primeros segundos
               </h2>
-              <p className={styles.sectionLead}>
+              <p className="mt-[18px] max-w-[36em] text-[19px] text-muted-foreground">
                 Cuando alguien está inconsciente, el equipo de emergencia no puede preguntarle nada. Tu ficha contesta por
                 vos, en el orden en que lo necesitan.
               </p>
             </Reveal>
-            <StaggerList as="dl" className={styles.dataList}>
+            <StaggerList as="dl" className="border-t-3 border-ink">
               {DATA.map((d, i) => (
-                <StaggerItem key={d.name} className={styles.dataRow} from={{ x: 24 }}>
+                <StaggerItem key={d.name} className="grid grid-cols-1 gap-1 border-b border-line py-4 min-[560px]:grid-cols-[11rem_1fr] min-[560px]:items-baseline min-[560px]:gap-5 [&_dd]:m-0 [&_dt]:flex [&_dt]:items-center [&_dt]:gap-3 [&_dt]:font-head [&_dt]:text-2xl/none [&_dt]:font-extrabold [&_dt]:uppercase first:[&_dt]:text-red" from={{ x: 24 }}>
                   <dt>
-                    <span className={i === 0 ? styles.iconTileRed : styles.iconTileLine}>
+                    <span className={i === 0 ? 'inline-grid size-9 shrink-0 place-items-center rounded-md [&_svg]:size-5 bg-red text-white' : 'inline-grid size-9 shrink-0 place-items-center rounded-md [&_svg]:size-5 border-2 border-ink text-ink'}>
                       <d.icon aria-hidden="true" strokeWidth={2.2} />
                     </span>
                     {d.name}
@@ -232,41 +234,41 @@ export function Landing() {
           </div>
         </section>
 
-        <section className={styles.section} aria-labelledby="donde">
+        <section className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]" aria-labelledby="donde">
           <Reveal>
-            <h2 id="donde" className={styles.h2}>
+            <h2 id="donde" className="max-w-[16ch] text-[clamp(36px,5vw,64px)]/[0.92]">
               Llevalo donde estés
             </h2>
-            <p className={styles.sectionLead}>
+            <p className="mt-[18px] max-w-[36em] text-[19px] text-muted-foreground">
               No hace falta tener auto ni moto. Un accidente le puede pasar a cualquiera, también caminando.
             </p>
           </Reveal>
-          <StaggerList as="ul" className={styles.places}>
+          <StaggerList as="ul" className="mt-10 grid list-none gap-x-8 gap-y-6 p-0 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1000px]:gap-x-12 min-[1000px]:gap-y-10 [&>li]:border-t-3 [&>li]:border-ink [&>li]:pt-4">
             {PLACES.map((p) => (
               <StaggerItem as="li" key={p.name}>
-                <p.icon className={styles.placeIcon} aria-hidden="true" strokeWidth={2} />
-                <h3 className={styles.h3}>{p.name}</h3>
+                <p.icon className="mb-3.5 block size-10 text-red" aria-hidden="true" strokeWidth={2} />
+                <h3 className="mb-2 text-[26px]/none">{p.name}</h3>
                 <p>{p.text}</p>
               </StaggerItem>
             ))}
           </StaggerList>
         </section>
 
-        <section className={styles.privacy} aria-labelledby="privacidad">
-          <div className={styles.privacyInner}>
+        <section className="bg-night text-white" aria-labelledby="privacidad">
+          <div className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]">
             <Reveal>
-              <h2 id="privacidad" className={styles.h2}>
+              <h2 id="privacidad" className="max-w-[16ch] text-[clamp(36px,5vw,64px)]/[0.92]">
                 Tus datos son tuyos
               </h2>
             </Reveal>
-            <StaggerList as="ul" className={styles.privacyList}>
+            <StaggerList as="ul" className="mt-10 grid list-none gap-x-10 gap-y-7 p-0 min-[800px]:grid-cols-2 [&>li]:flex [&>li]:items-start [&>li]:gap-4 [&_p]:max-w-[34em] [&_p]:text-white/82">
               {PRIVACY.map((p) => (
                 <StaggerItem as="li" key={p.title} from={{ x: -18 }}>
-                  <span className={styles.iconTileRed}>
+                  <span className="inline-grid size-11 shrink-0 place-items-center rounded-md [&_svg]:size-6 bg-red text-white">
                     <p.icon aria-hidden="true" strokeWidth={2.2} />
                   </span>
                   <div>
-                    <h3 className={styles.h3}>{p.title}</h3>
+                    <h3 className="mb-2 text-[26px]/none">{p.title}</h3>
                     <p>{p.text}</p>
                   </div>
                 </StaggerItem>
@@ -275,9 +277,9 @@ export function Landing() {
           </div>
         </section>
 
-        <section className={styles.section} aria-labelledby="preguntas">
+        <section className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]" aria-labelledby="preguntas">
           <Reveal>
-            <h2 id="preguntas" className={styles.h2}>
+            <h2 id="preguntas" className="max-w-[16ch] text-[clamp(36px,5vw,64px)]/[0.92]">
               Preguntas frecuentes
             </h2>
           </Reveal>
@@ -286,20 +288,20 @@ export function Landing() {
           </Reveal>
         </section>
 
-        <section className={styles.final}>
+        <section className="mx-auto grid max-w-[1240px] justify-items-start gap-7 border-t-3 border-ink px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,96px)]">
           <Reveal>
-            <h2 className={styles.finalTitle}>Hacé tu ficha hoy. Ojalá nunca la necesites.</h2>
+            <h2 className="max-w-[14ch] text-[clamp(40px,6vw,80px)]/[0.9]">Hacé tu ficha hoy. Ojalá nunca la necesites.</h2>
           </Reveal>
           <Reveal delay={0.15}>
-            <Link href="/registro" className={styles.ctaPrimary}>
+            <Link href="/registro" className="inline-flex min-h-14 items-center justify-center rounded-md px-[26px] py-3.5 font-head text-[22px] font-extrabold uppercase tracking-[0.03em] no-underline border-2 border-red bg-red text-white">
               Crear mi ficha gratis
             </Link>
           </Reveal>
         </section>
       </main>
 
-      <footer className={styles.footer}>
-        <p className={styles.footerSos}>
+      <footer className="grid gap-2 bg-night px-[clamp(16px,4vw,48px)] pt-8 pb-10 text-[15px] text-white [&_a]:font-bold [&_a]:text-red-bright">
+        <p className="font-head text-[26px] font-extrabold uppercase">
           En una emergencia llamá al <a href="tel:107">107</a> (SAME Jujuy).
         </p>
         <p>HelpJuy no reemplaza la atención médica. Los datos los carga cada persona y no los verifica un médico.</p>

@@ -4,7 +4,10 @@ import type { EmergencyAlertResultDto } from '@helpjuy/contracts';
 import { BellRing, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { postJson } from '@/shared/api/client';
-import styles from './emergency-card.module.css';
+import { cn } from '@/lib/utils';
+const alertBtn =
+  'inline-flex min-h-14 cursor-pointer items-center justify-center gap-2.5 rounded-md bg-red px-[18px] py-3 font-head text-xl font-extrabold text-white uppercase disabled:opacity-60';
+const cancelBtn = 'min-h-14 cursor-pointer rounded-md border-2 border-ink bg-white px-[18px] font-bold';
 
 /** Número argentino a formato internacional de WhatsApp (549 + área + número, sin 0 ni 15). */
 export function whatsappHref(phone: string, text: string): string {
@@ -51,28 +54,28 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
   const waText = `Hola, estoy con ${firstName} ${lastName}. Escaneé su ficha de emergencia de HelpJuy porque necesita ayuda.`;
 
   return (
-    <section className={styles.actions} aria-label="Avisar a la familia">
+    <section className="grid gap-2.5 border-b border-line bg-white p-4 card:px-8" aria-label="Avisar a la familia">
       {step === 'idle' && (
-        <button type="button" className={styles.alertBtn} onClick={() => setStep('confirm')}>
+        <button type="button" className={alertBtn} onClick={() => setStep('confirm')}>
           <BellRing size={22} aria-hidden="true" />
           Es una emergencia: avisar a la familia
         </button>
       )}
 
       {(step === 'confirm' || step === 'sending') && (
-        <div className={styles.confirm}>
+        <div className="grid gap-2.5 border-2 border-red bg-red-tint p-3.5">
           <p>
             <strong>¿Confirmás que {firstName} necesita ayuda?</strong> Le mandamos un aviso a su familia ahora.
           </p>
-          <label className={styles.locCheck}>
+          <label className="flex items-center gap-2.5 font-bold [&_input]:size-[22px] [&_input]:accent-red">
             <input type="checkbox" checked={shareLocation} onChange={(e) => setShareLocation(e.target.checked)} />
             Compartir mi ubicación aproximada (ayuda a que lleguen)
           </label>
-          <div className={styles.confirmRow}>
-            <button type="button" className={styles.alertBtn} onClick={send} disabled={step === 'sending'}>
+          <div className="grid gap-2 min-[560px]:grid-cols-[1fr_auto]">
+            <button type="button" className={alertBtn} onClick={send} disabled={step === 'sending'}>
               {step === 'sending' ? 'Avisando…' : `Sí, avisar a la familia de ${firstName}`}
             </button>
-            <button type="button" className={styles.cancelBtn} onClick={() => setStep('idle')} disabled={step === 'sending'}>
+            <button type="button" className={cancelBtn} onClick={() => setStep('idle')} disabled={step === 'sending'}>
               Cancelar
             </button>
           </div>
@@ -80,7 +83,7 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
       )}
 
       {step === 'done' && (
-        <p className={styles.doneMsg} role="status">
+        <p className="border-l-8 border-green bg-green-tint p-3.5 font-bold" role="status">
           <strong>
             {result.family > 0
               ? `Avisamos a ${result.family} ${result.family === 1 ? 'persona' : 'personas'} de la familia de ${firstName}.`
@@ -93,16 +96,16 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
       )}
 
       {step === 'error' && (
-        <div className={styles.errorMsg} role="alert">
+        <div className="border-l-8 border-red bg-red-tint p-3.5 font-bold" role="alert">
           <p>No pudimos avisar (puede ser la señal). Llamá al 107 y, si podés, al contacto de emergencia.</p>
-          <button type="button" className={styles.cancelBtn} style={{ marginTop: 10 }} onClick={send}>
+          <button type="button" className={cn(cancelBtn, 'mt-2.5')} onClick={send}>
             Reintentar
           </button>
         </div>
       )}
 
       {contact && (
-        <a className={styles.waBtn} href={whatsappHref(contact.phone, waText)} target="_blank" rel="noreferrer">
+        <a className="inline-flex min-h-13 items-center justify-center gap-2 rounded-md bg-[#1d8a4a] font-bold text-white no-underline" href={whatsappHref(contact.phone, waText)} target="_blank" rel="noreferrer">
           <MessageCircle size={20} aria-hidden="true" />
           Avisar por WhatsApp a {contact.name}
         </a>

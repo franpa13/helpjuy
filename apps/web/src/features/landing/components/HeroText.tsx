@@ -3,7 +3,6 @@
 import { motion, type Variants } from 'motion/react';
 import Link from 'next/link';
 import { Fragment } from 'react';
-import styles from './landing.module.css';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const TITLE = 'Si no podés hablar, tu ficha habla por vos';
@@ -23,13 +22,13 @@ const MotionLink = motion.create(Link);
 export function HeroText() {
   const words = TITLE.split(' ');
   return (
-    <div className={styles.heroText}>
-      <motion.h1 className={styles.heroTitle} variants={title} initial="hidden" animate="show" aria-label={TITLE}>
+    <div>
+      <motion.h1 className="max-w-[11ch] text-[clamp(54px,8.6vw,124px)]/[0.88] tracking-[-0.01em]" variants={title} initial="hidden" animate="show" aria-label={TITLE}>
         {words.map((w, i) => (
           // El espacio va afuera de la máscara: dentro de un inline-block el navegador lo descarta.
           <Fragment key={i}>
-            <span className={styles.wordMask} aria-hidden="true">
-              <motion.span className={styles.word} variants={word}>
+            <span className="-mb-[0.06em] inline-block overflow-hidden pb-[0.06em] align-top" aria-hidden="true">
+              <motion.span className="inline-block will-change-transform" variants={word}>
                 {w}
               </motion.span>
             </span>
@@ -39,7 +38,7 @@ export function HeroText() {
       </motion.h1>
 
       <motion.p
-        className={styles.heroLead}
+        className="mt-6 max-w-[34em] text-[clamp(18px,1.6vw,21px)]/[1.55]"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: EASE, delay: 0.75 }}
@@ -49,14 +48,14 @@ export function HeroText() {
       </motion.p>
 
       <motion.div
-        className={styles.heroCtas}
+        className="mt-8 flex flex-wrap gap-3 max-[559px]:[&_a]:flex-[1_1_100%]"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: EASE, delay: 0.95 }}
       >
         <MotionLink
           href="/registro"
-          className={styles.ctaPrimary}
+          className="inline-flex min-h-14 items-center justify-center rounded-md px-[26px] py-3.5 font-head text-[22px] font-extrabold uppercase tracking-[0.03em] no-underline border-2 border-red-bright bg-red-bright text-white"
           whileHover={{ y: -3 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -65,7 +64,7 @@ export function HeroText() {
         </MotionLink>
         <MotionLink
           href="/ingresar"
-          className={styles.ctaGhost}
+          className="inline-flex min-h-14 items-center justify-center rounded-md px-[26px] py-3.5 font-head text-[22px] font-extrabold uppercase tracking-[0.03em] no-underline border-2 border-white text-white"
           whileHover={{ y: -3 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -75,7 +74,7 @@ export function HeroText() {
       </motion.div>
 
       <motion.p
-        className={styles.heroNote}
+        className="mt-4 text-[15px] opacity-90"
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.9 }}
         transition={{ duration: 0.8, delay: 1.2 }}

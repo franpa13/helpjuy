@@ -50,6 +50,8 @@
   --breakpoint-wide: 68.75rem;
   /* Pantallas partidas (cuenta, landing): dos columnas desde 960px */
   --breakpoint-split: 60rem;
+  /* Ficha pública: columna de llamadas al costado desde 760px */
+  --breakpoint-card: 47.5rem;
 
   /* Todo el texto corrido usa interlineado 1.5, como antes de Tailwind */
   --text-xs--line-height: 1.5;
