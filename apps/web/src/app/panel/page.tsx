@@ -5,13 +5,13 @@ import { redirect } from 'next/navigation';
 import { ResendVerificationBanner } from '@/features/auth/components/AccountActions';
 import { NextSteps } from '@/features/panel/components/NextSteps';
 import { ProfileCards } from '@/features/panel/components/ProfileCards';
-import dash from '@/features/panel/components/dashboard.module.css';
+import { PanelPage } from '@/features/panel/components/PanelPage';
 import { apiServer } from '@/shared/api/server';
 import styles from './panel.module.css';
 
 export const metadata = { title: 'Mis fichas — HelpJuy' };
 
-export default async function PanelPage() {
+export default async function MisFichasPage() {
   const me = await apiServer<MeResponse>('/auth/me');
   if (!me) redirect('/ingresar?next=/panel');
   const [profiles, groups] = await Promise.all([
@@ -22,18 +22,12 @@ export default async function PanelPage() {
   const members = new Set(groups.flatMap((g) => g.members.filter((m) => !m.isMe).map((m) => m.userId))).size;
 
   return (
-    <main className={dash.wrap}>
-      <div className={dash.head}>
-        <h1>Mis fichas</h1>
-        <p>Cada ficha tiene su propio QR. Revisala cada tanto: un remedio nuevo o un teléfono que cambió hacen la diferencia.</p>
-      </div>
-
-      <div className={dash.layout}>
-        <div className={dash.main}>
-          <ProfileCards profiles={profiles} />
-        </div>
-
-        <aside className={dash.side}>
+    <PanelPage
+      title="Mis fichas"
+      subtitle="Cada ficha tiene su propio QR. Revisala cada tanto: un remedio nuevo o un teléfono que cambió hacen la diferencia."
+      asideLabel="Próximos pasos"
+      aside={
+        <>
           {!me.emailVerified && <ResendVerificationBanner />}
           <NextSteps emailVerified={me.emailVerified} profiles={profiles} familyMembers={members} />
           <Link href="/panel/familia" className={styles.familyCard}>
@@ -49,8 +43,10 @@ export default async function PanelPage() {
               </span>
             </span>
           </Link>
-        </aside>
-      </div>
-    </main>
+        </>
+      }
+    >
+      <ProfileCards profiles={profiles} />
+    </PanelPage>
   );
 }

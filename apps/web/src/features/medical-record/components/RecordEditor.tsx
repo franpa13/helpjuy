@@ -211,14 +211,8 @@ export function RecordEditor({ profile, initial }: Props) {
   const err = (k: string) => errors[k];
 
   return (
-    <div className={styles.editor}>
-      <div className={styles.progress} aria-live="polite">
-        <span>Ficha al {percent}%</span>
-        <span className={styles.bar}>
-          <span style={{ width: `${percent}%` }} />
-        </span>
-      </div>
-
+    <div className={styles.editorLayout}>
+      <div className={styles.blocks}>
       <Block
         title="Datos básicos"
         sections={['identity', 'vitals']}
@@ -536,6 +530,16 @@ export function RecordEditor({ profile, initial }: Props) {
                 maxLength={500}
                 error={err('notes')} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
       </Block>
+      </div>
+
+      {/* Columna lateral en escritorio; en celular sus piezas se reparten (progreso arriba, guardar fijo abajo). */}
+      <div className={styles.side}>
+      <div className={styles.progress} aria-live="polite">
+        <span>Ficha al {percent}%</span>
+        <span className={styles.bar}>
+          <span style={{ width: `${percent}%` }} />
+        </span>
+      </div>
 
       <div className={styles.summary} aria-live="polite">
         {visibleSections.length > 0 ? (
@@ -549,22 +553,24 @@ export function RecordEditor({ profile, initial }: Props) {
         )}
       </div>
 
+      <div className={styles.links}>
+        <a className={styles.preview} href={`/e/${profile.publicToken}`} target="_blank" rel="noreferrer">
+          Ver como el paramédico
+        </a>
+        <a className={styles.preview} href={`/panel/perfiles/${profile.id}/imprimir`}>
+          Imprimir mi QR
+        </a>
+      </div>
+
       <div className={styles.saveBar}>
         {status === 'saved' && <Alert tone="success">Guardado. Tu QR ya muestra estos datos.</Alert>}
         {status === 'error' && (
           <Alert tone="error">{errors._form ?? 'Hay datos para revisar. Están marcados en rojo.'}</Alert>
         )}
-        <div className={styles.saveActions}>
-          <a className={styles.preview} href={`/e/${profile.publicToken}`} target="_blank" rel="noreferrer">
-            Ver como el paramédico
-          </a>
-          <a className={styles.preview} href={`/panel/perfiles/${profile.id}/imprimir`}>
-            Imprimir mi QR
-          </a>
-          <Button type="button" onClick={save} disabled={status === 'saving'}>
-            {status === 'saving' ? 'Guardando…' : 'Guardar ficha'}
-          </Button>
-        </div>
+        <Button type="button" onClick={save} disabled={status === 'saving'}>
+          {status === 'saving' ? 'Guardando…' : 'Guardar ficha'}
+        </Button>
+      </div>
       </div>
     </div>
   );

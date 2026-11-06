@@ -1,7 +1,7 @@
 import type { FamilyGroupDto, MeResponse, ProfileDto } from '@helpjuy/contracts';
 import { redirect } from 'next/navigation';
 import { FamilyGroups } from '@/features/family/components/FamilyGroups';
-import dash from '@/features/panel/components/dashboard.module.css';
+import { PanelPage } from '@/features/panel/components/PanelPage';
 import { apiServer } from '@/shared/api/server';
 
 export const metadata = { title: 'Familia — HelpJuy' };
@@ -16,18 +16,12 @@ export default async function FamiliaPage() {
   const self = profiles.find((p) => p.relationship === 'SELF');
 
   return (
-    <>
-      <main className={dash.wrap}>
-        <div className={dash.head}>
-          <h1>Mi familia</h1>
-          <p>Las personas que se enteran si te pasa algo.</p>
-        </div>
-        <FamilyGroups
-          initial={groups}
-          emailVerified={me.emailVerified}
-          myName={self ? `${self.firstName} ${self.lastName}` : undefined}
-        />
-      </main>
-    </>
+    <PanelPage title="Mi familia" subtitle="Las personas que se enteran si te pasa algo.">
+      <FamilyGroups
+        initial={groups}
+        emailVerified={me.emailVerified}
+        myName={self ? `${self.firstName} ${self.lastName}` : undefined}
+      />
+    </PanelPage>
   );
 }

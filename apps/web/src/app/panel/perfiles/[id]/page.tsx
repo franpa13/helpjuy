@@ -1,7 +1,7 @@
 import type { MedicalRecordResponse, ProfileDto } from '@helpjuy/contracts';
-import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { RecordEditor } from '@/features/medical-record/components/RecordEditor';
+import { PanelPage } from '@/features/panel/components/PanelPage';
 import { apiServer } from '@/shared/api/server';
 
 export const metadata = { title: 'Editar ficha — HelpJuy' };
@@ -17,19 +17,12 @@ export default async function EditarFichaPage({ params }: PageProps<'/panel/perf
   if (!profile || !record) notFound();
 
   return (
-    <>
-      <main className="page page-wide">
-        <p style={{ marginBottom: 12 }}>
-          <Link href="/panel">← Mis fichas</Link>
-        </p>
-        <div className="page-title">
-          <h1>
-            {profile.firstName} {profile.lastName}
-          </h1>
-          <p>Todo es opcional. Completá lo que quieras y elegí qué se ve al escanear tu QR.</p>
-        </div>
-        <RecordEditor profile={profile} initial={{ data: record.data, visibility: record.visibility }} />
-      </main>
-    </>
+    <PanelPage
+      title={`${profile.firstName} ${profile.lastName}`}
+      subtitle="Todo es opcional. Completá lo que quieras y elegí qué se ve al escanear tu QR."
+      back={{ href: '/panel', label: 'Mis fichas' }}
+    >
+      <RecordEditor profile={profile} initial={{ data: record.data, visibility: record.visibility }} />
+    </PanelPage>
   );
 }

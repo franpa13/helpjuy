@@ -1,0 +1,84 @@
+/* Medidas comunes del panel: todas las pantallas comparten ancho, márgenes y columnas. */
+.wrap {
+  width: 100%;
+  max-width: 1180px;
+  padding: 24px 16px 48px;
+}
+
+@media (min-width: 900px) {
+  .wrap {
+    padding: 32px 0 48px;
+  }
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.head {
+  padding-bottom: 14px;
+  margin-bottom: 22px;
+  border-bottom: 3px solid var(--ink);
+}
+
+.head h1 {
+  font-size: clamp(36px, 5vw, 52px);
+  overflow-wrap: anywhere;
+}
+
+.head p {
+  margin-top: 8px;
+  max-width: 44em;
+  color: var(--muted);
+}
+
+/* Contenido + columna lateral (mismas proporciones en todas las pantallas) */
+.layout {
+  display: grid;
+  gap: 20px;
+}
+
+@media (min-width: 1100px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(300px, 1fr);
+    gap: 28px;
+    align-items: start;
+  }
+}
+
+.main {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.side {
+  display: grid;
+  gap: 16px;
+}
+
+@media (min-width: 1100px) {
+  .side {
+    position: sticky;
+    top: 24px;
+  }
+}
+
+/* Caja estándar de la columna lateral */
+.box {
+  padding: 18px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--night);
+}
+
+.boxTitle {
+  font-size: 22px;
+  margin-bottom: 10px;
+}

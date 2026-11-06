@@ -8,6 +8,8 @@ import { PrintSheet } from '@/features/print/components/PrintSheet';
 import { resolveSiteUrl } from '@/features/print/site-url';
 import { apiServer } from '@/shared/api/server';
 import { Alert } from '@/shared/ui/Alert';
+import { PanelPage } from '@/features/panel/components/PanelPage';
+import box from '@/features/panel/components/panel-page.module.css';
 import styles from './imprimir.module.css';
 
 export const metadata = { title: 'Imprimir mi QR — HelpJuy' };
@@ -34,41 +36,49 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
   const fingerprint = createHash('sha256').update(printFingerprintInput(profile.publicToken, data)).digest('hex');
 
   return (
-    <main className="page page-wide stack">
-      <p>
-        <Link href={`/panel/perfiles/${id}`}>← Volver a la ficha</Link>
-      </p>
-      <div className="page-title">
-        <h1>Imprimí tu QR</h1>
-        <p>Una hoja A4 con la tarjeta para la billetera, dos stickers y una versión grande. Recortá por las líneas punteadas.</p>
-      </div>
-
-      {profile.printStatus === 'outdated' && (
-        <Alert tone="warning">Cambiaron datos de lo que tenés impreso (o generaste un QR nuevo). Volvé a imprimirlo y reemplazá el viejo.</Alert>
-      )}
-      {!profile.active && (
-        <Alert tone="warning">
-          Todavía no cargaste un contacto de emergencia. Podés imprimir igual, pero conviene <Link href={`/panel/perfiles/${id}`}>agregarlo</Link> antes.
-        </Alert>
-      )}
-
-      <div className={styles.toolbar}>
-        <PrintActions profileId={id} fingerprint={fingerprint} />
-        {/* La misma dirección que va dentro del QR: si está mal configurada, se nota acá antes de imprimir. */}
-        <a className={styles.preview} href={url} target="_blank" rel="noreferrer">
-          Probar el QR: ver como el paramédico
-        </a>
-      </div>
-
-      <ul className={styles.tips}>
-        <li>Para el casco o la moto, usá <strong>papel autoadhesivo</strong> y cubrilo con <strong>cinta transparente</strong> para que aguante el sol y la lluvia.</li>
-        <li>La tarjeta de billetera dura más si la <strong>plastificás</strong>.</li>
-        <li>Lo impreso muestra solo lo que elegiste que se vea. Si cambiás algo, te avisamos para reimprimir.</li>
-      </ul>
-
+    <PanelPage
+      title="Imprimí tu QR"
+      subtitle="Una hoja A4 con la tarjeta para la billetera, dos stickers y una versión grande. Recortá por las líneas punteadas."
+      back={{ href: `/panel/perfiles/${id}`, label: `Ficha de ${profile.firstName}` }}
+      asideLabel="Imprimir"
+      aside={
+        <>
+          {profile.printStatus === 'outdated' && (
+            <Alert tone="warning">Cambiaron datos de lo que tenés impreso (o generaste un QR nuevo). Volvé a imprimirlo y reemplazá el viejo.</Alert>
+          )}
+          {!profile.active && (
+            <Alert tone="warning">
+              Todavía no cargaste un contacto de emergencia. Podés imprimir igual, pero conviene{' '}
+              <Link href={`/panel/perfiles/${id}`}>agregarlo</Link> antes.
+            </Alert>
+          )}
+          <section className={box.box}>
+            <h2 className={box.boxTitle}>Imprimir</h2>
+            <PrintActions profileId={id} fingerprint={fingerprint} />
+            {/* La misma dirección que va dentro del QR: si está mal configurada, se nota acá antes de imprimir. */}
+            <a className={styles.preview} href={url} target="_blank" rel="noreferrer">
+              Probar el QR: ver como el paramédico
+            </a>
+          </section>
+          <section className={box.box}>
+            <h2 className={box.boxTitle}>Consejos</h2>
+            <ul className={styles.tips}>
+              <li>
+                Para el casco o la moto, usá <strong>papel autoadhesivo</strong> y cubrilo con <strong>cinta transparente</strong> para que
+                aguante el sol y la lluvia.
+              </li>
+              <li>
+                La tarjeta de billetera dura más si la <strong>plastificás</strong>.
+              </li>
+              <li>Lo impreso muestra solo lo que elegiste que se vea. Si cambiás algo, te avisamos para reimprimir.</li>
+            </ul>
+          </section>
+        </>
+      }
+    >
       <div className={styles.sheetWrap}>
         <PrintSheet data={data} qrSvg={qrSvg} url={url} />
       </div>
-    </main>
+    </PanelPage>
   );
 }

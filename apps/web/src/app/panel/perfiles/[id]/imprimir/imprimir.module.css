@@ -1,17 +1,7 @@
-.toolbar {
-  display: grid;
-  gap: 10px;
-}
-
-@media (min-width: 640px) {
-  .toolbar {
-    grid-template-columns: 220px auto;
-    align-items: center;
-    justify-content: start;
-  }
-}
 
 .preview {
+  display: inline-block;
+  margin-top: 12px;
   font-weight: 700;
 }
 

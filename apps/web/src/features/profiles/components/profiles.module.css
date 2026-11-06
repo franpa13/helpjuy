@@ -132,3 +132,46 @@
   font-size: 15px;
   font-weight: 700;
 }
+
+/* Columna "Qué sigue" de Nueva ficha */
+.nextList {
+  list-style: none;
+  padding: 0;
+  display: grid;
+}
+
+.nextList li {
+  display: flex;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.nextNum {
+  font-family: var(--font-head), 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 0.9;
+  color: var(--red);
+  min-width: 20px;
+}
+
+.nextText {
+  display: block;
+  margin-top: 2px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.privacyNote {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.privacyNote svg {
+  flex-shrink: 0;
+  color: var(--green);
+}
