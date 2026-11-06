@@ -35,3 +35,13 @@ export type CreatedInviteDto = { url: string; expiresAt: string };
 export type InvitePreviewDto = { groupName: string; inviterName: string; memberCount: number };
 /** notified: emails enviados. family: cuántos fueron a familiares (sin contar al dueño de la ficha). */
 export type EmergencyAlertResultDto = { notified: number; family: number };
+
+/** Un aviso de emergencia en el historial ("Avisos recibidos"). La ubicación es aproximada (~100 m) y se borra a los 30 días. */
+export type ReceivedAlertDto = {
+  id: string;
+  at: string;
+  profileName: string;
+  /** true si la ficha es mía; false si es de alguien de mi familia. */
+  mine: boolean;
+  location: { lat: number; lng: number } | null;
+};

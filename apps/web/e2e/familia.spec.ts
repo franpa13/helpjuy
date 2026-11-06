@@ -53,11 +53,31 @@ test('grupo familiar: invitar por link, unirse y recibir el aviso de emergencia'
   await expect(b.getByRole('list', { name: 'Miembros de Familia Paredes' }).getByRole('listitem')).toHaveCount(2);
 
   // Alguien escanea el QR de A y marca emergencia
-  const visitor = await (await browser.newContext({ baseURL: 'http://localhost:3100' })).newPage();
+  // (comparte su ubicación: San Salvador de Jujuy)
+  const visitor = await (
+    await browser.newContext({
+      baseURL: 'http://localhost:3100',
+      geolocation: { latitude: -24.18571, longitude: -65.29944 },
+      permissions: ['geolocation'],
+    })
+  ).newPage();
   await visitor.goto(cardHref!);
   await visitor.getByRole('button', { name: 'Es una emergencia: avisar a la familia' }).click();
-  await visitor.getByRole('checkbox', { name: /Compartir mi ubicación/ }).uncheck();
+  await expect(visitor.getByRole('checkbox', { name: /Compartir mi ubicación/ })).toBeChecked();
   await visitor.getByRole('button', { name: 'Sí, avisar a la familia de Francisco' }).click();
   await expect(visitor.getByText('Avisamos a 1 persona de la familia de Francisco.')).toBeVisible();
   await expect(visitor.getByRole('link', { name: 'Avisar por WhatsApp a Ana' })).toHaveAttribute('href', /wa\.me\/5493884123456/);
+
+  // B ve el aviso en su panel, con la zona aproximada en el mapa
+  await b.goto('/panel/avisos');
+  const aviso = b.getByRole('list', { name: 'Avisos' }).getByRole('listitem');
+  await expect(aviso).toHaveCount(1);
+  await expect(aviso).toContainText('Francisco Paredes');
+  await expect(aviso).toContainText('De tu familia');
+  await expect(aviso.getByRole('link', { name: 'Abrir en Google Maps' })).toHaveAttribute(
+    'href',
+    'https://www.google.com/maps?q=-24.186,-65.299',
+  );
+  await expect(b.getByRole('region', { name: 'Mapa con la zona aproximada de cada aviso' })).toBeVisible();
+  await expect(b.locator('.leaflet-interactive')).toHaveCount(1);
 });

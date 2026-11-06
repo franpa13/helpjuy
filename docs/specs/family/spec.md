@@ -67,3 +67,11 @@ Debajo de "Llamar al 107" y "Llamar a {contacto}":
 - **Dado** que quien escanea no da permiso de ubicación, **entonces** el aviso sale igual, sin ubicación.
 - **Dado** un miembro que sale del grupo, **entonces** deja de recibir avisos de inmediato.
 - **Dado** un perfil de un menor, **cuando** se marca emergencia, **entonces** se avisa a los grupos del adulto que lo administra.
+
+## Avisos recibidos (historial con mapa)
+
+- `GET /alerts` (con sesión): avisos de los últimos 30 días de **mis fichas** y de las fichas de quienes comparten un grupo conmigo.
+- De cada grupo, solo los avisos **posteriores a mi ingreso**: quien entra a un grupo no ve ubicaciones viejas. Si salgo del grupo, dejo de verlos.
+- No se listan toques suprimidos (repetidos dentro de 10 minutos) ni avisos de prueba. Máximo 50, el más nuevo primero.
+- La respuesta no incluye ids de perfil ni datos médicos: nombre de la ficha, fecha, si es mía, y la ubicación redondeada (~100 m) o `null`.
+- En la web (`/panel/avisos`) el mapa es OpenStreetMap con Leaflet (sin API key) y dibuja un **círculo de ~110 m**, no un punto, porque la ubicación es aproximada.

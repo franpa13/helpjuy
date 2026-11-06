@@ -1,6 +1,6 @@
-import { Body, Controller, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
-import { PUBLIC_TOKEN_RE, emergencyAlertSchema, type EmergencyAlertInput, type EmergencyAlertResultDto } from '@helpjuy/contracts';
+import { PUBLIC_TOKEN_RE, emergencyAlertSchema, type EmergencyAlertInput, type EmergencyAlertResultDto, type ReceivedAlertDto } from '@helpjuy/contracts';
 import type { User } from '../../generated/prisma/client.js';
 import { ZodValidationPipe } from '../../shared/zod-validation.pipe.js';
 import { CurrentUser } from '../auth/current-user.decorator.js';
@@ -32,5 +32,17 @@ export class FamilyTestAlertController {
   @Throttle({ default: { limit: 3, ttl: 60_000 } })
   test(@CurrentUser() user: User, @Param('id') id: string): Promise<EmergencyAlertResultDto> {
     return this.alerts.test(user.id, id);
+  }
+}
+
+/** "Avisos recibidos": historial para el panel. */
+@UseGuards(SessionGuard)
+@Controller('alerts')
+export class ReceivedAlertsController {
+  constructor(private readonly alerts: EmergencyAlertService) {}
+
+  @Get()
+  list(@CurrentUser() user: User): Promise<ReceivedAlertDto[]> {
+    return this.alerts.history(user.id);
   }
 }

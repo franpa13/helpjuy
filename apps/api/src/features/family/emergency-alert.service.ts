@@ -1,5 +1,5 @@
 import { HttpException, Injectable, Logger, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
-import type { EmergencyAlertInput, EmergencyAlertResultDto } from '@helpjuy/contracts';
+import type { EmergencyAlertInput, EmergencyAlertResultDto, ReceivedAlertDto } from '@helpjuy/contracts';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { Mailer, type MailMessage } from '../mail/mailer.js';
 import { FamilyService } from './family.service.js';
@@ -127,6 +127,44 @@ export class EmergencyAlertService {
     );
     const sent = results.filter((r) => r.ok);
     return { notified: sent.length, family: sent.filter((r) => !r.self).length };
+  }
+
+  /**
+   * Historial de "Avisos recibidos": los de mis fichas y los de las fichas de mi familia,
+   * pero de cada grupo solo los posteriores a mi ingreso (quien entra no ve ubicaciones viejas).
+   * Sin toques repetidos ni pruebas, y solo de los últimos 30 días.
+   */
+  async history(userId: string): Promise<ReceivedAlertDto[]> {
+    await this.forgetOldLocations();
+    const memberships = await this.prisma.familyMember.findMany({
+      where: { userId },
+      select: { joinedAt: true, group: { select: { members: { where: { userId: { not: userId } }, select: { userId: true } } } } },
+    });
+    const since = new Date(Date.now() - LOCATION_RETENTION_MS);
+    const alerts = await this.prisma.emergencyAlert.findMany({
+      where: {
+        suppressed: false,
+        test: false,
+        createdAt: { gte: since },
+        OR: [
+          { profile: { ownerId: userId } },
+          ...memberships.map((m) => ({
+            profile: { ownerId: { in: m.group.members.map((o) => o.userId) } },
+            createdAt: { gte: m.joinedAt },
+          })),
+        ],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      select: { id: true, createdAt: true, lat: true, lng: true, profile: { select: { ownerId: true, firstName: true, lastName: true } } },
+    });
+    return alerts.map((a) => ({
+      id: a.id,
+      at: a.createdAt.toISOString(),
+      profileName: `${a.profile.firstName} ${a.profile.lastName}`,
+      mine: a.profile.ownerId === userId,
+      location: a.lat !== null && a.lng !== null ? { lat: a.lat, lng: a.lng } : null,
+    }));
   }
 
   /** Spec: la ubicación se guarda aproximada y se borra a los 30 días. */

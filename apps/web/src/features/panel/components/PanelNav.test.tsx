@@ -3,9 +3,10 @@ import { navState } from '../../../../vitest.setup';
 import { PanelNav } from './PanelNav';
 
 describe('PanelNav', () => {
-  it('muestra las dos opciones del panel', () => {
+  it('muestra las tres opciones del panel', () => {
     navState.pathname = '/panel';
     render(<PanelNav />);
+    expect(screen.getByRole('link', { name: /Avisos/ })).toHaveAttribute('href', '/panel/avisos');
     expect(screen.getByRole('link', { name: /Mis fichas/ })).toHaveAttribute('href', '/panel');
     expect(screen.getByRole('link', { name: /Mi familia/ })).toHaveAttribute('href', '/panel/familia');
   });
@@ -21,5 +22,12 @@ describe('PanelNav', () => {
     navState.pathname = '/panel/familia';
     render(<PanelNav />);
     expect(screen.getByRole('link', { name: /Mi familia/ })).toHaveAttribute('aria-current', 'page');
+  });
+
+  it('en Avisos, la activa es Avisos', () => {
+    navState.pathname = '/panel/avisos';
+    render(<PanelNav />);
+    expect(screen.getByRole('link', { name: /Avisos/ })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: /Mis fichas/ })).not.toHaveAttribute('aria-current');
   });
 });
