@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { MAX_PROFILES_PER_ACCOUNT } from '@helpjuy/contracts';
 import {
   DEFAULT_VISIBILITY,
   completion,
@@ -19,6 +20,8 @@ import { randomToken, sha256Hex } from '../../shared/crypto/tokens.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { ConsentService } from '../consent/consent.service.js';
 import { CardCache } from '../emergency-card/card-cache.js';
+import { ImageFetcher, isGooglePhotoUrl, largeGooglePhotoUrl } from './image-fetcher.js';
+import { processPhoto } from './photo.js';
 
 export const newPublicToken = () => randomToken(16);
 
@@ -33,6 +36,7 @@ function baseDto(p: Profile): Omit<ProfileDto, 'completion' | 'active' | 'printS
     isMinor: p.isMinor,
     publicToken: p.publicToken,
     createdAt: p.createdAt.toISOString(),
+    photoVersion: p.photoUpdatedAt ? String(p.photoUpdatedAt.getTime()) : null,
   };
 }
 
@@ -45,6 +49,7 @@ export class ProfilesService {
     private readonly consent: ConsentService,
     private readonly cipher: MedicalCipher,
     private readonly cardCache: CardCache,
+    private readonly images: ImageFetcher,
   ) {}
 
   /** Invalida la ficha pública cacheada; un fallo se loguea y no rompe la operación. */
@@ -105,6 +110,10 @@ export class ProfilesService {
       const hasSelf = (await tx.profile.count({ where: { ownerId, relationship: 'SELF' } })) > 0;
       if (input.relationship === 'SELF' && hasSelf) throw new ConflictException({ error: 'self_profile_exists' });
       if (input.relationship !== 'SELF' && !hasSelf) throw new ConflictException({ error: 'self_profile_required' });
+      // Tope por cuenta: alcanza para una familia grande y evita que alguien cree fichas en masa.
+      if ((await tx.profile.count({ where: { ownerId } })) >= MAX_PROFILES_PER_ACCOUNT) {
+        throw new ConflictException({ error: 'profile_limit' });
+      }
       const profile = await tx.profile.create({
         data: {
           ownerId,
@@ -161,5 +170,52 @@ export class ProfilesService {
     });
     await this.invalidateCard([profile.publicToken, updated.publicToken]);
     return updated.publicToken;
+  }
+
+  // ---------- Foto ----------
+
+  /** Guarda una foto subida por el titular (ya normalizada y sin metadatos). */
+  async setPhoto(ownerId: string, id: string, image: Buffer): Promise<ProfileWithRecord> {
+    await this.getOwned(ownerId, id);
+    return this.savePhoto(id, await processPhoto(image));
+  }
+
+  /** Copia la foto de la cuenta de Google a la ficha propia (una sola vez: después ya no depende de Google). */
+  async setGooglePhoto(owner: { id: string; googlePictureUrl: string | null }, id: string): Promise<ProfileWithRecord> {
+    const profile = await this.getOwned(owner.id, id);
+    if (profile.relationship !== 'SELF') throw new ConflictException({ error: 'photo_self_only' });
+    const url = owner.googlePictureUrl;
+    if (!url || !isGooglePhotoUrl(url)) throw new ConflictException({ error: 'google_photo_unavailable' });
+    let image: Buffer;
+    try {
+      image = await this.images.fetch(largeGooglePhotoUrl(url));
+    } catch (err) {
+      this.logger.warn(`No se pudo descargar la foto de Google: ${(err as Error).message}`);
+      throw new ConflictException({ error: 'google_photo_unavailable' });
+    }
+    return this.savePhoto(id, await processPhoto(image));
+  }
+
+  async removePhoto(ownerId: string, id: string): Promise<void> {
+    const profile = await this.getOwned(ownerId, id);
+    await this.prisma.profile.update({ where: { id }, data: { photoCipher: null, photoUpdatedAt: null } });
+    await this.invalidateCard([profile.publicToken]);
+  }
+
+  /** La foto del titular para el editor (descifrada). */
+  async getPhoto(ownerId: string, id: string): Promise<Buffer> {
+    const profile = await this.getOwned(ownerId, id);
+    if (!profile.photoCipher) throw new NotFoundException({ error: 'not_found' });
+    return this.cipher.decryptBytes(profile.photoCipher);
+  }
+
+  private async savePhoto(id: string, webp: Buffer): Promise<ProfileWithRecord> {
+    const updated = await this.prisma.profile.update({
+      where: { id },
+      data: { photoCipher: this.cipher.encryptBytes(webp), photoUpdatedAt: new Date() },
+      include: { medicalRecord: true },
+    });
+    await this.invalidateCard([updated.publicToken]);
+    return updated;
   }
 }

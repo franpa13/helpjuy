@@ -13,7 +13,7 @@ let dummyHash: Promise<string> | undefined;
 const getDummyHash = () => (dummyHash ??= hash('helpjuy-dummy-password'));
 
 export function toMe(user: User): MeResponse {
-  return { id: user.id, email: user.email, emailVerified: user.emailVerifiedAt !== null };
+  return { id: user.id, email: user.email, emailVerified: user.emailVerifiedAt !== null, googlePhoto: !!user.googlePictureUrl };
 }
 
 @Injectable()

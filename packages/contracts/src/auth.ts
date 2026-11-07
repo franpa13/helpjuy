@@ -14,7 +14,13 @@ export const loginSchema = z.object({
 });
 export type LoginInput = z.infer<typeof loginSchema>;
 
-export type MeResponse = { id: string; email: string; emailVerified: boolean };
+export type MeResponse = {
+  id: string;
+  email: string;
+  emailVerified: boolean;
+  /** Entró con Google y su cuenta tiene foto: se le ofrece copiarla a su ficha. */
+  googlePhoto: boolean;
+};
 
 export const tokenSchema = z.object({ token: z.string().min(10).max(200) });
 export type TokenInput = z.infer<typeof tokenSchema>;

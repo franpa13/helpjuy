@@ -34,3 +34,15 @@ Que una cuenta pueda administrar varias fichas (la propia, la de un hijo, la de 
 - La ficha propia no se convierte en otra ni al revés (`PATCH` → `409 self_profile_locked`).
 - No se puede borrar la ficha propia mientras haya otras a cargo (`409 self_profile_has_dependents`).
 - En la web, sin ficha propia el alta no pregunta "¿para quién es?": es la tuya. Con ficha propia se elige entre Hijo/a, Madre/Padre, Pareja u Otro.
+
+## Tope de fichas
+
+- Máximo `MAX_PROFILES_PER_ACCOUNT` (10) fichas por cuenta: la propia más las de la familia. La 11.ª responde `409 profile_limit`.
+- El alta de fichas tiene además un límite de 20 por minuto por IP.
+
+## Foto de la ficha
+
+- Opcional. `PUT /profiles/:id/photo { image: base64 }`: el servidor la gira según el celular, la recorta cuadrada (centrada en lo más llamativo), la achica a 320×320 webp y le borra los metadatos (GPS, modelo, fecha). Se guarda cifrada con la misma clave que los datos médicos.
+- `POST /profiles/:id/photo/google`: copia la foto de la cuenta de Google, solo a la ficha propia. Solo se descargan URLs `https://*.googleusercontent.com` (sin redirecciones, 8 s, 5 MB máx.). Después ya no depende de Google.
+- Visibilidad: sección `photo`, **oculta por defecto**. La ficha pública incluye `photoVersion` solo si es visible, y `GET /public/cards/:token/photo` responde 404 si no lo es. La foto no va impresa.
+- En la ficha de un menor, si se marca visible, la web avisa del riesgo.

@@ -45,6 +45,17 @@ export type ProfileDto = {
   /** never: nunca se imprimió · ok: lo impreso está al día · outdated: cambió algo impreso o el QR. */
   printStatus: 'never' | 'ok' | 'outdated';
   printedAt: string | null;
+  /** Cambia cada vez que cambia la foto (sirve para no mostrar una vieja de caché). null: sin foto. */
+  photoVersion: string | null;
 };
+
+/** Una cuenta: tu ficha más las de tu familia. Suficiente para una familia grande, y frena el abuso. */
+export const MAX_PROFILES_PER_ACCOUNT = 10;
+
+/** Foto en base64 (sin el prefijo data:). El servidor la recorta, la achica y le borra los metadatos. */
+export const profilePhotoSchema = z.object({
+  image: z.string().min(1).max(3_000_000),
+});
+export type ProfilePhotoInput = z.infer<typeof profilePhotoSchema>;
 
 export const markPrintedSchema = z.object({ fingerprint: z.string().regex(/^[0-9a-f]{64}$/) });

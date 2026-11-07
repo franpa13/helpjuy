@@ -15,6 +15,7 @@ const p = (over: Partial<ProfileDto> = {}): ProfileDto => ({
   active: true,
   printStatus: 'ok',
   printedAt: '2026-11-06T00:00:00.000Z',
+  photoVersion: null,
   ...over,
 });
 

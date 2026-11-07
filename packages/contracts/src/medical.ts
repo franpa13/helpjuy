@@ -6,6 +6,7 @@ export const BLOOD_TYPES = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as
 export type BloodType = (typeof BLOOD_TYPES)[number];
 
 export const SECTIONS = [
+  'photo',
   'identity',
   'vitals',
   'allergies',
@@ -22,6 +23,8 @@ export type Section = (typeof SECTIONS)[number];
 
 /** Lo clínico se ve en el QR; lo administrativo queda privado hasta que el titular lo active. */
 export const DEFAULT_VISIBILITY: Record<Section, boolean> = {
+  // La cara junto a datos de salud en una página pública: privada hasta que el titular decida mostrarla.
+  photo: false,
   identity: true,
   vitals: true,
   allergies: true,
@@ -106,9 +109,11 @@ export const medicalRecordSchema = z.object({
 export type MedicalRecord = z.infer<typeof medicalRecordSchema>;
 export type MedicalRecordInput = z.input<typeof medicalRecordSchema>;
 
-export const visibilitySchema = z.object(
-  Object.fromEntries(SECTIONS.map((s) => [s, z.boolean()])) as Record<Section, z.ZodBoolean>,
-);
+export const visibilitySchema = z.object({
+  ...(Object.fromEntries(SECTIONS.map((s) => [s, z.boolean()])) as Record<Exclude<Section, 'photo'>, z.ZodBoolean>),
+  // Se sumó después: si un cliente viejo no la manda, queda oculta.
+  photo: z.boolean().default(false),
+});
 export type Visibility = z.infer<typeof visibilitySchema>;
 
 export const saveMedicalRecordSchema = z.object({ data: medicalRecordSchema, visibility: visibilitySchema });

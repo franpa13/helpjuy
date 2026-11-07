@@ -27,7 +27,7 @@ describe('auth (e2e)', () => {
       .post('/auth/register')
       .send({ email: 'juan@mail.com', password: 'claveSegura1' })
       .expect(201);
-    expect(res.body).toEqual({ id: expect.any(String), email: 'juan@mail.com', emailVerified: false });
+    expect(res.body).toEqual({ id: expect.any(String), email: 'juan@mail.com', emailVerified: false, googlePhoto: false });
     expect(res.headers['set-cookie'][0]).toMatch(/hj_session=.+;.*HttpOnly/i);
     expect(res.headers['set-cookie'][0]).toMatch(/SameSite=Lax/i);
     await agent.get('/auth/me').expect(200);

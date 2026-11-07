@@ -11,6 +11,8 @@ export type PublicCardDto = {
   /** Tiene al menos un contacto de emergencia. */
   active: boolean;
   updatedAt: string | null;
+  /** Solo si el titular eligió mostrar la foto. Se pide a /public/cards/:token/photo?v=… */
+  photoVersion?: string;
   identity?: { age?: number; sex?: 'F' | 'M' | 'X'; language?: string };
   vitals?: { bloodType?: BloodType; weightKg?: number; heightCm?: number };
   allergies?: { items: { substance: string; reaction?: string }[]; none: boolean };

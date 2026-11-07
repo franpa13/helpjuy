@@ -30,7 +30,7 @@ export class GoogleOAuthClient implements GoogleOAuth {
     const ticket = await this.client.verifyIdToken({ idToken: tokens.id_token, audience: this.clientId });
     const payload = ticket.getPayload();
     if (!payload?.sub || !payload.email) throw new Error('Token de Google sin sub o email');
-    return { sub: payload.sub, email: payload.email, emailVerified: payload.email_verified === true };
+    return { sub: payload.sub, email: payload.email, emailVerified: payload.email_verified === true, picture: payload.picture };
   }
 }
 

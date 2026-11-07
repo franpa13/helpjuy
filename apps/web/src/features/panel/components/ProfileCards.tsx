@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { MAX_PROFILES_PER_ACCOUNT } from '@helpjuy/contracts';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 
@@ -37,6 +38,7 @@ export function ProfileCards({ profiles }: { profiles: ProfileDto[] }) {
             <article aria-label={name}>
             <header className="grid grid-cols-[auto_1fr] items-center gap-x-3.5 gap-y-3 sm:grid-cols-[auto_1fr_auto]">
               <Avatar size="lg" aria-hidden="true">
+                {p.photoVersion && <AvatarImage src={`/api/profiles/${p.id}/photo?v=${p.photoVersion}`} alt="" />}
                 <AvatarFallback>{initials(p)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
@@ -80,6 +82,7 @@ export function ProfileCards({ profiles }: { profiles: ProfileDto[] }) {
         );
       })}
 
+      {profiles.length < MAX_PROFILES_PER_ACCOUNT && (
       <Link
         href="/panel/perfiles/nuevo"
         className="flex items-center gap-3.5 border-2 border-dashed border-line p-[18px] text-ink no-underline transition-colors hover:border-ink"
@@ -94,6 +97,7 @@ export function ProfileCards({ profiles }: { profiles: ProfileDto[] }) {
           </span>
         </span>
       </Link>
+      )}
     </div>
   );
 }

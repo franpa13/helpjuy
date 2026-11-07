@@ -1,4 +1,4 @@
-import { Controller, Get, Header, NotFoundException, Param } from '@nestjs/common';
+import { Controller, Get, Header, NotFoundException, Param, StreamableFile } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { PUBLIC_TOKEN_RE, type PublicCardDto } from '@helpjuy/contracts';
 import { MedicalCipher } from '../../shared/crypto/medical-cipher.js';
@@ -32,5 +32,22 @@ export class EmergencyCardController {
       this.records.readVisibility(row?.visibility),
       row?.updatedAt ?? null,
     );
+  }
+
+  /** Foto de la ficha, solo si el titular la hizo visible. Mismo límite que la ficha. */
+  @Get(':token/photo')
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
+  @Header('X-Robots-Tag', 'noindex, nofollow')
+  @Header('Content-Type', 'image/webp')
+  @Header('Cache-Control', 'no-store')
+  async photo(@Param('token') token: string): Promise<StreamableFile> {
+    if (!PUBLIC_TOKEN_RE.test(token)) throw new NotFoundException({ error: 'not_found' });
+    const profile = await this.prisma.profile.findUnique({
+      where: { publicToken: token },
+      select: { photoCipher: true, medicalRecord: { select: { visibility: true } } },
+    });
+    const visible = this.records.readVisibility(profile?.medicalRecord?.visibility).photo;
+    if (!profile?.photoCipher || !visible) throw new NotFoundException({ error: 'not_found' });
+    return new StreamableFile(this.cipher.decryptBytes(profile.photoCipher));
   }
 }

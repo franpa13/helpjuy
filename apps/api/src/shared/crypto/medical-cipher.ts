@@ -15,6 +15,15 @@ export class MedicalCipher {
   decrypt(ciphertext: string): MedicalRecord {
     return medicalRecordSchema.parse(decryptJson(ciphertext, this.key));
   }
+
+  /** La foto de la ficha va cifrada igual que los datos médicos. */
+  encryptBytes(bytes: Buffer): string {
+    return encryptJson(bytes.toString('base64'), this.key);
+  }
+
+  decryptBytes(ciphertext: string): Buffer {
+    return Buffer.from(decryptJson<string>(ciphertext, this.key), 'base64');
+  }
 }
 
 @Global()

@@ -1,4 +1,4 @@
-export type GoogleIdentity = { sub: string; email: string; emailVerified: boolean };
+export type GoogleIdentity = { sub: string; email: string; emailVerified: boolean; picture?: string };
 
 /** Puerto hacia Google. En producción, `GoogleOAuthClient`; en tests, un fake. `null` si no está configurado. */
 export abstract class GoogleOAuth {

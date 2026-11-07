@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { createHash, timingSafeEqual } from 'node:crypto';
+import { isGooglePhotoUrl } from '../../profiles/image-fetcher.js';
 import type { User } from '../../../generated/prisma/client.js';
 import { randomToken } from '../../../shared/crypto/tokens.js';
 import { PrismaService } from '../../../shared/prisma/prisma.service.js';
@@ -81,17 +82,22 @@ export class GoogleAuthService {
 
   private async findOrLink(identity: GoogleIdentity): Promise<User> {
     const email = identity.email.trim().toLowerCase();
+    // Solo guardamos la foto si es de Google (nunca la mostramos desde ahí: se copia a la ficha si el titular quiere).
+    const picture = identity.picture && isGooglePhotoUrl(identity.picture) ? identity.picture : null;
     const byGoogle = await this.prisma.user.findUnique({ where: { googleId: identity.sub } });
-    if (byGoogle) return byGoogle;
+    if (byGoogle) {
+      if (byGoogle.googlePictureUrl === picture) return byGoogle;
+      return this.prisma.user.update({ where: { id: byGoogle.id }, data: { googlePictureUrl: picture } });
+    }
 
     const byEmail = await this.prisma.user.findUnique({ where: { email } });
     if (!byEmail) {
-      return this.prisma.user.create({ data: { email, googleId: identity.sub, emailVerifiedAt: new Date() } });
+      return this.prisma.user.create({ data: { email, googleId: identity.sub, emailVerifiedAt: new Date(), googlePictureUrl: picture } });
     }
 
     if (byEmail.emailVerifiedAt) {
       // La cuenta ya demostró que el email es de su dueño: solo sumamos Google.
-      return this.prisma.user.update({ where: { id: byEmail.id }, data: { googleId: identity.sub } });
+      return this.prisma.user.update({ where: { id: byEmail.id }, data: { googleId: identity.sub, googlePictureUrl: picture } });
     }
 
     // Cuenta con contraseña y email nunca verificado: cualquiera pudo haberla creado con este email.
@@ -99,7 +105,7 @@ export class GoogleAuthService {
     await this.sessions.revokeAll(byEmail.id);
     return this.prisma.user.update({
       where: { id: byEmail.id },
-      data: { googleId: identity.sub, emailVerifiedAt: new Date(), passwordHash: null },
+      data: { googleId: identity.sub, emailVerifiedAt: new Date(), passwordHash: null, googlePictureUrl: picture },
     });
   }
 }

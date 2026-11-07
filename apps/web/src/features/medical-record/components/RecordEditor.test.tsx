@@ -15,6 +15,7 @@ const profile: ProfileDto = {
   active: false,
   printStatus: 'never',
   printedAt: null,
+  photoVersion: null,
 };
 const initial = { data: medicalRecordSchema.parse({}), visibility: DEFAULT_VISIBILITY };
 

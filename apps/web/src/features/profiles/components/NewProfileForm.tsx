@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  MAX_PROFILES_PER_ACCOUNT,
   RELATIONSHIP_LABELS,
   createProfileSchema,
     type ConsentAcceptance,
@@ -84,6 +85,10 @@ export function NewProfileForm({ consent: initialConsent, hasOwn }: { consent: C
       }
       if (err instanceof ApiError && err.code === 'self_profile_required') {
         setFormError('Primero creá tu propia ficha. Después podés agregar las de tu familia.');
+        return;
+      }
+      if (err instanceof ApiError && err.code === 'profile_limit') {
+        setFormError(`Llegaste al máximo de ${MAX_PROFILES_PER_ACCOUNT} fichas por cuenta. Si necesitás más, otra persona de la familia puede crear su propia cuenta.`);
         return;
       }
       if (err instanceof ApiError && err.code === 'self_profile_exists') {

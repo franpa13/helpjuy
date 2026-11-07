@@ -1,4 +1,5 @@
-import type { ConsentDto, ProfileDto } from '@helpjuy/contracts';
+import { MAX_PROFILES_PER_ACCOUNT, type ConsentDto, type ProfileDto } from '@helpjuy/contracts';
+import { Alert } from '@/components/ui/alert';
 import { redirect } from 'next/navigation';
 import { PanelPage } from '@/features/panel/components/PanelPage';
 import { NewProfileNext } from '@/features/profiles/components/NewProfileNext';
@@ -27,7 +28,14 @@ export default async function NuevoPerfilPage() {
       aside={<NewProfileNext />}
       asideLabel="Qué sigue"
     >
-      <NewProfileForm consent={consent} hasOwn={hasOwn} />
+      {profiles.length >= MAX_PROFILES_PER_ACCOUNT ? (
+        <Alert variant="warning">
+          Llegaste al máximo de {MAX_PROFILES_PER_ACCOUNT} fichas por cuenta. Si necesitás más, otra persona de la familia
+          puede crear su propia cuenta y sumarse a tu grupo familiar.
+        </Alert>
+      ) : (
+        <NewProfileForm consent={consent} hasOwn={hasOwn} />
+      )}
     </PanelPage>
   );
 }

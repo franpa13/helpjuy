@@ -28,6 +28,8 @@ model User {
   passwordHash    String?
   emailVerifiedAt DateTime?
   googleId        String?         @unique
+  /// Foto de la cuenta de Google (solo para ofrecer copiarla a la ficha propia; nunca se muestra desde Google).
+  googlePictureUrl String?
   createdAt       DateTime        @default(now())
   sessions        Session[]
   emailTokens     EmailToken[]
@@ -72,6 +74,9 @@ model Profile {
   /// Huella de lo último impreso (sha256 del token + datos impresos), para avisar cuándo reimprimir.
   printedHash    String?
   printedAt      DateTime?
+  /// Foto de la ficha: webp 320x320 sin metadatos, cifrada como los datos médicos.
+  photoCipher    String?
+  photoUpdatedAt DateTime?
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   consents       ConsentRecord[]

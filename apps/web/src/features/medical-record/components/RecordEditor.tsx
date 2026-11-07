@@ -16,6 +16,7 @@ import { ApiError, apiFetch } from '@/shared/api/client';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field, TextareaField } from '@/shared/ui/Field';
+import { ProfilePhoto } from '@/features/profiles/components/ProfilePhoto';
 import { buttonVariants } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Field as FieldRoot, FieldLabel } from '@/components/ui/field';
@@ -37,6 +38,7 @@ const EMPTY = '__vacio';
 const grid2 = 'grid gap-3.5 sm:grid-cols-2';
 
 const SECTION_LABEL: Record<Section, string> = {
+  photo: 'Foto',
   identity: 'Edad, sexo e idioma',
   vitals: 'Sangre, peso y altura',
   allergies: 'Alergias',
@@ -197,9 +199,14 @@ function NoneCheck({ label, checked, onChange }: { label: string; checked: boole
   );
 }
 
-type Props = { profile: ProfileDto; initial: { data: MedicalRecord; visibility: Visibility } };
+type Props = {
+  profile: ProfileDto;
+  initial: { data: MedicalRecord; visibility: Visibility };
+  /** La cuenta entró con Google y tiene foto (se ofrece copiarla a la ficha propia). */
+  googlePhoto?: boolean;
+};
 
-export function RecordEditor({ profile, initial }: Props) {
+export function RecordEditor({ profile, initial, googlePhoto = false }: Props) {
   const [draft, setDraft] = useState<Draft>(() => fromRecord(initial.data));
   const [visibility, setVisibility] = useState<Visibility>(initial.visibility);
   const [errors, setErrors] = useState<EditorErrors>({});
@@ -249,6 +256,23 @@ export function RecordEditor({ profile, initial }: Props) {
   return (
     <div className="grid gap-4 [grid-template-areas:'progress'_'blocks'_'summary'_'links'_'save'] wide:grid-cols-[minmax(0,1.7fr)_minmax(300px,1fr)] wide:items-start wide:gap-7 wide:[grid-template-areas:'blocks_side']">
       <div className="grid min-w-0 gap-4 [grid-area:blocks]">
+      <Block
+        title="Foto"
+        question="Ayuda a confirmar que la ficha es de la persona que están atendiendo."
+        sections={['photo']}
+        visibility={visibility}
+        setVisible={setVisible}
+      >
+        <ProfilePhoto
+          profileId={profile.id}
+          name={`${profile.firstName} ${profile.lastName}`}
+          relationship={profile.relationship}
+          isMinor={profile.isMinor}
+          photoVersion={profile.photoVersion}
+          googlePhoto={googlePhoto}
+          visible={visibility.photo}
+        />
+      </Block>
       <Block
         title="Datos básicos"
         sections={['identity', 'vitals']}

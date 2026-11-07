@@ -124,6 +124,15 @@ describe('ingreso con Google (e2e)', () => {
     await roundTrip(request.agent(app.getHttpServer()), 'code-juan');
     expect(mailer.sent).toHaveLength(0);
   });
+
+  it('guarda la foto de la cuenta de Google (solo si es de Google)', async () => {
+    google.identities.set('code-foto', { sub: 'g-foto', email: 'foto@gmail.com', emailVerified: true, picture: 'https://lh3.googleusercontent.com/a/xyz=s96-c' });
+    google.identities.set('code-rara', { sub: 'g-rara', email: 'rara@gmail.com', emailVerified: true, picture: 'https://evil.example/x.png' });
+    await roundTrip(request.agent(app.getHttpServer()), 'code-foto');
+    await roundTrip(request.agent(app.getHttpServer()), 'code-rara');
+    expect((await prisma.user.findUniqueOrThrow({ where: { email: 'foto@gmail.com' } })).googlePictureUrl).toBe('https://lh3.googleusercontent.com/a/xyz=s96-c');
+    expect((await prisma.user.findUniqueOrThrow({ where: { email: 'rara@gmail.com' } })).googlePictureUrl).toBeNull();
+  });
 });
 
 describe('Google sin configurar (e2e)', () => {
@@ -133,4 +142,5 @@ describe('Google sin configurar (e2e)', () => {
     expect(res.headers.location).toBe('/ingresar?error=google_disabled');
     await app.close();
   });
+
 });

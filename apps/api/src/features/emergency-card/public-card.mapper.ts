@@ -8,7 +8,7 @@ const defined = <T extends object>(o: T): T =>
  * (lista blanca): nada que no esté acá puede filtrarse aunque el contrato crezca.
  */
 export function toPublicCard(
-  profile: { firstName: string; lastName: string },
+  profile: { firstName: string; lastName: string; photoUpdatedAt?: Date | null },
   record: MedicalRecord | null,
   visibility: Visibility,
   updatedAt: Date | null,
@@ -20,8 +20,10 @@ export function toPublicCard(
     active: record ? isActive(record) : false,
     updatedAt: updatedAt ? updatedAt.toISOString() : null,
   };
-  if (!record) return card;
   const show = (s: keyof Visibility) => visibility[s] === true;
+  // La foto se ve solo si el titular la eligió mostrar (por defecto, oculta).
+  if (show('photo') && profile.photoUpdatedAt) card.photoVersion = String(profile.photoUpdatedAt.getTime());
+  if (!record) return card;
 
   if (show('identity')) {
     card.identity = defined({

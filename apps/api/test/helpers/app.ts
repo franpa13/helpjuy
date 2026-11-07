@@ -8,9 +8,11 @@ import { Mailer } from '../../src/features/mail/mailer.js';
 import { FakeCardCache } from './fake-card-cache.js';
 import { FakeGoogleOAuth } from './fake-google.js';
 import { FakeMailer } from './fake-mailer.js';
+import { ImageFetcher } from '../../src/features/profiles/image-fetcher.js';
+import { FakeImageFetcher } from './fake-image-fetcher.js';
 
 export async function createTestApp(
-  overrides: { mailer?: Mailer; cardCache?: CardCache; google?: GoogleOAuth | null } = {},
+  overrides: { mailer?: Mailer; cardCache?: CardCache; google?: GoogleOAuth | null; imageFetcher?: ImageFetcher } = {},
 ): Promise<INestApplication> {
   const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
     .overrideProvider(Mailer)
@@ -19,6 +21,8 @@ export async function createTestApp(
     .useValue(overrides.cardCache ?? new FakeCardCache())
     .overrideProvider(GoogleOAuth)
     .useValue(overrides.google === undefined ? new FakeGoogleOAuth() : overrides.google)
+    .overrideProvider(ImageFetcher)
+    .useValue(overrides.imageFetcher ?? new FakeImageFetcher())
     .compile();
   const app = configureApp(moduleRef.createNestApplication());
   await app.init();

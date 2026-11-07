@@ -1,4 +1,5 @@
 import type { PublicCardDto } from '@helpjuy/contracts';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { CallButton, CardPage, CardSection, CardStrip, InactiveNotice, callbar, sec, tiny } from './card-ui';
@@ -84,11 +85,25 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
     <CardPage>
       <CardStrip logo />
 
-      <div className="border-b-3 border-ink px-4 pt-[18px] pb-3.5 card:px-8">
-        <h1 className="text-[clamp(38px,10vw,64px)]/[0.92]">
-          {card.firstName} {card.lastName}
-        </h1>
-        {meta && <p className="mt-1.5 text-base text-muted-foreground">{meta}</p>}
+      <div className="flex items-center gap-4 border-b-3 border-ink px-4 pt-[18px] pb-3.5 card:gap-6 card:px-8">
+        {card.photoVersion && token && (
+          <Avatar className="size-20 shrink-0 rounded-md border-3 border-ink card:size-28">
+            <AvatarImage
+              src={`/api/public/cards/${token}/photo?v=${card.photoVersion}`}
+              alt={`Foto de ${card.firstName} ${card.lastName}`}
+              className="rounded-none"
+            />
+            <AvatarFallback className="rounded-none text-2xl">
+              {`${card.firstName[0] ?? ''}${card.lastName[0] ?? ''}`.toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        )}
+        <div className="min-w-0">
+          <h1 className="text-[clamp(38px,10vw,64px)]/[0.92] wrap-anywhere">
+            {card.firstName} {card.lastName}
+          </h1>
+          {meta && <p className="mt-1.5 text-base text-muted-foreground">{meta}</p>}
+        </div>
       </div>
 
       {card.vitals || card.identity?.age !== undefined ? (
