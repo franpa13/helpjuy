@@ -60,11 +60,17 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
           <PanelBox title="Consejos">
             <ul className="grid gap-1.5 pl-5 text-muted-foreground">
               <li>
-                Para el casco o la moto, usá <strong>papel autoadhesivo</strong> y cubrilo con <strong>cinta transparente</strong> para que
-                aguante el sol y la lluvia.
+                <strong>Casco:</strong> el sticker va <strong>afuera</strong>, del lado derecho junto a la visera (o atrás). Usá papel
+                autoadhesivo y cubrilo con cinta transparente.
               </li>
               <li>
-                La tarjeta de billetera dura más si la <strong>plastificás</strong>.
+                <strong>Billetera:</strong> la tarjeta, <strong>plastificada y pegada al DNI</strong>.
+              </li>
+              <li>
+                <strong>Auto:</strong> una tarjeta detrás del <strong>parasol del conductor</strong>.
+              </li>
+              <li>
+                <strong>Casa:</strong> la hoja grande en la puerta de la heladera.
               </li>
               <li>Lo impreso muestra solo lo que elegiste que se vea. Si cambiás algo, te avisamos para reimprimir.</li>
             </ul>

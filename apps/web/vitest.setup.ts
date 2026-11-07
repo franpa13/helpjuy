@@ -17,6 +17,8 @@ class IO {
   }
 }
 globalThis.IntersectionObserver ??= IO as unknown as typeof IntersectionObserver;
+// Radix lo usa para medir los controles dentro de formularios (casillas, radios).
+globalThis.ResizeObserver ??= IO as unknown as typeof ResizeObserver;
 window.matchMedia ??= ((q: string) => ({
   matches: false,
   media: q,

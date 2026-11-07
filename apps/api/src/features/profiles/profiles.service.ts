@@ -99,6 +99,12 @@ export class ProfilesService {
   async create(ownerId: string, input: CreateProfileInput): Promise<Profile> {
     this.consent.assertValid(input.consent, input.isMinor);
     return this.prisma.$transaction(async (tx) => {
+      // Primero tu ficha: la de otra persona solo se crea si ya tenés la propia, y la propia es una sola.
+      // Lock por cuenta: dos altas simultáneas no pueden dejar dos fichas propias.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${'self:' + ownerId}))`;
+      const hasSelf = (await tx.profile.count({ where: { ownerId, relationship: 'SELF' } })) > 0;
+      if (input.relationship === 'SELF' && hasSelf) throw new ConflictException({ error: 'self_profile_exists' });
+      if (input.relationship !== 'SELF' && !hasSelf) throw new ConflictException({ error: 'self_profile_required' });
       const profile = await tx.profile.create({
         data: {
           ownerId,
@@ -127,7 +133,11 @@ export class ProfilesService {
   }
 
   async update(ownerId: string, id: string, input: UpdateProfileInput): Promise<ProfileWithRecord> {
-    await this.getOwned(ownerId, id);
+    const current = await this.getOwned(ownerId, id);
+    // La ficha propia no se convierte en la de otra persona, ni al revés.
+    if (input.relationship && (input.relationship === 'SELF') !== (current.relationship === 'SELF')) {
+      throw new ConflictException({ error: 'self_profile_locked' });
+    }
     const updated = await this.prisma.profile.update({ where: { id }, data: input, include: { medicalRecord: true } });
     await this.invalidateCard([updated.publicToken]);
     return updated;
@@ -135,6 +145,10 @@ export class ProfilesService {
 
   async remove(ownerId: string, id: string): Promise<void> {
     const profile = await this.getOwned(ownerId, id);
+    // Sin la ficha propia, las de la familia quedarían "sueltas": primero se borran esas.
+    if (profile.relationship === 'SELF' && (await this.prisma.profile.count({ where: { ownerId, NOT: { id } } })) > 0) {
+      throw new ConflictException({ error: 'self_profile_has_dependents' });
+    }
     await this.prisma.profile.delete({ where: { id } });
     await this.invalidateCard([profile.publicToken]);
   }

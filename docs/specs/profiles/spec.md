@@ -26,3 +26,11 @@ Que una cuenta pueda administrar varias fichas (la propia, la de un hijo, la de 
 - **Dado** un perfil, **cuando** rota el token, **entonces** el token nuevo es distinto y el viejo ya no existe en la DB.
 - **Dado** un usuario, **puede** tener varios perfiles (yo, hijo, padre).
 - **Dado** un pedido sin sesión, **entonces** 401.
+
+## Primero tu ficha
+
+- La primera ficha de una cuenta es siempre la del titular (`relationship: SELF`). Sin ella, crear la de otra persona responde `409 self_profile_required`.
+- Hay una sola ficha propia por cuenta: una segunda `SELF` responde `409 self_profile_exists` (lock por cuenta para altas simultáneas).
+- La ficha propia no se convierte en otra ni al revés (`PATCH` → `409 self_profile_locked`).
+- No se puede borrar la ficha propia mientras haya otras a cargo (`409 self_profile_has_dependents`).
+- En la web, sin ficha propia el alta no pregunta "¿para quién es?": es la tuya. Con ficha propia se elige entre Hijo/a, Madre/Padre, Pareja u Otro.

@@ -41,17 +41,19 @@ export const staggerChild = (from: { x?: number; y?: number } = { y: 18 }): Vari
 });
 
 type ListProps = {
+  'aria-label'?: string;
   as?: 'ul' | 'ol' | 'dl' | 'div';
   className?: string;
   children: ReactNode;
 };
 
 /** Contenedor que escalona la aparición de sus hijos `StaggerItem` al entrar en pantalla. */
-export function StaggerList({ as = 'div', className, children }: ListProps) {
+export function StaggerList({ as = 'div', className, children, 'aria-label': ariaLabel }: ListProps) {
   const Comp = motion[as];
   return (
     <Comp
       className={className}
+      aria-label={ariaLabel}
       variants={staggerParent}
       initial="hidden"
       whileInView="show"

@@ -65,6 +65,7 @@ describe('consentimiento y perfiles (e2e)', () => {
   });
 
   it('menor sin declaración de tutor → 400 guardian_required', async () => {
+    await alice.post('/profiles').send(base).expect(201);
     await alice
       .post('/profiles')
       .send({ ...base, relationship: 'CHILD', isMinor: true })
@@ -72,6 +73,7 @@ describe('consentimiento y perfiles (e2e)', () => {
   });
 
   it('menor con declaración de tutor → la guarda en el consentimiento', async () => {
+    await alice.post('/profiles').send(base).expect(201);
     const r = await alice
       .post('/profiles')
       .send({ ...base, relationship: 'CHILD', isMinor: true, consent: { ...base.consent, guardianDeclared: true } })
@@ -134,5 +136,46 @@ describe('consentimiento y perfiles (e2e)', () => {
     expect(r.body.version).toBe('2026-11-05');
     expect(r.body.text).toContain('Frankfurt');
     expect(r.body.text).toContain('25.326');
+  });
+
+  describe('primero tu ficha', () => {
+    const kid = {
+      ...base,
+      firstName: 'Sofía',
+      relationship: 'CHILD',
+      isMinor: true,
+      consent: { ...base.consent, guardianDeclared: true },
+    };
+
+    it('sin ficha propia no se puede crear la de otra persona', async () => {
+      await alice.post('/profiles').send(kid).expect(409, { error: 'self_profile_required' });
+      expect(await prisma.profile.count()).toBe(0);
+    });
+
+    it('con la ficha propia ya se pueden agregar otras', async () => {
+      await alice.post('/profiles').send(base).expect(201);
+      await alice.post('/profiles').send(kid).expect(201);
+    });
+
+    it('solo hay una ficha propia por cuenta', async () => {
+      await alice.post('/profiles').send(base).expect(201);
+      await alice.post('/profiles').send({ ...base, firstName: 'Otro' }).expect(409, { error: 'self_profile_exists' });
+    });
+
+    it('la ficha propia no se puede convertir en otra ni al revés', async () => {
+      const own = (await alice.post('/profiles').send(base)).body;
+      const child = (await alice.post('/profiles').send(kid)).body;
+      await alice.patch(`/profiles/${own.id}`).send({ relationship: 'OTHER' }).expect(409, { error: 'self_profile_locked' });
+      await alice.patch(`/profiles/${child.id}`).send({ relationship: 'SELF' }).expect(409, { error: 'self_profile_locked' });
+      await alice.patch(`/profiles/${child.id}`).send({ relationship: 'OTHER' }).expect(200);
+    });
+
+    it('no se puede borrar la ficha propia mientras haya otras a cargo', async () => {
+      const own = (await alice.post('/profiles').send(base)).body;
+      const child = (await alice.post('/profiles').send(kid)).body;
+      await alice.delete(`/profiles/${own.id}`).expect(409, { error: 'self_profile_has_dependents' });
+      await alice.delete(`/profiles/${child.id}`).expect(204);
+      await alice.delete(`/profiles/${own.id}`).expect(204);
+    });
   });
 });

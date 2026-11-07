@@ -29,4 +29,14 @@ describe('Landing', () => {
       expect(screen.getByRole("heading", { name })).toBeInTheDocument();
     }
   });
+
+  it("dice dónde poner cada cosa, con los lugares que buscan los rescatistas", () => {
+    render(<Landing />);
+    expect(screen.getByRole("heading", { name: "Dónde ponerlo para que lo encuentren" })).toBeInTheDocument();
+    expect(screen.getByText(/Afuera del casco, del lado derecho/)).toBeInTheDocument();
+    expect(screen.getByText(/detrás del parasol del conductor/)).toBeInTheDocument();
+    expect(screen.getByText(/Pegada al DNI/)).toBeInTheDocument();
+    expect(screen.getByText(/lado de adentro de la puerta de entrada/)).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Tres reglas" })).toBeInTheDocument();
+  });
 });

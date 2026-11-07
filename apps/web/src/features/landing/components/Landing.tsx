@@ -25,6 +25,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import { Badge } from '@/components/ui/badge';
 import { buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Logo } from '@/shared/brand/Logo';
@@ -61,37 +62,59 @@ const DATA = [
   { icon: PhoneCall, name: 'Contactos', why: 'Le avisan a tu familia en seguida, aunque no tengas el celular a mano.' },
 ];
 
-const PLACES = [
+/**
+ * Dónde poner cada pieza. Basado en programas de rescate que ya funcionan: CRASH Card (motos, Reino Unido),
+ * Rettungskarte del ADAC (autos, Alemania) y "Message in a Bottle" de los Lions (casas, Reino Unido e Irlanda).
+ */
+const PLACES: Array<{ icon: LucideIcon; name: string; piece: string; where: string; why: string }> = [
+  {
+    icon: Motorbike,
+    name: 'Moto y casco',
+    piece: 'Sticker',
+    where: 'Afuera del casco, del lado derecho junto a la visera (o atrás). Nunca adentro.',
+    why: 'Es donde lo buscan los programas de rescate para motociclistas. Adentro no sirve: para verlo habría que sacarte el casco, y eso solo lo debe hacer el equipo de emergencias.',
+  },
   {
     icon: WalletCards,
     name: 'Billetera',
-    text: 'Una tarjeta del tamaño de una de crédito, al lado del DNI. Es lo primero que se revisa para identificarte.',
+    piece: 'Tarjeta',
+    where: 'Pegada al DNI, detrás o adelante. Plastificada.',
+    why: 'Lo primero que se busca para saber quién sos es el documento. Al lado ya encuentran alergias, sangre y a quién llamar, aunque nadie escanee nada.',
   },
   {
     icon: Smartphone,
     name: 'Celular',
-    text: 'Un sticker atrás, debajo de la funda. Es lo que casi todos llevamos siempre encima.',
-  },
-  {
-    icon: KeyRound,
-    name: 'Llavero',
-    text: 'Una tarjetita plastificada colgada de las llaves, para salir sin pensar en nada más.',
-  },
-  {
-    icon: Motorbike,
-    name: 'Moto y casco',
-    text: 'Un sticker en el casco y otro en la moto, con tus datos clave impresos por si no hay señal en la ruta.',
+    piece: 'Sticker + ajuste',
+    where: 'Atrás, debajo de la funda transparente. Y activá la información de emergencia en la pantalla bloqueada.',
+    why: 'En iPhone es "Ficha médica" y en Android "Información de emergencia": se ven sin desbloquear. Pegá ahí el link de tu ficha y tu contacto.',
   },
   {
     icon: CarFront,
     name: 'Auto',
-    text: 'En el parasol o la guantera del lado del conductor, donde un rescatista mira primero.',
+    piece: 'Tarjeta + sticker',
+    where: 'La tarjeta detrás del parasol del conductor. El sticker en una esquina del parabrisas, del lado del conductor, sin tapar la vista.',
+    why: 'Detrás del parasol del conductor es donde los rescatistas buscan la tarjeta de rescate del auto en Europa. El sticker avisa que hay información adentro.',
   },
   {
     icon: Refrigerator,
     name: 'Heladera',
-    text: 'Para adultos mayores en casa: los equipos de emergencia saben buscar ahí.',
+    piece: 'Hoja grande',
+    where: 'En la puerta de la heladera. Y un sticker del lado de adentro de la puerta de entrada.',
+    why: 'Es el método de los Lions para adultos mayores que viven solos: el sticker de la puerta avisa al que entra que la información está en la heladera.',
   },
+  {
+    icon: KeyRound,
+    name: 'Llavero',
+    piece: 'Tarjeta chica',
+    where: 'Una copia de la tarjeta plastificada, colgada de las llaves.',
+    why: 'Para salir a caminar, correr o andar en bici sin billetera: las llaves casi siempre van con vos.',
+  },
+];
+
+const RULES = [
+  { title: 'El sticker avisa, la tarjeta informa', text: 'Usá los dos: el QR lleva a la ficha completa y la tarjeta tiene lo crítico impreso, por si no hay señal.' },
+  { title: 'Siempre a la vista desde afuera', text: 'Nada adentro del casco ni escondido: si para encontrarlo hay que moverte, no sirve.' },
+  { title: 'Siempre en el mismo lugar', text: 'Contale a tu familia dónde lo tenés. Y cuando cambie algo, reimprimilo: te avisamos.' },
 ];
 
 const PRIVACY = [
@@ -239,21 +262,58 @@ export function Landing() {
         <section className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]" aria-labelledby="donde">
           <Reveal>
             <h2 id="donde" className="max-w-[16ch] text-[clamp(36px,5vw,64px)]/[0.92]">
-              Llevalo donde estés
+              Dónde ponerlo para que lo encuentren
             </h2>
             <p className="mt-[18px] max-w-[36em] text-[19px] text-muted-foreground">
-              No hace falta tener auto ni moto. Un accidente le puede pasar a cualquiera, también caminando.
+              No sirve de nada si nadie lo ve. Estos lugares son los que ya usan los programas de rescate en otros países.
             </p>
           </Reveal>
-          <StaggerList as="ul" className="mt-10 grid list-none gap-x-8 gap-y-6 p-0 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1000px]:gap-x-12 min-[1000px]:gap-y-10 [&>li]:border-t-3 [&>li]:border-ink [&>li]:pt-4">
-            {PLACES.map((p) => (
-              <StaggerItem as="li" key={p.name}>
-                <p.icon className="mb-3.5 block size-10 text-red" aria-hidden="true" strokeWidth={2} />
-                <h3 className="mb-2 text-[26px]/none">{p.name}</h3>
-                <p>{p.text}</p>
+
+          <StaggerList as="ol" className="mt-8 grid list-none gap-3 p-0 min-[860px]:grid-cols-3" aria-label="Tres reglas">
+            {RULES.map((r, i) => (
+              <StaggerItem as="li" key={r.title} className="flex gap-3 bg-night p-4 text-white">
+                <span className="font-head text-[40px]/[0.8] font-extrabold text-red-bright" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span>
+                  <strong className="block font-head text-xl/tight font-extrabold uppercase">{r.title}</strong>
+                  <span className="mt-1 block text-[15px] text-white/82">{r.text}</span>
+                </span>
               </StaggerItem>
             ))}
           </StaggerList>
+
+          <StaggerList as="ul" className="mt-10 grid list-none gap-x-8 gap-y-8 p-0 min-[700px]:grid-cols-2 min-[1000px]:grid-cols-3 min-[1000px]:gap-x-12 min-[1000px]:gap-y-10">
+            {PLACES.map((p) => (
+              <StaggerItem as="li" key={p.name} className="border-t-3 border-ink pt-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <p.icon className="size-10 text-red" aria-hidden="true" strokeWidth={2} />
+                  <Badge variant="outline" className="border-ink text-ink">
+                    {p.piece}
+                  </Badge>
+                </div>
+                <h3 className="mb-2 text-[26px]/none">{p.name}</h3>
+                <p className="font-bold">{p.where}</p>
+                <p className="mt-2 text-[15px] text-muted-foreground">{p.why}</p>
+              </StaggerItem>
+            ))}
+          </StaggerList>
+
+          <p className="mt-10 max-w-[60em] text-sm text-muted-foreground">
+            Basado en{' '}
+            <a href="https://somersetroadsafety.org/motorcyclists/crash-card/" target="_blank" rel="noreferrer">
+              CRASH Card
+            </a>{' '}
+            (motociclistas, Reino Unido), la{' '}
+            <a href="https://www.adac.de/rund-ums-fahrzeug/unfall/rettungskarte/" target="_blank" rel="noreferrer">
+              tarjeta de rescate del ADAC
+            </a>{' '}
+            (autos, Alemania) y{' '}
+            <a href="https://members.farnhamlions.org.uk/community/communitycare/messageinbottle.html" target="_blank" rel="noreferrer">
+              Message in a Bottle
+            </a>{' '}
+            de los Lions (casas, Reino Unido e Irlanda).
+          </p>
         </section>
 
         <section className="bg-night text-white" aria-labelledby="privacidad">
