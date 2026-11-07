@@ -10,7 +10,7 @@ const profileBody = {
   lastName: 'Mamani',
   relationship: 'SELF',
   isMinor: false,
-  consent: { version: '2026-11-05', accepted: true },
+  consent: { version: '2026-11-07', accepted: true },
 };
 
 const data = {

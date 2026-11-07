@@ -12,7 +12,7 @@ const ITEMS = [
     hint: 'Tus datos y tu QR',
     icon: IdCard,
     // Todo lo que no es familia ni avisos es parte de "Mis fichas" (editar, nueva ficha…)
-    active: (p: string) => !p.startsWith('/panel/familia') && !p.startsWith('/panel/avisos'),
+    active: (p: string) => !['/panel/familia', '/panel/avisos', '/panel/cuenta'].some((s) => p.startsWith(s)),
   },
   {
     href: '/panel/familia',

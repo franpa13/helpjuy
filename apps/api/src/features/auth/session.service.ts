@@ -6,6 +6,13 @@ import { PrismaService } from '../../shared/prisma/prisma.service.js';
 export const SESSION_COOKIE = 'hj_session';
 export const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
+export const sessionCookieOptions = () => ({
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax' as const,
+  path: '/',
+});
+
 @Injectable()
 export class SessionService {
   constructor(private readonly prisma: PrismaService) {}

@@ -6,7 +6,7 @@ import { PrismaService } from '../src/shared/prisma/prisma.service.js';
 import { createTestApp } from './helpers/app.js';
 import { resetDb } from './helpers/db.js';
 
-const consent = { version: '2026-11-05', accepted: true };
+const consent = { version: '2026-11-07', accepted: true };
 const base = {
   allergies: [{ substance: 'Penicilina' }],
   bloodType: 'A+',

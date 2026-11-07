@@ -77,6 +77,9 @@ model Profile {
   /// Foto de la ficha: webp 320x320 sin metadatos, cifrada como los datos médicos.
   photoCipher    String?
   photoUpdatedAt DateTime?
+  /// Último email de "alguien abrió tu ficha" (como mucho uno por hora).
+  lastScanEmailAt DateTime?
+  scans          CardScan[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
   consents       ConsentRecord[]
@@ -160,4 +163,15 @@ model EmergencyAlert {
   test       Boolean  @default(false)
 
   @@index([profileId, createdAt])
+}
+
+/// Cada vez que alguien abre la ficha pública (sin IP ni datos de quien la abrió). Se borra a los 90 días.
+model CardScan {
+  id        String   @id @default(uuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([profileId, createdAt])
+  @@index([createdAt])
 }

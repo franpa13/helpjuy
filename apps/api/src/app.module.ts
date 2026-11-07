@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { AccountModule } from './features/account/account.module.js';
 import { AuthModule } from './features/auth/auth.module.js';
 import { ConsentModule } from './features/consent/consent.module.js';
 import { CardCacheModule } from './features/emergency-card/card-cache.js';
@@ -27,6 +28,7 @@ import { PrismaModule } from './shared/prisma/prisma.module.js';
     MedicalRecordModule,
     EmergencyCardModule,
     FamilyModule,
+    AccountModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ClientIpThrottlerGuard }],

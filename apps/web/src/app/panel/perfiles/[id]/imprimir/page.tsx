@@ -4,6 +4,7 @@ import { createHash } from 'node:crypto';
 import { notFound, redirect } from 'next/navigation';
 import QRCode from 'qrcode';
 import { PrintActions } from '@/features/print/components/PrintActions';
+import { RotateQr } from '@/features/print/components/RotateQr';
 import { PrintSheet } from '@/features/print/components/PrintSheet';
 import { resolveSiteUrl } from '@/features/print/site-url';
 import { apiServer } from '@/shared/api/server';
@@ -56,6 +57,9 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
             <a className="mt-3 inline-block font-bold" href={url} target="_blank" rel="noreferrer">
               Probar el QR: ver como el paramédico
             </a>
+          </PanelBox>
+          <PanelBox title="¿Perdiste el sticker?">
+            <RotateQr profileId={id} />
           </PanelBox>
           <PanelBox title="Consejos">
             <ul className="grid gap-1.5 pl-5 text-muted-foreground">

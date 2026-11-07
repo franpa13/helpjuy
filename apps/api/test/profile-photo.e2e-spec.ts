@@ -7,7 +7,7 @@ import { resetDb } from './helpers/db.js';
 import { FakeImageFetcher } from './helpers/fake-image-fetcher.js';
 
 type Agent = ReturnType<typeof request.agent>;
-const consent = { version: '2026-11-05', accepted: true };
+const consent = { version: '2026-11-07', accepted: true };
 const own = { firstName: 'Lucía', lastName: 'Mamani', relationship: 'SELF', isMinor: false, consent };
 const kid = { ...own, firstName: 'Mateo', relationship: 'CHILD', isMinor: true, consent: { ...consent, guardianDeclared: true } };
 

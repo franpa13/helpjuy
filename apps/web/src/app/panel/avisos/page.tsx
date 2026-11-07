@@ -1,14 +1,15 @@
-import type { ReceivedAlertDto } from '@helpjuy/contracts';
+import type { ReceivedAlertDto, ScanDto } from '@helpjuy/contracts';
 import { Clock, MapPin, ShieldCheck, Users } from 'lucide-react';
 import { redirect } from 'next/navigation';
 import { AlertsHistory } from '@/features/alerts/components/AlertsHistory';
+import { ScanHistory } from '@/features/alerts/components/ScanHistory';
 import { PanelBox, PanelPage } from '@/features/panel/components/PanelPage';
 import { apiServer } from '@/shared/api/server';
 
 export const metadata = { title: 'Avisos — HelpJuy' };
 
 export default async function AvisosPage() {
-  const alerts = await apiServer<ReceivedAlertDto[]>('/alerts');
+  const [alerts, scans] = await Promise.all([apiServer<ReceivedAlertDto[]>('/alerts'), apiServer<ScanDto[]>('/scans')]);
   if (!alerts) redirect('/ingresar?next=/panel/avisos');
 
   return (
@@ -47,6 +48,7 @@ export default async function AvisosPage() {
       }
     >
       <AlertsHistory alerts={alerts} />
+      <ScanHistory scans={scans ?? []} />
     </PanelPage>
   );
 }

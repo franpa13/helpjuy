@@ -11,7 +11,7 @@ const profileBody = (firstName: string) => ({
   lastName: 'Paredes',
   relationship: 'SELF',
   isMinor: false,
-  consent: { version: '2026-11-05', accepted: true },
+  consent: { version: '2026-11-07', accepted: true },
 });
 const tokenOf = (url: string) => url.split('/unirme/')[1];
 
@@ -97,7 +97,7 @@ describe('grupos familiares (e2e)', () => {
     const sinFicha = request.agent(server);
     await sinFicha.post('/auth/register').send({ email: 'juan.perez1985@mail.com', password: 'claveSegura1' });
     // No puede tener la ficha de un hijo (sin email confirmado ni ficha propia): no tiene ninguna, y tampoco se muestra su email.
-    await sinFicha.post('/profiles').send({ ...profileBody('Sofía'), relationship: 'CHILD', isMinor: true, consent: { version: '2026-11-05', accepted: true, guardianDeclared: true } }).expect(403);
+    await sinFicha.post('/profiles').send({ ...profileBody('Sofía'), relationship: 'CHILD', isMinor: true, consent: { version: '2026-11-07', accepted: true, guardianDeclared: true } }).expect(403);
     await sinFicha.post(`/family-invites/${await invite(ana, g.id)}/accept`).expect(200);
     const names = (await ana.get('/family-groups')).body[0].members.map((m: { name: string }) => m.name);
     expect(names).toEqual(['Ana Paredes', 'Miembro sin ficha propia']);

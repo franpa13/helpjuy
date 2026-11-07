@@ -9,7 +9,7 @@ const base = {
   lastName: 'Pérez',
   relationship: 'SELF',
   isMinor: false,
-  consent: { version: '2026-11-05', accepted: true },
+  consent: { version: '2026-11-07', accepted: true },
 };
 
 describe('consentimiento y perfiles (e2e)', () => {
@@ -40,14 +40,14 @@ describe('consentimiento y perfiles (e2e)', () => {
     expect(r.body).toMatchObject({ firstName: 'Juan', lastName: 'Pérez', relationship: 'SELF', isMinor: false });
     expect(r.body.publicToken).toMatch(/^[A-Za-z0-9_-]{22}$/);
     expect(
-      await prisma.consentRecord.count({ where: { profileId: r.body.id, version: '2026-11-05' } }),
+      await prisma.consentRecord.count({ where: { profileId: r.body.id, version: '2026-11-07' } }),
     ).toBe(1);
   });
 
   it('accepted:false → 400 y no crea nada', async () => {
     await alice
       .post('/profiles')
-      .send({ ...base, consent: { version: '2026-11-05', accepted: false } })
+      .send({ ...base, consent: { version: '2026-11-07', accepted: false } })
       .expect(400);
     expect(await prisma.profile.count()).toBe(0);
   });
@@ -61,7 +61,7 @@ describe('consentimiento y perfiles (e2e)', () => {
     await alice
       .post('/profiles')
       .send({ ...base, consent: { version: '2020-01-01', accepted: true } })
-      .expect(409, { error: 'consent_outdated', currentVersion: '2026-11-05' });
+      .expect(409, { error: 'consent_outdated', currentVersion: '2026-11-07' });
     expect(await prisma.profile.count()).toBe(0);
   });
 
@@ -134,7 +134,7 @@ describe('consentimiento y perfiles (e2e)', () => {
 
   it('GET /consent/current es público', async () => {
     const r = await request(server).get('/consent/current').expect(200);
-    expect(r.body.version).toBe('2026-11-05');
+    expect(r.body.version).toBe('2026-11-07');
     expect(r.body.text).toContain('Frankfurt');
     expect(r.body.text).toContain('25.326');
   });

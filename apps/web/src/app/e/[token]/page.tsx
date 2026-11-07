@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getPublicCard } from '@/features/emergency-card/api';
 import { EmergencyCard } from '@/features/emergency-card/components/EmergencyCard';
+import { ScanBeacon } from '@/features/emergency-card/components/ScanBeacon';
 
 // ISR: cada ficha se genera en el primer pedido y queda cacheada. La API la invalida al cambiar.
 // Como red de seguridad, se refresca en segundo plano una vez por día.
@@ -23,5 +24,10 @@ export default async function EmergencyCardPage({ params }: PageProps<'/e/[token
   if (!PUBLIC_TOKEN_RE.test(token)) notFound();
   const card = await getPublicCard(token);
   if (!card) notFound();
-  return <EmergencyCard card={card} token={token} />;
+  return (
+    <>
+      <EmergencyCard card={card} token={token} />
+      <ScanBeacon token={token} />
+    </>
+  );
 }

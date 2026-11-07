@@ -9,3 +9,4 @@ export * from './medical';
 export * from './public-card';
 export * from './family';
 export * from './printable';
+export * from './account';

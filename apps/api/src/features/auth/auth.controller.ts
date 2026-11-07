@@ -19,17 +19,12 @@ import { ZodValidationPipe } from '../../shared/zod-validation.pipe.js';
 import { AuthService, toMe } from './auth.service.js';
 import { CurrentUser } from './current-user.decorator.js';
 import { SessionGuard } from './session.guard.js';
-import { SESSION_COOKIE, SESSION_TTL_MS, SessionService } from './session.service.js';
+import { SESSION_COOKIE, SESSION_TTL_MS, SessionService, sessionCookieOptions } from './session.service.js';
 
 // Límite estricto solo en las acciones sensibles; /auth/me queda con el global.
 const STRICT = { default: { limit: 10, ttl: 60_000 } };
 
-const cookieOptions = () => ({
-  httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax' as const,
-  path: '/',
-});
+const cookieOptions = sessionCookieOptions;
 
 
 @Controller('auth')

@@ -174,9 +174,14 @@ const FAQ = [
   },
 ];
 
-export function Landing() {
+export function Landing({ accountDeleted = false }: { accountDeleted?: boolean }) {
   return (
     <>
+      {accountDeleted && (
+        <p role="status" className="bg-green px-4 py-3 text-center font-bold text-white">
+          Listo: borramos tu cuenta y todos sus datos. Los QR impresos ya no funcionan.
+        </p>
+      )}
       <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-white/18 bg-night px-[clamp(16px,4vw,48px)] py-2.5 text-white">
         <Link href="/" className="font-head text-[22px] font-extrabold tracking-[0.06em] text-white uppercase no-underline max-[559px]:[&_svg]:size-6 max-[559px]:[&>span>span]:text-[24px]!" aria-label="HelpJuy, inicio">
           <Logo size={32} crossColor="var(--red-bright)" />

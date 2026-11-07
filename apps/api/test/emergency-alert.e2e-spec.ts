@@ -6,7 +6,7 @@ import { resetDb } from './helpers/db.js';
 import { FakeMailer } from './helpers/fake-mailer.js';
 
 type Agent = ReturnType<typeof request.agent>;
-const consent = { version: '2026-11-05', accepted: true };
+const consent = { version: '2026-11-07', accepted: true };
 const tokenOf = (url: string) => url.split('/unirme/')[1];
 
 describe('avisos de emergencia a la familia (e2e)', () => {

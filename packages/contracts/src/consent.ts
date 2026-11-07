@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const CONSENT_VERSION = '2026-11-05';
+export const CONSENT_VERSION = '2026-11-07';
 
 export const consentAcceptanceSchema = z.object({
   version: z.string().min(1).max(32),
