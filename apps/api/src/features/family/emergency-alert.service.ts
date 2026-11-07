@@ -47,7 +47,6 @@ export class EmergencyAlertService {
   }
 
   async trigger(publicToken: string, input: EmergencyAlertInput): Promise<EmergencyAlertResultDto> {
-    await this.forgetOldLocations();
     const profile = await this.prisma.profile.findUnique({ where: { publicToken } });
     if (!profile) throw new NotFoundException({ error: 'not_found' });
 
@@ -135,7 +134,6 @@ export class EmergencyAlertService {
    * Sin toques repetidos ni pruebas, y solo de los últimos 30 días.
    */
   async history(userId: string): Promise<ReceivedAlertDto[]> {
-    await this.forgetOldLocations();
     const memberships = await this.prisma.familyMember.findMany({
       where: { userId },
       select: { joinedAt: true, group: { select: { members: { where: { userId: { not: userId } }, select: { userId: true } } } } },
@@ -165,14 +163,6 @@ export class EmergencyAlertService {
       mine: a.profile.ownerId === userId,
       location: a.lat !== null && a.lng !== null ? { lat: a.lat, lng: a.lng } : null,
     }));
-  }
-
-  /** Spec: la ubicación se guarda aproximada y se borra a los 30 días. */
-  private async forgetOldLocations(): Promise<void> {
-    await this.prisma.emergencyAlert.updateMany({
-      where: { createdAt: { lt: new Date(Date.now() - LOCATION_RETENTION_MS) }, OR: [{ lat: { not: null } }, { lng: { not: null } }] },
-      data: { lat: null, lng: null },
-    });
   }
 
   private alertMessage(to: string, name: string, firstName: string, at: Date, lat: number | null, lng: number | null): MailMessage {

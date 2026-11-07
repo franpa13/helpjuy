@@ -67,8 +67,9 @@ describe('foto de la ficha (e2e)', () => {
 
   it('se guarda cifrada en la base', async () => {
     await ana.put(`/profiles/${profile.id}/photo`).send({ image: await phonePhoto() }).expect(200);
-    const row = await prisma.profile.findUniqueOrThrow({ where: { id: profile.id } });
-    expect(row.photoCipher).toMatch(/^v1\./);
+    // En su propia tabla: las consultas de fichas no la traen si no hace falta.
+    const row = await prisma.profilePhoto.findUniqueOrThrow({ where: { profileId: profile.id } });
+    expect(row.cipher).toMatch(/^v1\./);
   });
 
   it('rechaza lo que no es una imagen', async () => {

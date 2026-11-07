@@ -29,6 +29,7 @@ export class AccountService {
           orderBy: { createdAt: 'asc' },
           include: {
             medicalRecord: true,
+            photo: true,
             consents: { orderBy: { acceptedAt: 'asc' } },
             alerts: { where: { suppressed: false, test: false }, orderBy: { createdAt: 'desc' } },
             scans: { orderBy: { createdAt: 'desc' } },
@@ -56,7 +57,7 @@ export class AccountService {
         publicLinkToken: p.publicToken,
         record: p.medicalRecord ? this.cipher.decrypt(p.medicalRecord.ciphertext) : null,
         visibility: this.records.readVisibility(p.medicalRecord?.visibility),
-        photo: p.photoCipher ? `data:image/webp;base64,${this.cipher.decryptBytes(p.photoCipher).toString('base64')}` : null,
+        photo: p.photo ? `data:image/webp;base64,${this.cipher.decryptBytes(p.photo.cipher).toString('base64')}` : null,
         printedAt: p.printedAt?.toISOString() ?? null,
         consents: p.consents.map((c) => ({ version: c.version, acceptedAt: c.acceptedAt.toISOString(), guardianDeclared: c.guardianDeclared })),
         emergencyAlerts: p.alerts.map((a) => ({

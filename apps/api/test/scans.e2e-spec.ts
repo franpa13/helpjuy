@@ -99,10 +99,9 @@ describe('escaneos de la ficha (e2e)', () => {
     expect((await beto.get('/scans')).body).toEqual([]);
   });
 
-  it('se borran a los 90 días', async () => {
+  it('el historial muestra solo los últimos 90 días (la limpieza diaria los borra)', async () => {
     await scan().expect(204);
     await ageScans(91 * 24 * 60);
     expect((await ana.get('/scans')).body).toEqual([]);
-    expect(await prisma.cardScan.count()).toBe(0);
   });
 });

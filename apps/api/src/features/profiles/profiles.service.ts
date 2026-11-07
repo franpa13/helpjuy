@@ -202,23 +202,27 @@ export class ProfilesService {
 
   async removePhoto(ownerId: string, id: string): Promise<void> {
     const profile = await this.getOwned(ownerId, id);
-    await this.prisma.profile.update({ where: { id }, data: { photoCipher: null, photoUpdatedAt: null } });
+    await this.prisma.$transaction([
+      this.prisma.profilePhoto.deleteMany({ where: { profileId: id } }),
+      this.prisma.profile.update({ where: { id }, data: { photoUpdatedAt: null } }),
+    ]);
     await this.invalidateCard([profile.publicToken]);
   }
 
   /** La foto del titular para el editor (descifrada). */
   async getPhoto(ownerId: string, id: string): Promise<Buffer> {
-    const profile = await this.getOwned(ownerId, id);
-    if (!profile.photoCipher) throw new NotFoundException({ error: 'not_found' });
-    return this.cipher.decryptBytes(profile.photoCipher);
+    await this.getOwned(ownerId, id);
+    const photo = await this.prisma.profilePhoto.findUnique({ where: { profileId: id } });
+    if (!photo) throw new NotFoundException({ error: 'not_found' });
+    return this.cipher.decryptBytes(photo.cipher);
   }
 
   private async savePhoto(id: string, webp: Buffer): Promise<ProfileWithRecord> {
-    const updated = await this.prisma.profile.update({
-      where: { id },
-      data: { photoCipher: this.cipher.encryptBytes(webp), photoUpdatedAt: new Date() },
-      include: { medicalRecord: true },
-    });
+    const cipher = this.cipher.encryptBytes(webp);
+    const [, updated] = await this.prisma.$transaction([
+      this.prisma.profilePhoto.upsert({ where: { profileId: id }, create: { profileId: id, cipher }, update: { cipher } }),
+      this.prisma.profile.update({ where: { id }, data: { photoUpdatedAt: new Date() }, include: { medicalRecord: true } }),
+    ]);
     await this.invalidateCard([updated.publicToken]);
     return updated;
   }

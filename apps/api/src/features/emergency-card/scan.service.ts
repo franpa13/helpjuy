@@ -5,7 +5,7 @@ import { Mailer } from '../mail/mailer.js';
 
 const DEDUPE_MS = 10 * 60 * 1000;
 const EMAIL_EVERY_MS = 60 * 60 * 1000;
-const RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
+export const SCAN_RETENTION_MS = 90 * 24 * 60 * 60 * 1000;
 
 const timeInJujuy = (d: Date) =>
   new Intl.DateTimeFormat('es-AR', { timeZone: 'America/Argentina/Jujuy', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d);
@@ -53,19 +53,14 @@ export class ScanService {
   }
 
   async history(ownerId: string): Promise<ScanDto[]> {
-    await this.forgetOld();
+    // Lo más viejo lo borra la limpieza diaria; acá además no lo mostramos.
     const scans = await this.prisma.cardScan.findMany({
-      where: { profile: { ownerId } },
+      where: { profile: { ownerId }, createdAt: { gte: new Date(Date.now() - SCAN_RETENTION_MS) } },
       orderBy: { createdAt: 'desc' },
       take: 100,
       select: { id: true, createdAt: true, profile: { select: { firstName: true, lastName: true } } },
     });
     return scans.map((s) => ({ id: s.id, at: s.createdAt.toISOString(), profileName: `${s.profile.firstName} ${s.profile.lastName}` }));
-  }
-
-  /** Spec: los escaneos se guardan 90 días. */
-  async forgetOld(): Promise<void> {
-    await this.prisma.cardScan.deleteMany({ where: { createdAt: { lt: new Date(Date.now() - RETENTION_MS) } } });
   }
 
   private message(to: string, name: string, at: Date) {

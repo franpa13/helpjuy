@@ -44,10 +44,10 @@ export class EmergencyCardController {
     if (!PUBLIC_TOKEN_RE.test(token)) throw new NotFoundException({ error: 'not_found' });
     const profile = await this.prisma.profile.findUnique({
       where: { publicToken: token },
-      select: { photoCipher: true, medicalRecord: { select: { visibility: true } } },
+      select: { photo: { select: { cipher: true } }, medicalRecord: { select: { visibility: true } } },
     });
     const visible = this.records.readVisibility(profile?.medicalRecord?.visibility).photo;
-    if (!profile?.photoCipher || !visible) throw new NotFoundException({ error: 'not_found' });
-    return new StreamableFile(this.cipher.decryptBytes(profile.photoCipher));
+    if (!profile?.photo || !visible) throw new NotFoundException({ error: 'not_found' });
+    return new StreamableFile(this.cipher.decryptBytes(profile.photo.cipher));
   }
 }

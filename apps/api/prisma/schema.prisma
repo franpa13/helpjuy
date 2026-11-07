@@ -74,9 +74,9 @@ model Profile {
   /// Huella de lo último impreso (sha256 del token + datos impresos), para avisar cuándo reimprimir.
   printedHash    String?
   printedAt      DateTime?
-  /// Foto de la ficha: webp 320x320 sin metadatos, cifrada como los datos médicos.
-  photoCipher    String?
+  /// Cuándo cambió la foto (la foto en sí vive en ProfilePhoto, así no viaja en cada consulta de fichas).
   photoUpdatedAt DateTime?
+  photo          ProfilePhoto?
   /// Último email de "alguien abrió tu ficha" (como mucho uno por hora).
   lastScanEmailAt DateTime?
   scans          CardScan[]
@@ -163,6 +163,8 @@ model EmergencyAlert {
   test       Boolean  @default(false)
 
   @@index([profileId, createdAt])
+  /// Para la limpieza diaria de ubicaciones viejas.
+  @@index([createdAt])
 }
 
 /// Cada vez que alguien abre la ficha pública (sin IP ni datos de quien la abrió). Se borra a los 90 días.
@@ -174,4 +176,12 @@ model CardScan {
 
   @@index([profileId, createdAt])
   @@index([createdAt])
+}
+
+/// Foto de la ficha: webp 320x320 sin metadatos, cifrada como los datos médicos (~40 KB).
+model ProfilePhoto {
+  profileId String   @id
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  cipher    String
+  updatedAt DateTime @updatedAt
 }

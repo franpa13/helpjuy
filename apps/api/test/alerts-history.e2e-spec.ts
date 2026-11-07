@@ -96,11 +96,9 @@ describe('avisos recibidos (e2e)', () => {
     expect((await beto.get('/alerts')).body).toHaveLength(0);
   });
 
-  it('solo los últimos 30 días, y sin ubicación pasado ese plazo', async () => {
+  it('solo los últimos 30 días (la limpieza diaria borra la ubicación)', async () => {
     await emergency(anaCard, { lat: -24.1, lng: -65.3 });
     await prisma.emergencyAlert.updateMany({ data: { createdAt: new Date(Date.now() - 31 * DAY) } });
     expect((await ana.get('/alerts')).body).toHaveLength(0);
-    const old = await prisma.emergencyAlert.findFirstOrThrow();
-    expect(old.lat).toBeNull();
   });
 });

@@ -1,5 +1,6 @@
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
+import { MaintenanceService } from '../src/features/maintenance/maintenance.service.js';
 import { PrismaService } from '../src/shared/prisma/prisma.service.js';
 import { createTestApp } from './helpers/app.js';
 import { resetDb } from './helpers/db.js';
@@ -158,10 +159,10 @@ describe('avisos de emergencia a la familia (e2e)', () => {
     await ana.post(`/family-groups/${groupId}/test-alert`).expect(429, { error: "test_alert_cooldown" });
   });
 
-  it("las ubicaciones de más de 30 días se borran", async () => {
+  it("las ubicaciones de más de 30 días se borran (limpieza diaria)", async () => {
     await emergency(anaCard, { lat: -24.1, lng: -65.3 }).expect(201);
     await prisma.emergencyAlert.updateMany({ data: { createdAt: new Date(Date.now() - 31 * 24 * 60 * 60 * 1000) } });
-    await emergency(anaCard).expect(201);
+    await app.get(MaintenanceService).run();
     const old = await prisma.emergencyAlert.findFirstOrThrow({ where: { createdAt: { lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } } });
     expect(old.lat).toBeNull();
     expect(old.lng).toBeNull();
