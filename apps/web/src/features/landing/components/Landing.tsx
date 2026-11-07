@@ -112,7 +112,10 @@ const PLACES: Array<{ icon: LucideIcon; name: string; piece: string; where: stri
 ];
 
 const RULES = [
-  { title: 'El sticker avisa, la tarjeta informa', text: 'Usá los dos: el QR lleva a la ficha completa y la tarjeta tiene lo crítico impreso, por si no hay señal.' },
+  {
+    title: 'Un QR, tres formatos',
+    text: 'Al imprimir te llevás una tarjeta para la billetera, dos stickers (casco, moto o celular) y una hoja grande para la heladera. Todos traen el QR y lo más importante impreso, por si no hay señal.',
+  },
   { title: 'Siempre a la vista desde afuera', text: 'Nada adentro del casco ni escondido: si para encontrarlo hay que moverte, no sirve.' },
   { title: 'Siempre en el mismo lugar', text: 'Contale a tu familia dónde lo tenés. Y cuando cambie algo, reimprimilo: te avisamos.' },
 ];
