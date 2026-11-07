@@ -22,7 +22,9 @@ import { SessionGuard } from './session.guard.js';
 import { SESSION_COOKIE, SESSION_TTL_MS, SessionService, sessionCookieOptions } from './session.service.js';
 
 // Límite estricto solo en las acciones sensibles; /auth/me queda con el global.
-const STRICT = { default: { limit: 10, ttl: 60_000 } };
+// 10 por minuto por IP: en celulares mucha gente comparte la IP pública (CGNAT), así que no conviene bajarlo más.
+// Configurable (los e2e crean muchas cuentas desde la misma IP).
+const STRICT = { default: { limit: Number(process.env.AUTH_RATE_LIMIT) || 10, ttl: 60_000 } };
 
 const cookieOptions = sessionCookieOptions;
 

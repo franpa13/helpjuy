@@ -11,7 +11,7 @@ export default defineConfig({
     {
       command: 'pnpm --filter api db:deploy && pnpm --filter api start',
       url: 'http://localhost:4100/health',
-      env: { DATABASE_URL: TEST_DB, PORT: '4100', RESEND_API_KEY: '', NODE_ENV: 'test', PROXY_SECRET: 'e2e-secret', WEB_URL: 'http://localhost:3100', REVALIDATE_SECRET: 'e2e-revalidate', MEDICAL_DATA_KEY: 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=' },
+      env: { DATABASE_URL: TEST_DB, PORT: '4100', RESEND_API_KEY: '', NODE_ENV: 'test', PROXY_SECRET: 'e2e-secret', WEB_URL: 'http://localhost:3100', REVALIDATE_SECRET: 'e2e-revalidate', AUTH_RATE_LIMIT: '200', MEDICAL_DATA_KEY: 'AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=' },
       reuseExistingServer: false,
       timeout: 120_000,
       cwd: '../..',

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { multiLine, singleLine } from './text';
 
 export const TIME_ZONE = 'America/Argentina/Jujuy';
 
@@ -66,8 +67,10 @@ const birthDateSchema = z
   .refine((s) => s >= '1900-01-01', 'too_old')
   .refine((s) => s <= todayInJujuy(), 'future_date');
 
-const text = (max: number) => z.string().trim().max(max);
+const text = singleLine;
 const optText = (max: number) => text(max).optional();
+/** Textos largos (pueden tener varias líneas). */
+const optLong = (max: number) => multiLine(max).optional();
 const phone = z.string().trim().regex(/^\+?[0-9 ()-]{6,20}$/, 'invalid_phone');
 
 export const allergySchema = z.object({ substance: text(80).min(1), reaction: optText(80) });
@@ -98,13 +101,13 @@ export const medicalRecordSchema = z.object({
   communication: optText(200),
   transfusion: z.enum(['ACCEPTS', 'REFUSES', 'UNKNOWN']).default('UNKNOWN'),
   organDonor: z.enum(['YES', 'NO', 'UNKNOWN']).default('UNKNOWN'),
-  directives: optText(300),
+  directives: optLong(300),
 
-  surgeries: optText(300),
+  surgeries: optLong(300),
   implants: optText(200),
   insurance: z.object({ name: text(60), number: optText(40) }).optional(),
   doctor: z.object({ name: text(60), phone: phone.optional() }).optional(),
-  notes: optText(500),
+  notes: optLong(500),
 });
 export type MedicalRecord = z.infer<typeof medicalRecordSchema>;
 export type MedicalRecordInput = z.input<typeof medicalRecordSchema>;

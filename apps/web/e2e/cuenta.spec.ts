@@ -17,8 +17,13 @@ async function signupWithCard(page: Page) {
 test('generar un QR nuevo deja sin efecto el viejo', async ({ page }) => {
   const oldHref = await signupWithCard(page);
   await page.getByRole('link', { name: 'Imprimir mi QR' }).click();
-  await page.getByRole('button', { name: 'Generar QR nuevo' }).click();
-  await page.getByRole('alertdialog').getByRole('button', { name: 'Sí, generar uno nuevo' }).click();
+  // Recién navegada, la página puede no tener React conectado: reintentamos el clic hasta que abra el diálogo.
+  const dialog = page.getByRole('alertdialog');
+  await expect(async () => {
+    await page.getByRole('button', { name: 'Generar QR nuevo' }).click();
+    await expect(dialog).toBeVisible({ timeout: 1000 });
+  }).toPass();
+  await dialog.getByRole('button', { name: 'Sí, generar uno nuevo' }).click();
   await expect(page.getByText('Listo, tu QR es nuevo.')).toBeVisible();
 
   const res = await page.request.get(oldHref);

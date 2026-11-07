@@ -4,7 +4,7 @@ import type { LoginInput, MeResponse, RegisterInput } from '@helpjuy/contracts';
 import { EmailTokenType, Prisma, type User } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { Mailer, type MailMessage } from '../mail/mailer.js';
-import { resetPasswordMessage, verifyEmailMessage } from './auth-emails.js';
+import { resetPasswordMessage, signupAttemptMessage, verifyEmailMessage } from './auth-emails.js';
 import { EmailTokenService } from './email-token.service.js';
 import { SessionService } from './session.service.js';
 
@@ -34,12 +34,26 @@ export class AuthService {
       user = await this.prisma.user.create({ data: { email: input.email, passwordHash } });
     } catch (e) {
       if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') {
+        await this.noticeSignupAttempt(input.email);
         throw new ConflictException({ error: 'email_taken' });
       }
       throw e;
     }
     await this.onRegistered(user);
     return { user, token: await this.sessions.create(user.id) };
+  }
+
+  /**
+   * Con login inmediato no se puede ocultar del todo si un email ya tiene cuenta (una cuenta nueva recibe la sesión).
+   * Lo compensamos: límite estricto de intentos y un aviso al dueño real, como mucho uno por hora.
+   */
+  private async noticeSignupAttempt(email: string): Promise<void> {
+    const hourAgo = new Date(Date.now() - 60 * 60 * 1000);
+    const { count } = await this.prisma.user.updateMany({
+      where: { email, OR: [{ signupNoticeAt: null }, { signupNoticeAt: { lt: hourAgo } }] },
+      data: { signupNoticeAt: new Date() },
+    });
+    if (count > 0) await this.sendSafely(signupAttemptMessage(email));
   }
 
   async login(input: LoginInput): Promise<{ user: User; token: string }> {

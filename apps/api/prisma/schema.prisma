@@ -30,6 +30,8 @@ model User {
   googleId        String?         @unique
   /// Foto de la cuenta de Google (solo para ofrecer copiarla a la ficha propia; nunca se muestra desde Google).
   googlePictureUrl String?
+  /// Último aviso de "alguien intentó registrarse con tu email" (como mucho uno por hora).
+  signupNoticeAt  DateTime?
   createdAt       DateTime        @default(now())
   sessions        Session[]
   emailTokens     EmailToken[]

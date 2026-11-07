@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { singleLine } from './text';
 import { consentAcceptanceSchema } from './consent';
 
 export const relationshipSchema = z.enum(['SELF', 'CHILD', 'PARENT', 'PARTNER', 'OTHER']);
@@ -12,7 +13,7 @@ export const RELATIONSHIP_LABELS: Record<Relationship, string> = {
   OTHER: 'Otro',
 };
 
-const name = z.string().trim().min(1).max(60);
+const name = singleLine(60).min(1);
 
 export const createProfileSchema = z.object({
   firstName: name,
