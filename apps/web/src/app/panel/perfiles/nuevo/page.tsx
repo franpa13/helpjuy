@@ -1,4 +1,5 @@
-import { MAX_PROFILES_PER_ACCOUNT, type ConsentDto, type ProfileDto } from '@helpjuy/contracts';
+import { MAX_PROFILES_PER_ACCOUNT, type ConsentDto, type MeResponse, type ProfileDto } from '@helpjuy/contracts';
+import { ResendVerificationBanner } from '@/features/auth/components/AccountActions';
 import { Alert } from '@/components/ui/alert';
 import { redirect } from 'next/navigation';
 import { PanelPage } from '@/features/panel/components/PanelPage';
@@ -9,8 +10,8 @@ import { apiServer } from '@/shared/api/server';
 export const metadata = { title: 'Nueva ficha — HelpJuy' };
 
 export default async function NuevoPerfilPage() {
-  const profiles = await apiServer<ProfileDto[]>('/profiles');
-  if (!profiles) redirect('/ingresar?next=/panel/perfiles/nuevo');
+  const [me, profiles] = await Promise.all([apiServer<MeResponse>('/auth/me'), apiServer<ProfileDto[]>('/profiles')]);
+  if (!me || !profiles) redirect('/ingresar?next=/panel/perfiles/nuevo');
   const consent = await apiServer<ConsentDto>('/consent/current');
   // La primera ficha es siempre la tuya; recién después se agregan las de la familia.
   const hasOwn = profiles.some((p) => p.relationship === 'SELF');
@@ -33,6 +34,15 @@ export default async function NuevoPerfilPage() {
           Llegaste al máximo de {MAX_PROFILES_PER_ACCOUNT} fichas por cuenta. Si necesitás más, otra persona de la familia
           puede crear su propia cuenta y sumarse a tu grupo familiar.
         </Alert>
+      ) : hasOwn && !me.emailVerified ? (
+        // Las fichas de la familia piden el email confirmado (frena la creación masiva de fichas).
+        <div className="stack">
+          <Alert variant="warning">
+            <strong>Para agregar la ficha de otra persona, primero confirmá tu email.</strong> Te mandamos un link cuando
+            creaste la cuenta; si no lo encontrás, pedí otro acá abajo.
+          </Alert>
+          <ResendVerificationBanner />
+        </div>
       ) : (
         <NewProfileForm consent={consent} hasOwn={hasOwn} />
       )}

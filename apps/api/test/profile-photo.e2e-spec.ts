@@ -45,6 +45,7 @@ describe('foto de la ficha (e2e)', () => {
     beto = request.agent(server);
     await ana.post('/auth/register').send({ email: 'ana@mail.com', password: 'claveSegura1' }).expect(201);
     await beto.post('/auth/register').send({ email: 'beto@mail.com', password: 'claveSegura1' }).expect(201);
+    await prisma.user.updateMany({ data: { emailVerifiedAt: new Date() } });
     profile = (await ana.post('/profiles').send(own).expect(201)).body;
   });
 

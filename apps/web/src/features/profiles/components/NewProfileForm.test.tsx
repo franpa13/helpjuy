@@ -47,4 +47,12 @@ describe('NewProfileForm', () => {
     await fillAndAccept(user);
     expect(await screen.findByText(/Primero creá tu propia ficha/)).toBeInTheDocument();
   });
+
+  it('si falta confirmar el email, lo explica', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(json(403, { error: 'email_unverified' }));
+    render(<NewProfileForm consent={consent} hasOwn />);
+    await fillAndAccept(user);
+    expect(await screen.findByText(/primero confirmá tu email/)).toBeInTheDocument();
+  });
 });

@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { MAX_PROFILES_PER_ACCOUNT } from '@helpjuy/contracts';
 import {
   DEFAULT_VISIBILITY,
@@ -101,7 +101,11 @@ export class ProfilesService {
     });
   }
 
-  async create(ownerId: string, input: CreateProfileInput): Promise<Profile> {
+  async create(owner: { id: string; emailVerifiedAt: Date | null }, input: CreateProfileInput): Promise<Profile> {
+    const ownerId = owner.id;
+    // Las fichas de otras personas piden el email confirmado: frena la creación masiva con cuentas descartables.
+    // La propia no, así nadie se traba al registrarse.
+    if (input.relationship !== 'SELF' && !owner.emailVerifiedAt) throw new ForbiddenException({ error: 'email_unverified' });
     this.consent.assertValid(input.consent, input.isMinor);
     return this.prisma.$transaction(async (tx) => {
       // Primero tu ficha: la de otra persona solo se crea si ya tenés la propia, y la propia es una sola.

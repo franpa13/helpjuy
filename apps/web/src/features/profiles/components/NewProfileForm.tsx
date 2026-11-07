@@ -87,6 +87,10 @@ export function NewProfileForm({ consent: initialConsent, hasOwn }: { consent: C
         setFormError('Primero creá tu propia ficha. Después podés agregar las de tu familia.');
         return;
       }
+      if (err instanceof ApiError && err.code === 'email_unverified') {
+        setFormError('Para agregar la ficha de otra persona, primero confirmá tu email (revisá tu correo).');
+        return;
+      }
       if (err instanceof ApiError && err.code === 'profile_limit') {
         setFormError(`Llegaste al máximo de ${MAX_PROFILES_PER_ACCOUNT} fichas por cuenta. Si necesitás más, otra persona de la familia puede crear su propia cuenta.`);
         return;

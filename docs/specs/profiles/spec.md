@@ -39,6 +39,7 @@ Que una cuenta pueda administrar varias fichas (la propia, la de un hijo, la de 
 
 - Máximo `MAX_PROFILES_PER_ACCOUNT` (10) fichas por cuenta: la propia más las de la familia. La 11.ª responde `409 profile_limit`.
 - El alta de fichas tiene además un límite de 20 por minuto por IP.
+- Las fichas de otras personas requieren el email confirmado (`403 email_unverified`); la propia no, para no trabar el registro. La web muestra el pedido de confirmación con el botón de reenviar en lugar del formulario.
 
 ## Foto de la ficha
 

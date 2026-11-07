@@ -28,6 +28,7 @@ describe('consentimiento y perfiles (e2e)', () => {
     bob = request.agent(server);
     await alice.post('/auth/register').send({ email: 'alice@mail.com', password: 'claveSegura1' }).expect(201);
     await bob.post('/auth/register').send({ email: 'bob@mail.com', password: 'claveSegura1' }).expect(201);
+    await prisma.user.updateMany({ data: { emailVerifiedAt: new Date() } });
   });
 
   afterEach(async () => {
@@ -177,5 +178,14 @@ describe('consentimiento y perfiles (e2e)', () => {
       await alice.delete(`/profiles/${child.id}`).expect(204);
       await alice.delete(`/profiles/${own.id}`).expect(204);
     });
+  });
+
+  it('sin email confirmado solo podés tener tu propia ficha', async () => {
+    await prisma.user.update({ where: { email: 'alice@mail.com' }, data: { emailVerifiedAt: null } });
+    await alice.post('/profiles').send(base).expect(201);
+    await alice
+      .post('/profiles')
+      .send({ ...base, firstName: 'Sofía', relationship: 'CHILD', isMinor: true, consent: { ...base.consent, guardianDeclared: true } })
+      .expect(403, { error: 'email_unverified' });
   });
 });

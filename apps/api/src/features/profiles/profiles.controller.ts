@@ -32,7 +32,7 @@ export class ProfilesController {
     @CurrentUser() user: User,
     @Body(new ZodValidationPipe(createProfileSchema)) body: CreateProfileInput,
   ): Promise<ProfileDto> {
-    return this.profiles.toDto(await this.profiles.create(user.id, body));
+    return this.profiles.toDto(await this.profiles.create(user, body));
   }
 
   @Get(':id')
