@@ -98,11 +98,15 @@ describe('FamilyGroups', () => {
     expect(screen.getByText(/Confirmá tu email para recibir los avisos/)).toBeInTheDocument();
   });
 
-  it("con grupo, el ejemplo del aviso queda plegado dentro de Cómo funciona y se nota que es un ejemplo", () => {
+  it("con grupo, el ejemplo del aviso queda plegado dentro de Cómo funciona y se nota que es un ejemplo", async () => {
+    const user = userEvent.setup();
     render(<FamilyGroups initial={[group()]} />);
     const side = screen.getByRole("complementary", { name: "Sobre los avisos" });
+    const fold = within(side).getByRole("button", { name: "Ver un ejemplo del aviso" });
+    expect(fold).toHaveAttribute("aria-expanded", "false");
+    expect(within(side).queryByLabelText("Ejemplo del email que recibe tu familia")).not.toBeInTheDocument();
+    await user.click(fold);
     const example = within(side).getByLabelText("Ejemplo del email que recibe tu familia");
-    expect(example.closest("details")).not.toHaveAttribute("open");
     expect(example).toHaveTextContent("EJEMPLO");
     expect(example).not.toHaveTextContent("Francisco Paredes");
     expect(within(side).getByText("Ver un ejemplo del aviso")).toBeInTheDocument();

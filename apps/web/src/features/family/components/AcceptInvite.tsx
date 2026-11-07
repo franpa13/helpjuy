@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 export function AcceptInvite({ token, groupName }: { token: string; groupName: string }) {
   const router = useRouter();
@@ -31,6 +32,7 @@ export function AcceptInvite({ token, groupName }: { token: string; groupName: s
     <div className="stack">
       {error && <Alert variant="error">{error}</Alert>}
       <Button type="button" onClick={accept} disabled={sending}>
+        {sending && <Spinner className="size-5" />}
         {sending ? 'Uniéndote…' : `Unirme a ${groupName}`}
       </Button>
     </div>

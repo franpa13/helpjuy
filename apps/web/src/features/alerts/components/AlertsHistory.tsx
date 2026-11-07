@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { AlertsMap, type MapPoint } from './AlertsMap';
 import { Badge } from '@/components/ui/badge';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 
 const when = (iso: string) =>
@@ -19,8 +21,7 @@ const when = (iso: string) =>
     hourCycle: 'h23',
   }).format(new Date(iso));
 
-const linkBtn =
-  'inline-flex min-h-9 cursor-pointer items-center gap-1.5 bg-transparent p-0 text-[15px] font-bold text-ink underline underline-offset-3';
+const linkBtn = 'min-h-9 gap-1.5 text-[15px]';
 
 const googleMaps = (l: { lat: number; lng: number }) => `https://www.google.com/maps?q=${l.lat},${l.lng}`;
 
@@ -75,11 +76,11 @@ export function AlertsHistory({ alerts }: { alerts: ReceivedAlertDto[] }) {
               <p className="text-[15px] text-muted-foreground capitalize">{when(a.at)}</p>
               {a.location ? (
                 <div className="mt-1 flex flex-wrap gap-x-[18px] gap-y-1.5">
-                  <button type="button" className={linkBtn} onClick={() => setSelectedId(a.id)}>
+                  <Button type="button" variant="link" className={linkBtn} onClick={() => setSelectedId(a.id)}>
                     <MapPin size={16} aria-hidden="true" />
                     Ver en el mapa
-                  </button>
-                  <a href={googleMaps(a.location)} target="_blank" rel="noreferrer" className={linkBtn}>
+                  </Button>
+                  <a href={googleMaps(a.location)} target="_blank" rel="noreferrer" className={cn(buttonVariants({ variant: 'link' }), linkBtn)}>
                     <ExternalLink size={16} aria-hidden="true" />
                     Abrir en Google Maps
                   </a>

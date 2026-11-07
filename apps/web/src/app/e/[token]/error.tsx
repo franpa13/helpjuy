@@ -1,5 +1,6 @@
 'use client';
 
+import { Button } from '@/components/ui/button';
 import { CallButton, CardPage, CardStrip, callbar, sec } from '@/features/emergency-card/components/card-ui';
 
 /** Si la ficha no se puede cargar, nunca dejamos a nadie sin el botón de 107. */
@@ -12,9 +13,9 @@ export default function CardError({ reset }: { error: Error & { digest?: string 
         <p className="mt-3 text-base text-muted-foreground">
           Puede ser la señal. Si alguien necesita ayuda, llamá al 107 ahora y probá de nuevo después.
         </p>
-        <button type="button" onClick={reset} className="mt-4 min-h-12 cursor-pointer border-2 border-ink bg-transparent px-[18px] font-bold">
+        <Button type="button" variant="outline" size="compact" onClick={reset} className="mt-4 min-h-12 text-[17px]">
           Reintentar
-        </button>
+        </Button>
       </main>
       <nav aria-label="Llamadas">
         <div className={callbar}>

@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 
 type Step = 'idle' | 'confirm' | 'saving' | 'done' | 'outdated' | 'error';
 
@@ -55,6 +56,7 @@ export function PrintActions({ profileId, fingerprint }: { profileId: string; fi
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             <Button type="button" onClick={confirm} disabled={step === 'saving'}>
+              {step === 'saving' && <Spinner className="size-5" />}
               Sí, ya lo tengo impreso
             </Button>
             <Button type="button" variant="outline" onClick={print} disabled={step === 'saving'}>

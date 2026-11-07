@@ -1,4 +1,5 @@
 import { buttonVariants } from '@/components/ui/button';
+import { FieldSeparator } from '@/components/ui/field';
 import { cn } from '@/lib/utils';
 
 /** Botón de ingreso con Google (logo oficial de Google, como pide su guía de marca). */
@@ -16,9 +17,7 @@ export function GoogleButton({ next = '/panel' }: { next?: string }) {
         </svg>
         Continuar con Google
       </a>
-      <div className="flex items-center gap-3 text-sm text-muted-foreground before:h-px before:flex-1 before:bg-line before:content-[''] after:h-px after:flex-1 after:bg-line after:content-['']">
-        <span>o con tu email</span>
-      </div>
+      <FieldSeparator className="my-0 text-sm [&_[data-slot=field-separator-content]]:bg-paper">o con tu email</FieldSeparator>
     </>
   );
 }

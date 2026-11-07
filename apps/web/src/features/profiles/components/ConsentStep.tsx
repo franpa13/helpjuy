@@ -4,6 +4,8 @@ import type { ConsentAcceptance, ConsentDto } from '@helpjuy/contracts';
 import { useState } from 'react';
 import Markdown from 'react-markdown';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
+import { Checkbox } from '@/components/ui/checkbox';
 import { checkCard } from '@/components/ui/choice';
 
 type Props = {
@@ -27,12 +29,12 @@ export function ConsentStep({ consent, isMinor, sending = false, onAccept }: Pro
         <Markdown>{consent.text}</Markdown>
       </div>
       <label className={checkCard}>
-        <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} />
+        <Checkbox checked={accepted} onCheckedChange={(v) => setAccepted(v === true)} />
         <span>Leí y acepto que estos datos se guarden y que lo que marque como público se muestre al escanear mi QR.</span>
       </label>
       {isMinor && (
         <label className={checkCard}>
-          <input type="checkbox" checked={guardian} onChange={(e) => setGuardian(e.target.checked)} />
+          <Checkbox checked={guardian} onCheckedChange={(v) => setGuardian(v === true)} />
           <span>Soy padre, madre o tutor de esta persona.</span>
         </label>
       )}
@@ -41,6 +43,7 @@ export function ConsentStep({ consent, isMinor, sending = false, onAccept }: Pro
         disabled={!canSubmit}
         onClick={() => onAccept({ version: consent.version, accepted: true, guardianDeclared: isMinor ? guardian : false })}
       >
+        {sending && <Spinner className="size-5" />}
         {sending ? 'Creando…' : 'Aceptar y crear perfil'}
       </Button>
       <p className="text-sm text-muted-foreground">

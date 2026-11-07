@@ -2,9 +2,9 @@
 
 import { Eye, EyeOff } from 'lucide-react';
 import { useId, useState, type InputHTMLAttributes } from 'react';
+import { Button } from '@/components/ui/button';
+import { Field, FieldDescription, FieldError, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { FieldError } from './Field';
 
 type Props = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   label: string;
@@ -24,8 +24,8 @@ export function PasswordField({ label, error, minLength, id, onChange, ...props 
   const ok = minLength ? length >= minLength : false;
 
   return (
-    <div className="grid gap-1.5">
-      <Label htmlFor={inputId}>{label}</Label>
+    <Field data-invalid={error ? true : undefined}>
+      <FieldLabel htmlFor={inputId}>{label}</FieldLabel>
       <div className="relative">
         <Input
           id={inputId}
@@ -39,26 +39,32 @@ export function PasswordField({ label, error, minLength, id, onChange, ...props 
           }}
           {...props}
         />
-        <button
+        <Button
           type="button"
-          className="absolute top-1/2 right-1.5 grid h-10 w-11 -translate-y-1/2 cursor-pointer place-items-center rounded-md text-muted-foreground hover:text-ink"
+          variant="ghost"
+          size="icon"
+          className="absolute top-1/2 right-1.5 h-10 -translate-y-1/2 text-muted-foreground hover:bg-transparent hover:text-ink active:not-disabled:scale-100"
           aria-pressed={visible}
           aria-label={visible ? 'Ocultar contraseña' : 'Mostrar contraseña'}
           onClick={() => setVisible((v) => !v)}
         >
           {visible ? <EyeOff aria-hidden="true" size={20} /> : <Eye aria-hidden="true" size={20} />}
-        </button>
+        </Button>
       </div>
       {minLength && (
-        <span
+        <FieldDescription
           id={hintId}
           data-ok={ok ? 'true' : 'false'}
-          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground before:size-2.5 before:rounded-full before:border-2 before:border-current before:content-[''] data-[ok=true]:font-bold data-[ok=true]:text-green data-[ok=true]:before:bg-current"
+          className="inline-flex items-center gap-1.5 before:size-2.5 before:rounded-full before:border-2 before:border-current before:content-[''] data-[ok=true]:font-bold data-[ok=true]:text-green data-[ok=true]:before:bg-current"
         >
           Al menos {minLength} caracteres
-        </span>
+        </FieldDescription>
       )}
-      {error && <FieldError id={errorId}>{error}</FieldError>}
-    </div>
+      {error && (
+        <FieldError id={errorId} role={undefined}>
+          {error}
+        </FieldError>
+      )}
+    </Field>
   );
 }

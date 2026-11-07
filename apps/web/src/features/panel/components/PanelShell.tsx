@@ -4,8 +4,6 @@ import { LogoutButton } from '@/features/auth/components/AccountActions';
 import { Logo } from '@/shared/brand/Logo';
 import { PanelNav } from './PanelNav';
 
-const logout = 'justify-self-start font-head text-[15px] font-bold uppercase tracking-[0.12em] text-white';
-
 /** Armado del panel: barra lateral en escritorio; barra superior + pestañas abajo en celular. */
 export function PanelShell({ email, children }: { email?: string; children: ReactNode }) {
   return (
@@ -22,7 +20,7 @@ export function PanelShell({ email, children }: { email?: string; children: Reac
               {email}
             </p>
           )}
-          <span className={logout}>
+          <span className="justify-self-start">
             <LogoutButton />
           </span>
           <a className="font-head text-lg font-extrabold uppercase text-red-bright no-underline" href="tel:107">
@@ -35,9 +33,9 @@ export function PanelShell({ email, children }: { email?: string; children: Reac
         <Link href="/panel" className="px-2 text-white no-underline" aria-label="HelpJuy, mis fichas">
           <Logo size={24} crossColor="var(--red-bright)" />
         </Link>
-        <span className={logout}>
-          <LogoutButton />
-        </span>
+        <span className="justify-self-start">
+            <LogoutButton />
+          </span>
       </header>
 
       <div className="pb-22 panel:px-[clamp(16px,4vw,48px)] panel:pt-2 panel:pb-8">{children}</div>

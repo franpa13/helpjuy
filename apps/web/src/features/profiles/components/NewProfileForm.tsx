@@ -17,7 +17,10 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Field } from '@/shared/ui/Field';
 import { ConsentStep } from './ConsentStep';
+import { Checkbox } from '@/components/ui/checkbox';
 import { checkCard, radioCard } from '@/components/ui/choice';
+import { FieldLegend, FieldSet } from '@/components/ui/field';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 type Draft = { firstName: string; lastName: string; relationship: Relationship; isMinor: boolean };
 
@@ -101,29 +104,25 @@ export function NewProfileForm({ consent: initialConsent, isFirst }: { consent: 
         onChange={(e) => setDraft({ ...draft, lastName: e.target.value })}
         error={errors.lastName}
       />
-      <fieldset className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2 border-0 p-0">
-        <legend className="label mb-1.5">
-          ¿Quién es?
-        </legend>
-        {relationshipSchema.options.map((r) => (
-          <label key={r} className={radioCard}>
-            <input
-              type="radio"
-              name="relationship"
-              value={r}
-              checked={draft.relationship === r}
-              onChange={() => setDraft({ ...draft, relationship: r })}
-            />
-            {RELATIONSHIP_LABELS[r]}
-          </label>
-        ))}
-      </fieldset>
+      <FieldSet className="gap-0">
+        <FieldLegend>¿Quién es?</FieldLegend>
+        <RadioGroup
+          name="relationship"
+          aria-label="¿Quién es?"
+          value={draft.relationship}
+          onValueChange={(r) => setDraft({ ...draft, relationship: r as Relationship })}
+          className="grid-cols-[repeat(auto-fit,minmax(120px,1fr))]"
+        >
+          {relationshipSchema.options.map((r) => (
+            <label key={r} className={radioCard}>
+              <RadioGroupItem value={r} />
+              {RELATIONSHIP_LABELS[r]}
+            </label>
+          ))}
+        </RadioGroup>
+      </FieldSet>
       <label className={checkCard}>
-        <input
-          type="checkbox"
-          checked={draft.isMinor}
-          onChange={(e) => setDraft({ ...draft, isMinor: e.target.checked })}
-        />
+        <Checkbox checked={draft.isMinor} onCheckedChange={(v) => setDraft({ ...draft, isMinor: v === true })} />
         <span>Es menor de 18 años</span>
       </label>
       <Button type="submit">Seguir</Button>

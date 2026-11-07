@@ -3,6 +3,7 @@
 import { motion, type Variants } from 'motion/react';
 import Link from 'next/link';
 import { Fragment } from 'react';
+import { buttonVariants } from '@/components/ui/button';
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 const TITLE = 'Si no podés hablar, tu ficha habla por vos';
@@ -55,7 +56,7 @@ export function HeroText() {
       >
         <MotionLink
           href="/registro"
-          className="inline-flex min-h-14 items-center justify-center rounded-md px-[26px] py-3.5 font-head text-[22px] font-extrabold uppercase tracking-[0.03em] no-underline border-2 border-red-bright bg-red-bright text-white"
+          className={buttonVariants({ variant: 'night', size: 'lg' })}
           whileHover={{ y: -3 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}
@@ -64,7 +65,7 @@ export function HeroText() {
         </MotionLink>
         <MotionLink
           href="/ingresar"
-          className="inline-flex min-h-14 items-center justify-center rounded-md px-[26px] py-3.5 font-head text-[22px] font-extrabold uppercase tracking-[0.03em] no-underline border-2 border-white text-white"
+          className={buttonVariants({ variant: 'inverse', size: 'lg' })}
           whileHover={{ y: -3 }}
           whileTap={{ scale: 0.97 }}
           transition={{ type: 'spring', stiffness: 400, damping: 22 }}

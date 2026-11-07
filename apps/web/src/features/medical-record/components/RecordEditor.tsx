@@ -9,22 +9,31 @@ import {
   type Visibility,
 } from '@helpjuy/contracts';
 import { Eye, Lock } from 'lucide-react';
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui';
 import { motion } from 'motion/react';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import { ApiError, apiFetch } from '@/shared/api/client';
 import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Field } from '@/shared/ui/Field';
+import { Field, TextareaField } from '@/shared/ui/Field';
+import { buttonVariants } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Field as FieldRoot, FieldLabel } from '@/components/ui/field';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { Select as SelectRoot, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Spinner } from '@/components/ui/spinner';
 import { draftCompletion, fromRecord, validate, type Draft, type EditorErrors } from '../draft';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
 
-const removeBtn =
-  'min-h-13 cursor-pointer rounded-md border-2 border-line bg-transparent px-3.5 font-bold text-muted-foreground';
 const row =
   'grid gap-2.5 border border-line bg-paper p-3 min-[720px]:grid-cols-[1fr_1fr_auto] min-[720px]:items-end min-[720px]:has-[>:nth-child(4)]:grid-cols-[1fr_1fr_1fr_auto]';
-const previewLink = 'inline-flex min-h-13 items-center justify-center rounded-md border-2 border-ink font-bold no-underline';
+const previewLink = cn(buttonVariants({ variant: 'outline' }), 'font-sans text-[17px] font-bold normal-case tracking-normal');
+/** "Quitar" una fila: discreto, para no competir con los datos. */
+const removeBtnProps = { type: 'button' as const, variant: 'soft' as const, size: 'compact' as const, className: 'min-h-13 bg-transparent text-muted-foreground' };
+/** Radix Select no acepta "" como valor: lo traducimos a uno interno. */
+const EMPTY = '__vacio';
 const grid2 = 'grid gap-3.5 sm:grid-cols-2';
 
 const SECTION_LABEL: Record<Section, string> = {
@@ -64,24 +73,24 @@ function VisibilityChoice({
       <span className="font-head text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground" aria-hidden="true">
         {named ? `¿Quién ve: ${SECTION_LABEL[section].toLowerCase()}?` : '¿Quién ve esto?'}
       </span>
-      <div role="radiogroup" aria-label={`${SECTION_LABEL[section]}: ¿quién lo ve?`} className="inline-grid grid-cols-2 gap-1 rounded-full border-2 border-line bg-paper p-1">
+      <RadioGroup
+        name={name}
+        value={on ? 'public' : 'private'}
+        onValueChange={(v) => onChange(v === 'public')}
+        aria-label={`${SECTION_LABEL[section]}: ¿quién lo ve?`}
+        className="inline-grid w-auto grid-cols-2 gap-1 rounded-full border-2 border-line bg-paper p-1"
+      >
         {options.map(({ value, label, icon: Icon, cls }) => {
           const selected = on === value;
           return (
-            <label
+            <RadioGroupPrimitive.Item
               key={label}
+              value={value ? 'public' : 'private'}
               className={cn(
-                'relative grid min-h-10 cursor-pointer place-items-center whitespace-nowrap rounded-full px-3.5 text-sm font-bold text-muted-foreground transition-colors hover:text-ink has-focus-visible:outline-3 has-focus-visible:outline-offset-2 has-focus-visible:outline-blue',
+                'relative grid min-h-10 cursor-pointer place-items-center whitespace-nowrap rounded-full px-3.5 text-sm font-bold text-muted-foreground transition-colors outline-none hover:text-ink focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue',
                 selected && 'text-white hover:text-white',
               )}
             >
-              <input
-                type="radio"
-                name={name}
-                className="absolute inset-0 z-2 m-0 size-full cursor-pointer opacity-0"
-                checked={selected}
-                onChange={() => onChange(value)}
-              />
               {selected && (
                 <motion.span
                   layoutId={`indicator-${section}`}
@@ -93,10 +102,10 @@ function VisibilityChoice({
                 <Icon size={16} aria-hidden="true" />
                 {label}
               </span>
-            </label>
+            </RadioGroupPrimitive.Item>
           );
         })}
-      </div>
+      </RadioGroup>
     </div>
   );
 }
@@ -159,26 +168,30 @@ function Select<T extends string>({
   options: Array<[T, string]>;
   onChange: (v: T) => void;
 }) {
+  const id = useId();
   return (
-    <label className="grid gap-1.5">
-      <span className="label">{label}</span>
-      <select
-        className="min-h-13 rounded-md border-2 border-ink bg-white px-3 py-2.5 text-ink"
-       value={value} onChange={(e) => onChange(e.target.value as T)}>
-        {options.map(([v, l]) => (
-          <option key={v} value={v}>
-            {l}
-          </option>
-        ))}
-      </select>
-    </label>
+    <FieldRoot>
+      <FieldLabel htmlFor={id}>{label}</FieldLabel>
+      <SelectRoot value={value === '' ? EMPTY : value} onValueChange={(v) => onChange((v === EMPTY ? '' : v) as T)}>
+        <SelectTrigger id={id} className="w-full">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {options.map(([v, l]) => (
+            <SelectItem key={v || EMPTY} value={v === '' ? EMPTY : v}>
+              {l}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </SelectRoot>
+    </FieldRoot>
   );
 }
 
 function NoneCheck({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
-    <label className="flex cursor-pointer items-center gap-2.5 font-bold [&_input]:size-[22px] [&_input]:accent-ink">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+    <label className="flex cursor-pointer items-center gap-2.5 font-bold">
+      <Checkbox checked={checked} onCheckedChange={(v) => onChange(v === true)} />
       {label}
     </label>
   );
@@ -316,9 +329,9 @@ export function RecordEditor({ profile, initial }: Props) {
                 onChange={(e) => setRow('allergies', i, { reaction: e.target.value })}
                 placeholder="Me hincho, me cuesta respirar"
               />
-              <button type="button" className={removeBtn} onClick={() => removeRow('allergies', i)}>
+              <Button {...removeBtnProps} onClick={() => removeRow('allergies', i)}>
                 Quitar
-              </button>
+              </Button>
             </div>
           ))}
         <Button
@@ -354,9 +367,9 @@ export function RecordEditor({ profile, initial }: Props) {
               <Field label={`Detalle ${i + 1}`}
                 maxLength={120}
                 error={err(`conditions.${i}.note`)} value={c.note} onChange={(e) => setRow('conditions', i, { note: e.target.value })} />
-              <button type="button" className={removeBtn} onClick={() => removeRow('conditions', i)}>
+              <Button {...removeBtnProps} onClick={() => removeRow('conditions', i)}>
                 Quitar
-              </button>
+              </Button>
             </div>
           ))}
         <Button
@@ -392,17 +405,16 @@ export function RecordEditor({ profile, initial }: Props) {
               <Field label={`Dosis ${i + 1}`}
                 maxLength={60}
                 error={err(`medications.${i}.dose`)} value={m.dose} onChange={(e) => setRow('medications', i, { dose: e.target.value })} placeholder="50 mg a la mañana" />
-              <label className="flex cursor-pointer items-center gap-2.5 font-bold [&_input]:size-[22px] [&_input]:accent-ink">
-                <input
-                  type="checkbox"
+              <label className="flex cursor-pointer items-center gap-2.5 font-bold">
+                <Checkbox
                   checked={m.anticoagulant}
-                  onChange={(e) => setRow('medications', i, { anticoagulant: e.target.checked })}
+                  onCheckedChange={(v) => setRow('medications', i, { anticoagulant: v === true })}
                 />
                 Es anticoagulante (para la sangre)
               </label>
-              <button type="button" className={removeBtn} onClick={() => removeRow('medications', i)}>
+              <Button {...removeBtnProps} onClick={() => removeRow('medications', i)}>
                 Quitar
-              </button>
+              </Button>
             </div>
           ))}
         <Button
@@ -449,9 +461,9 @@ export function RecordEditor({ profile, initial }: Props) {
               placeholder="388 412-3456"
               error={err(`contacts.${i}.phone`)}
             />
-            <button type="button" className={removeBtn} onClick={() => removeRow('contacts', i)}>
-              Quitar
-            </button>
+            <Button {...removeBtnProps} onClick={() => removeRow('contacts', i)}>
+                Quitar
+              </Button>
           </div>
         ))}
         <Button
@@ -495,7 +507,7 @@ export function RecordEditor({ profile, initial }: Props) {
             ]}
           />
         </div>
-        <Field
+        <TextareaField
           label="Voluntades anticipadas"
                 maxLength={300}
                 error={err('directives')}
@@ -507,7 +519,7 @@ export function RecordEditor({ profile, initial }: Props) {
 
       <Block title="Cirugías e implantes" sections={['history']} visibility={visibility} setVisible={setVisible}>
         <div className={grid2}>
-          <Field label="Cirugías"
+          <TextareaField label="Cirugías"
                 maxLength={300}
                 error={err('surgeries')} value={draft.surgeries} onChange={(e) => set('surgeries', e.target.value)} />
           <Field
@@ -549,7 +561,7 @@ export function RecordEditor({ profile, initial }: Props) {
       </Block>
 
       <Block title="Notas" sections={['notes']} visibility={visibility} setVisible={setVisible}>
-        <Field label="Algo más que quieras dejar anotado"
+        <TextareaField label="Algo más que quieras dejar anotado"
                 maxLength={500}
                 error={err('notes')} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
       </Block>
@@ -559,7 +571,7 @@ export function RecordEditor({ profile, initial }: Props) {
       <div className="contents wide:sticky wide:top-6 wide:grid wide:gap-4 wide:border wide:border-t-4 wide:border-line wide:border-t-night wide:bg-white wide:p-[18px] wide:[grid-area:side]">
       <div className="grid gap-1.5 font-head text-xl font-extrabold uppercase max-wide:[grid-area:progress]" aria-live="polite">
         <span>Ficha al {percent}%</span>
-        <Progress value={percent} aria-hidden="true" className="[&>span]:transition-[width] [&>span]:duration-400" />
+        <Progress value={percent} aria-label="Ficha completa" />
       </div>
 
       <div className="max-wide:[grid-area:summary]" aria-live="polite">
@@ -589,6 +601,7 @@ export function RecordEditor({ profile, initial }: Props) {
           <Alert variant="error">{errors._form ?? 'Hay datos para revisar. Están marcados en rojo.'}</Alert>
         )}
         <Button type="button" onClick={save} disabled={status === 'saving'}>
+          {status === 'saving' && <Spinner className="size-5" />}
           {status === 'saving' ? 'Guardando…' : 'Guardar ficha'}
         </Button>
       </div>

@@ -4,10 +4,15 @@ import type { EmergencyAlertResultDto } from '@helpjuy/contracts';
 import { BellRing, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { postJson } from '@/shared/api/client';
+import { Alert } from '@/components/ui/alert';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Spinner } from '@/components/ui/spinner';
 import { cn } from '@/lib/utils';
-const alertBtn =
-  'inline-flex min-h-14 cursor-pointer items-center justify-center gap-2.5 rounded-md bg-red px-[18px] py-3 font-head text-xl font-extrabold text-white uppercase disabled:opacity-60';
-const cancelBtn = 'min-h-14 cursor-pointer rounded-md border-2 border-ink bg-white px-[18px] font-bold';
+
+/** Botón grande para avisar (más alto que el normal: se toca con apuro). */
+const alertBtn = 'min-h-14 gap-2.5 tracking-normal disabled:opacity-60';
+const cancelBtn = 'min-h-14 bg-white font-sans text-[17px] font-bold normal-case tracking-normal';
 
 /** Número argentino a formato internacional de WhatsApp (549 + área + número, sin 0 ni 15). */
 export function whatsappHref(phone: string, text: string): string {
@@ -56,10 +61,10 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
   return (
     <section className="grid gap-2.5 border-b border-line bg-white p-4 card:px-8" aria-label="Avisar a la familia">
       {step === 'idle' && (
-        <button type="button" className={alertBtn} onClick={() => setStep('confirm')}>
+        <Button type="button" className={alertBtn} onClick={() => setStep('confirm')}>
           <BellRing size={22} aria-hidden="true" />
           Es una emergencia: avisar a la familia
-        </button>
+        </Button>
       )}
 
       {(step === 'confirm' || step === 'sending') && (
@@ -67,23 +72,35 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
           <p>
             <strong>¿Confirmás que {firstName} necesita ayuda?</strong> Le mandamos un aviso a su familia ahora.
           </p>
-          <label className="flex items-center gap-2.5 font-bold [&_input]:size-[22px] [&_input]:accent-red">
-            <input type="checkbox" checked={shareLocation} onChange={(e) => setShareLocation(e.target.checked)} />
+          <label className="flex cursor-pointer items-center gap-2.5 font-bold">
+            <Checkbox
+              checked={shareLocation}
+              onCheckedChange={(v) => setShareLocation(v === true)}
+              className="data-checked:border-red data-checked:bg-red"
+            />
             Compartir mi ubicación aproximada (ayuda a que lleguen)
           </label>
           <div className="grid gap-2 min-[560px]:grid-cols-[1fr_auto]">
-            <button type="button" className={alertBtn} onClick={send} disabled={step === 'sending'}>
+            <Button type="button" className={alertBtn} onClick={send} disabled={step === 'sending'}>
+              {step === 'sending' && <Spinner className="size-5" />}
               {step === 'sending' ? 'Avisando…' : `Sí, avisar a la familia de ${firstName}`}
-            </button>
-            <button type="button" className={cancelBtn} onClick={() => setStep('idle')} disabled={step === 'sending'}>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="inline"
+              className={cancelBtn}
+              onClick={() => setStep('idle')}
+              disabled={step === 'sending'}
+            >
               Cancelar
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {step === 'done' && (
-        <p className="border-l-8 border-green bg-green-tint p-3.5 font-bold" role="status">
+        <Alert variant="success" className="p-3.5 font-bold">
           <strong>
             {result.family > 0
               ? `Avisamos a ${result.family} ${result.family === 1 ? 'persona' : 'personas'} de la familia de ${firstName}.`
@@ -92,20 +109,20 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
                 : `No hay a quién avisar por HelpJuy.`}
           </strong>{' '}
           {result.family > 0 ? 'Si es grave, llamá al 107 ahora.' : 'Llamá al 107 y, si podés, al contacto de emergencia.'}
-        </p>
+        </Alert>
       )}
 
       {step === 'error' && (
-        <div className="border-l-8 border-red bg-red-tint p-3.5 font-bold" role="alert">
+        <Alert variant="error" className="p-3.5 font-bold">
           <p>No pudimos avisar (puede ser la señal). Llamá al 107 y, si podés, al contacto de emergencia.</p>
-          <button type="button" className={cn(cancelBtn, 'mt-2.5')} onClick={send}>
+          <Button type="button" variant="outline" size="inline" className={cn(cancelBtn, 'mt-2.5')} onClick={send}>
             Reintentar
-          </button>
-        </div>
+          </Button>
+        </Alert>
       )}
 
       {contact && (
-        <a className="inline-flex min-h-13 items-center justify-center gap-2 rounded-md bg-[#1d8a4a] font-bold text-white no-underline" href={whatsappHref(contact.phone, waText)} target="_blank" rel="noreferrer">
+        <a className={cn(buttonVariants({ size: 'compact' }), 'min-h-13 border-[#1d8a4a] bg-[#1d8a4a] text-[17px]')} href={whatsappHref(contact.phone, waText)} target="_blank" rel="noreferrer">
           <MessageCircle size={20} aria-hidden="true" />
           Avisar por WhatsApp a {contact.name}
         </a>

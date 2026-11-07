@@ -4,12 +4,15 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { buttonVariants } from '@/components/ui/button';
 
 const initials = (p: ProfileDto) => `${p.firstName[0] ?? ''}${p.lastName[0] ?? ''}`.toUpperCase();
 
 const note = 'border-l-5 px-3 py-2 text-[15px] font-bold';
-const action =
-  'inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-md border-2 border-ink px-3 text-center text-[15px] font-bold no-underline';
+/** Acciones de la tarjeta: botones compactos de shadcn, un poco más altos para el dedo. */
+const action = (variant: 'ink' | 'outline') => cn(buttonVariants({ variant, size: 'compact' }), 'min-h-12 gap-2 whitespace-nowrap px-3', variant === 'outline' && 'bg-white');
 
 function PrintNote({ p }: { p: ProfileDto }) {
   if (p.printStatus === 'outdated')
@@ -33,12 +36,9 @@ export function ProfileCards({ profiles }: { profiles: ProfileDto[] }) {
           <Card asChild key={p.id} rule="red" className="grid gap-3.5 p-[18px]">
             <article aria-label={name}>
             <header className="grid grid-cols-[auto_1fr] items-center gap-x-3.5 gap-y-3 sm:grid-cols-[auto_1fr_auto]">
-              <span
-                className="grid size-13 place-items-center rounded-full bg-night font-head text-[22px] font-extrabold text-white"
-                aria-hidden="true"
-              >
-                {initials(p)}
-              </span>
+              <Avatar size="lg" aria-hidden="true">
+                <AvatarFallback>{initials(p)}</AvatarFallback>
+              </Avatar>
               <div className="min-w-0">
                 <h2 className="text-[28px] wrap-anywhere">{name}</h2>
                 <p className="mt-1 text-muted-foreground">
@@ -46,14 +46,12 @@ export function ProfileCards({ profiles }: { profiles: ProfileDto[] }) {
                   {p.isMinor ? ' · menor' : ''}
                 </p>
               </div>
-              <span
-                className={cn(
-                  'col-span-full justify-self-start rounded-full px-2.5 py-1 text-sm font-bold sm:col-auto',
-                  p.active ? 'bg-green-tint text-green' : 'bg-amber-tint text-amber',
-                )}
+              <Badge
+                variant={p.active ? 'green' : 'amber'}
+                className="col-span-full justify-self-start rounded-full px-2.5 py-1 text-sm normal-case tracking-normal sm:col-auto"
               >
                 {p.active ? 'QR activo' : 'Falta un contacto de emergencia'}
-              </span>
+              </Badge>
             </header>
 
             <div className="grid gap-1.5">
@@ -64,15 +62,15 @@ export function ProfileCards({ profiles }: { profiles: ProfileDto[] }) {
             <PrintNote p={p} />
 
             <div className="grid gap-2 sm:flex sm:flex-wrap">
-              <Link className={cn(action, 'bg-ink text-white')} href={`/panel/perfiles/${p.id}`}>
+              <Link className={action('ink')} href={`/panel/perfiles/${p.id}`}>
                 <Pencil size={18} aria-hidden="true" />
                 Editar ficha
               </Link>
-              <Link className={cn(action, 'bg-white text-ink')} href={`/panel/perfiles/${p.id}/imprimir`}>
+              <Link className={action('outline')} href={`/panel/perfiles/${p.id}/imprimir`}>
                 <Printer size={18} aria-hidden="true" />
                 Imprimir QR
               </Link>
-              <a className={cn(action, 'bg-white text-ink')} href={`/e/${p.publicToken}`} target="_blank" rel="noreferrer">
+              <a className={action('outline')} href={`/e/${p.publicToken}`} target="_blank" rel="noreferrer">
                 <Eye size={18} aria-hidden="true" />
                 Ver como el paramédico
               </a>

@@ -1,4 +1,5 @@
 import type { PublicCardDto } from '@helpjuy/contracts';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { cn } from '@/lib/utils';
 import { CallButton, CardPage, CardSection, CardStrip, InactiveNotice, callbar, sec, tiny } from './card-ui';
 import { EmergencyActions } from './EmergencyActions';
@@ -223,10 +224,11 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
           )}
 
           {hasMore && (
-            <details className={cn(sec, 'group')}>
-              <summary className="flex cursor-pointer list-none justify-between font-head text-base font-extrabold tracking-[0.14em] uppercase after:text-muted-foreground after:content-['Ver_+'] group-open:after:content-['Cerrar'] [&::-webkit-details-marker]:hidden">
+            <Collapsible className={cn(sec, 'group/more')}>
+              <CollapsibleTrigger className="flex w-full cursor-pointer justify-between font-head text-base font-extrabold tracking-[0.14em] uppercase after:text-muted-foreground after:content-['Ver_+'] group-data-[state=open]/more:after:content-['Cerrar']">
                 Más información
-              </summary>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
               <dl
                 className={cn(
                   'mt-3.5 grid grid-cols-1 gap-3 text-base min-[480px]:grid-cols-2 [&_dd]:m-0 [&_dt]:mb-0.5 [&_dt]:text-muted-foreground',
@@ -275,7 +277,8 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
                   </div>
                 )}
               </dl>
-            </details>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </main>
 

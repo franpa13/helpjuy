@@ -1,11 +1,25 @@
 'use client';
 
 import type { CreatedInviteDto, EmergencyAlertResultDto, FamilyGroupDto, FamilyInviteDto } from '@helpjuy/contracts';
-import { BellOff, BellRing, Copy, Send, UserMinus, Users } from 'lucide-react';
+import { BellOff, BellRing, ChevronDown, Copy, Send, UserMinus, Users } from 'lucide-react';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ApiError, apiFetch, postJson } from '@/shared/api/client';
 import { Alert } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Field } from '@/shared/ui/Field';
 import { AlertPreview, FamilyIntro, IntroLead } from './FamilyIntro';
 import { Badge } from '@/components/ui/badge';
@@ -13,9 +27,51 @@ import { Card, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
-const textBtn = 'cursor-pointer justify-self-start bg-transparent py-1 font-bold text-ink underline';
-const action =
-  'inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-md border-2 border-line bg-paper px-3.5 text-[15px] font-bold text-ink hover:border-ink';
+/** Pide confirmación antes de algo que no se deshace (reemplaza al confirm() del navegador). */
+function ConfirmAction({
+  trigger,
+  title,
+  description,
+  confirmLabel,
+  onConfirm,
+}: {
+  trigger: React.ReactNode;
+  title: string;
+  description: string;
+  confirmLabel: string;
+  onConfirm: () => void;
+}) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{title}</AlertDialogTitle>
+          <AlertDialogDescription>{description}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel size="inline">Cancelar</AlertDialogCancel>
+          <AlertDialogAction size="inline" onClick={onConfirm}>
+            {confirmLabel}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+/** Pliegue con el título como botón y una flecha que gira al abrir. */
+function Fold({ title, className, children }: { title: string; className?: string; children: React.ReactNode }) {
+  return (
+    <Collapsible className={cn('group/fold', className)}>
+      <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between gap-2 text-left font-bold">
+        {title}
+        <ChevronDown aria-hidden="true" size={20} className="shrink-0 transition-transform group-data-[state=open]/fold:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pt-2.5">{children}</CollapsibleContent>
+    </Collapsible>
+  );
+}
 const meta = 'mt-1 text-[15px] text-muted-foreground';
 
 const initials = (name: string) =>
@@ -137,9 +193,7 @@ function GroupCard({
     }
   }
 
-  async function removeMember(userId: string, name: string, self: boolean) {
-    const ok = window.confirm(self ? `¿Salir de "${group.name}"? Vas a dejar de recibir sus avisos.` : `¿Sacar a ${name} del grupo?`);
-    if (!ok) return;
+  async function removeMember(userId: string, self: boolean) {
     try {
       await apiFetch(`/family-groups/${group.id}/members/${userId}`, { method: 'DELETE' });
       if (self) onGone();
@@ -191,12 +245,9 @@ function GroupCard({
       <ul className="grid list-none border-t border-line p-0" aria-label={`Miembros de ${group.name}`}>
         {group.members.map((m) => (
           <li key={m.userId} className="flex items-center gap-3 border-b border-line py-2.5">
-            <span
-              className="grid size-10 shrink-0 place-items-center rounded-full bg-night font-head text-[17px] font-extrabold text-white"
-              aria-hidden="true"
-            >
-              {initials(m.name)}
-            </span>
+            <Avatar className="size-10" aria-hidden="true">
+              <AvatarFallback>{initials(m.name)}</AvatarFallback>
+            </Avatar>
             <span className="flex flex-1 flex-wrap items-center gap-x-2.5 gap-y-1 font-bold">
               {m.name}
               <span className="inline-flex gap-1.5">
@@ -213,10 +264,28 @@ function GroupCard({
               </span>
             </span>
             {admin && !m.isMe && (
-              <button type="button" className="grid size-10 cursor-pointer place-items-center rounded-md border-2 border-line bg-transparent text-muted-foreground hover:border-red hover:text-red" onClick={() => removeMember(m.userId, m.name, false)}>
-                <UserMinus size={18} aria-hidden="true" />
-                <span className="sr-only">Sacar a {m.name}</span>
-              </button>
+              <Tooltip>
+              <ConfirmAction
+                title={`¿Sacar a ${m.name}?`}
+                description={`Deja de recibir los avisos de "${group.name}". Lo podés volver a invitar cuando quieras.`}
+                confirmLabel="Sí, sacar"
+                onConfirm={() => removeMember(m.userId, false)}
+                trigger={
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="soft"
+                      size="icon"
+                      className="size-10 bg-transparent text-muted-foreground hover:border-red hover:text-red"
+                      aria-label={`Sacar a ${m.name}`}
+                    >
+                      <UserMinus size={18} aria-hidden="true" />
+                    </Button>
+                  </TooltipTrigger>
+                }
+              />
+              <TooltipContent>Sacar del grupo</TooltipContent>
+              </Tooltip>
             )}
           </li>
         ))}
@@ -241,13 +310,13 @@ function GroupCard({
               </p>
               <div className="flex gap-2">
                 <Input className="min-h-12 flex-1 bg-paper px-3 py-2.5 text-sm" readOnly value={invite.url} aria-label="Link de invitación" onFocus={(e) => e.target.select()} />
-                <button type="button" className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border-2 border-ink bg-white px-3.5 font-bold" onClick={copy}>
+                <Button type="button" variant="outline" size="compact" className="min-h-12 bg-white" onClick={copy}>
                   <Copy size={18} aria-hidden="true" />
                   {copied ? 'Copiado' : 'Copiar'}
-                </button>
+                </Button>
               </div>
               <a
-                className="inline-flex min-h-13 items-center justify-center gap-2 rounded-md bg-[#1d8a4a] font-bold text-white no-underline"
+                className={cn(buttonVariants({ size: 'compact' }), 'min-h-13 border-[#1d8a4a] bg-[#1d8a4a] text-[17px]')}
                 href={`https://wa.me/?text=${encodeURIComponent(waText(group.name, invite.url))}`}
                 target="_blank"
                 rel="noreferrer"
@@ -255,9 +324,9 @@ function GroupCard({
                 <Send size={18} aria-hidden="true" />
                 Compartir por WhatsApp
               </a>
-              <button type="button" className={textBtn} onClick={createInvite}>
+              <Button type="button" variant="link" className="justify-self-start py-1" onClick={createInvite}>
                 Generar otro link
-              </button>
+              </Button>
             </>
           )}
           {pending && pending.length > 0 && (
@@ -267,9 +336,9 @@ function GroupCard({
                 {pending.map((i) => (
                   <li key={i.id} className="flex items-center justify-between text-[15px]">
                     Vence el {new Date(i.expiresAt).toLocaleDateString('es-AR')}
-                    <button type="button" className={textBtn} onClick={() => revoke(i.id)}>
+                    <Button type="button" variant="link" className="py-1" onClick={() => revoke(i.id)}>
                       Cancelar
-                    </button>
+                    </Button>
                   </li>
                 ))}
               </ul>
@@ -280,18 +349,26 @@ function GroupCard({
 
       <footer className="flex flex-wrap gap-2 border-t border-line pt-3">
         {admin && (
-          <button type="button" className={action} onClick={testAlert}>
+          <Button type="button" variant="soft" size="compact" onClick={testAlert}>
             <BellRing size={18} aria-hidden="true" />
             Probar aviso
-          </button>
+          </Button>
         )}
-        <button type="button" className={action} onClick={toggleMute} aria-pressed={group.muted}>
+        <Button type="button" variant="soft" size="compact" onClick={toggleMute} aria-pressed={group.muted}>
           <BellOff size={18} aria-hidden="true" />
           {group.muted ? 'Volver a recibir avisos' : 'Silenciar avisos'}
-        </button>
-        <button type="button" className={cn(action, 'text-red hover:border-red')} onClick={() => removeMember(me.userId, me.name, true)}>
-          Salir del grupo
-        </button>
+        </Button>
+        <ConfirmAction
+          title={`¿Salir de "${group.name}"?`}
+          description="Vas a dejar de recibir sus avisos de emergencia. Para volver, te tienen que invitar de nuevo."
+          confirmLabel="Sí, salir"
+          onConfirm={() => removeMember(me.userId, true)}
+          trigger={
+            <Button type="button" variant="soft" size="compact" className="text-red hover:border-red">
+              Salir del grupo
+            </Button>
+          }
+        />
       </footer>
       </article>
     </Card>
@@ -358,18 +435,16 @@ export function FamilyGroups({
           <Card className="p-[18px]">
             <CardTitle>Cómo funciona</CardTitle>
             <FamilyIntro compact />
-            <details className="mt-3.5 border-t border-line pt-3">
-              <summary className="mb-2.5 cursor-pointer font-bold">Ver un ejemplo del aviso</summary>
+            <Fold title="Ver un ejemplo del aviso" className="mt-3.5 border-t border-line pt-3">
               <AlertPreview compact />
-            </details>
+            </Fold>
           </Card>
-          <details className="border border-line bg-white px-4 py-3.5">
-            <summary className="cursor-pointer font-bold">Crear otro grupo</summary>
+          <Fold title="Crear otro grupo" className="border border-line bg-white px-4 py-3.5">
             <p className={meta}>Por ejemplo, uno con tu familia y otro con amigos o compañeros de trabajo.</p>
             <div className="mt-2.5">
               <CreateGroup first={false} stacked onCreated={created} />
             </div>
-          </details>
+          </Fold>
         </aside>
       </div>
     </div>

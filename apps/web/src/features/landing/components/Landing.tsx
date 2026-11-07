@@ -25,6 +25,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { Logo } from '@/shared/brand/Logo';
 import { Reveal, StaggerItem, StaggerList } from '@/shared/motion/Reveal';
 import { Faq } from './Faq';
@@ -155,7 +157,7 @@ export function Landing() {
         </Link>
         <nav className="flex items-center gap-[18px] text-base font-bold max-[559px]:gap-3 max-[559px]:text-[15px] [&_a]:text-white" aria-label="Cuenta">
           <Link href="/ingresar">Ingresar</Link>
-          <Link href="/registro" className="rounded-md bg-red-bright px-3.5 py-2 whitespace-nowrap text-white! no-underline max-[559px]:px-2.5 max-[559px]:py-[7px]">
+          <Link href="/registro" className={cn(buttonVariants({ variant: 'night', size: 'compact' }), 'min-h-0 px-3.5 py-2 text-base whitespace-nowrap text-white! max-[559px]:px-2.5 max-[559px]:py-[7px] max-[559px]:text-[15px]')}>
             Crear mi ficha
           </Link>
         </nav>
@@ -293,7 +295,7 @@ export function Landing() {
             <h2 className="max-w-[14ch] text-[clamp(40px,6vw,80px)]/[0.9]">Hacé tu ficha hoy. Ojalá nunca la necesites.</h2>
           </Reveal>
           <Reveal delay={0.15}>
-            <Link href="/registro" className="inline-flex min-h-14 items-center justify-center rounded-md px-[26px] py-3.5 font-head text-[22px] font-extrabold uppercase tracking-[0.03em] no-underline border-2 border-red bg-red text-white">
+            <Link href="/registro" className={buttonVariants({ size: 'lg' })}>
               Crear mi ficha gratis
             </Link>
           </Reveal>

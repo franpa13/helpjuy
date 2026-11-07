@@ -12,6 +12,7 @@ import { Field } from '@/shared/ui/Field';
 import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 import { GoogleButton } from './GoogleButton';
+import { Spinner } from '@/components/ui/spinner';
 
 export function RegisterForm({ googleEnabled = false, next }: { googleEnabled?: boolean; next?: string }) {
   const router = useRouter();
@@ -47,6 +48,7 @@ export function RegisterForm({ googleEnabled = false, next }: { googleEnabled?: 
       <Field label="Email" name="email" type="email" autoComplete="email" inputMode="email" error={errors.email} />
       <PasswordField label="Contraseña" name="password" autoComplete="new-password" minLength={8} error={errors.password} />
       <Button type="submit" disabled={sending}>
+        {sending && <Spinner className="size-5" />}
         {sending ? 'Creando…' : 'Crear cuenta'}
       </Button>
       <p className="text-sm text-muted-foreground">

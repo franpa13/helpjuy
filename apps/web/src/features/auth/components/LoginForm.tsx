@@ -12,6 +12,7 @@ import { Field } from '@/shared/ui/Field';
 import { PasswordField } from '@/shared/ui/PasswordField';
 import { AUTH_FIELD_MESSAGES, authErrorMessage } from '../messages';
 import { GoogleButton } from './GoogleButton';
+import { Spinner } from '@/components/ui/spinner';
 
 export function LoginForm({ next, googleEnabled = false, error }: { next?: string; googleEnabled?: boolean; error?: string }) {
   const router = useRouter();
@@ -48,6 +49,7 @@ export function LoginForm({ next, googleEnabled = false, error }: { next?: strin
         <Link href="/recuperar">Me olvidé la contraseña</Link>
       </p>
       <Button type="submit" disabled={sending}>
+        {sending && <Spinner className="size-5" />}
         {sending ? 'Ingresando…' : 'Ingresar'}
       </Button>
       <p className="text-muted-foreground">
