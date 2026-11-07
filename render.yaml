@@ -1,0 +1,50 @@
+# API de HelpJuy en Render (plan gratis). Se crea con: Render → New → Blueprint → este repo.
+# Los valores con `sync: false` los pide Render al crear el servicio.
+services:
+  - type: web
+    name: helpjuy-api
+    runtime: node
+    region: frankfurt # misma región que la base (Neon, Frankfurt): los datos no salen de la UE
+    plan: free
+    branch: main
+    buildCommand: >-
+      corepack enable &&
+      pnpm install --frozen-lockfile --prod=false &&
+      pnpm --filter @helpjuy/contracts build &&
+      pnpm --filter api build
+    startCommand: pnpm --filter api db:deploy && pnpm --filter api start:prod
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      # Neon: la conexión con pooler (host con "-pooler")
+      - key: DATABASE_URL
+        sync: false
+      # Neon: la conexión directa (sin "-pooler"), solo para las migraciones
+      - key: DIRECT_URL
+        sync: false
+      # La URL de la web en Vercel, ej. https://helpjuy.vercel.app (sin barra al final)
+      - key: WEB_URL
+        sync: false
+      # 32 bytes en base64. Guardala aparte: si se pierde, los datos médicos no se pueden leer nunca más.
+      - key: MEDICAL_DATA_KEY
+        sync: false
+      # Estos tres los genera Render. PROXY_SECRET y REVALIDATE_SECRET se copian iguales en Vercel.
+      - key: PROXY_SECRET
+        generateValue: true
+      - key: REVALIDATE_SECRET
+        generateValue: true
+      - key: MAINTENANCE_SECRET
+        generateValue: true
+      # Emails (opcional). Sin RESEND_API_KEY los emails solo se ven en los logs de Render.
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM
+        value: HelpJuy <onboarding@resend.dev>
+      # Ingreso con Google (opcional)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
