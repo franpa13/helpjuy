@@ -43,10 +43,8 @@ describe('POST /internal/mail (Gmail a través de la web)', () => {
   });
 
   it('limpia lo que se cuela al copiar: espacios, comillas, saltos de línea', async () => {
-    vi.stubEnv('GMAIL_USER', ' "helpjuy.avisos@gmail.com"
-');
-    vi.stubEnv('GMAIL_APP_PASSWORD', '"abcd efgh ijkl mnop"
-');
+    vi.stubEnv('GMAIL_USER', ' "helpjuy.avisos@gmail.com"\n');
+    vi.stubEnv('GMAIL_APP_PASSWORD', '"abcd efgh ijkl mnop"\n');
     await POST(req(msg, 'secreto'));
     expect(nodemailer.createTransport).toHaveBeenLastCalledWith(
       expect.objectContaining({ auth: { user: 'helpjuy.avisos@gmail.com', pass: 'abcdefghijklmnop' } }),
