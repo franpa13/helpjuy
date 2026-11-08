@@ -8,7 +8,9 @@ import {
   type Section,
   type Visibility,
 } from '@helpjuy/contracts';
-import { Eye, Lock } from 'lucide-react';
+import { ChevronDown, Eye, Lock } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useUnsavedChangesGuard } from '@/shared/forms/useUnsavedChangesGuard';
 import { RadioGroup as RadioGroupPrimitive } from 'radix-ui';
 import { motion } from 'motion/react';
 import { useId, useMemo, useState, type ReactNode } from 'react';
@@ -199,6 +201,51 @@ function NoneCheck({ label, checked, onChange }: { label: string; checked: boole
   );
 }
 
+function VitalHeading() {
+  return (
+    <div className="border-l-6 border-red bg-white px-4 py-3">
+      <p className="label">Lo vital · 2 minutos</p>
+      <p className="mt-1">
+        <strong>Con esto ya sirve en una emergencia.</strong> Con un contacto cargado, tu QR queda activo.
+      </p>
+    </div>
+  );
+}
+
+/** Lo que suma pero no es urgente: plegado al principio para no espantar a nadie con 12 secciones. */
+function OptionalSections({ open, onOpenChange, children }: { open: boolean; onOpenChange: (v: boolean) => void; children: ReactNode }) {
+  return (
+    <Collapsible open={open} onOpenChange={onOpenChange} className="grid gap-4">
+      <CollapsibleTrigger className="group flex w-full cursor-pointer items-center justify-between gap-3 border-2 border-dashed border-line bg-white p-4 text-left hover:border-ink">
+        <span>
+          <strong className="block font-head text-xl font-extrabold uppercase">Completá cuando puedas</strong>
+          <span className="mt-0.5 block text-[15px] text-muted-foreground">
+            Foto, obra social, médico, cirugías, transfusiones y notas.
+          </span>
+        </span>
+        <ChevronDown size={24} aria-hidden="true" className="shrink-0 transition-transform group-data-[state=open]:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="grid gap-4">{children}</CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+/** Errores que caen en las secciones plegadas (para abrirlas y que se vean). */
+const OPTIONAL_ERROR = /^(communication|directives|surgeries|implants|insurance\.|doctor\.|notes)/;
+
+function hasOptionalData(d: Draft, photo: boolean) {
+  return (
+    photo ||
+    d.transfusion !== 'UNKNOWN' ||
+    d.organDonor !== 'UNKNOWN' ||
+    [d.communication, d.directives, d.surgeries, d.implants, d.insuranceName, d.insuranceNumber, d.doctorName, d.doctorPhone, d.notes].some(
+      (v) => v.trim() !== '',
+    )
+  );
+}
+
+const snapshot = (d: Draft, v: Visibility) => JSON.stringify([d, v]);
+
 type Props = {
   profile: ProfileDto;
   initial: { data: MedicalRecord; visibility: Visibility };
@@ -211,7 +258,12 @@ export function RecordEditor({ profile, initial, googlePhoto = false }: Props) {
   const [visibility, setVisibility] = useState<Visibility>(initial.visibility);
   const [errors, setErrors] = useState<EditorErrors>({});
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [optionalOpen, setOptionalOpen] = useState(() => hasOptionalData(fromRecord(initial.data), !!profile.photoVersion));
+  const [savedSnapshot, setSavedSnapshot] = useState(() => snapshot(fromRecord(initial.data), initial.visibility));
+  const dirty = snapshot(draft, visibility) !== savedSnapshot;
+  useUnsavedChangesGuard(dirty);
   const percent = useMemo(() => draftCompletion(draft), [draft]);
+  const hasContact = draft.contacts.some((c) => c.phone.trim() !== '');
   const visibleSections = (Object.keys(SECTION_LABEL) as Section[]).filter((s) => visibility[s]);
 
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => {
@@ -234,16 +286,19 @@ export function RecordEditor({ profile, initial, googlePhoto = false }: Props) {
     const result = validate(draft, visibility);
     if (!result.ok) {
       setErrors(result.errors);
+      if (Object.keys(result.errors).some((k) => OPTIONAL_ERROR.test(k))) setOptionalOpen(true);
       setStatus('error');
       return;
     }
     setErrors({});
     setStatus('saving');
+    const sent = snapshot(draft, visibility);
     try {
       await apiFetch<MedicalRecordResponse>(`/profiles/${profile.id}/record`, {
         method: 'PUT',
         body: JSON.stringify(result.body),
       });
+      setSavedSnapshot(sent);
       setStatus('saved');
     } catch (err) {
       setStatus('error');
@@ -256,73 +311,54 @@ export function RecordEditor({ profile, initial, googlePhoto = false }: Props) {
   return (
     <div className="grid gap-4 [grid-template-areas:'progress'_'blocks'_'summary'_'links'_'save'] wide:grid-cols-[minmax(0,1.7fr)_minmax(300px,1fr)] wide:items-start wide:gap-7 wide:[grid-template-areas:'blocks_side']">
       <div className="grid min-w-0 gap-4 [grid-area:blocks]">
+      <VitalHeading />
       <Block
-        title="Foto"
-        question="Ayuda a confirmar que la ficha es de la persona que están atendiendo."
-        sections={['photo']}
+        title="Contactos de emergencia"
+        question="¿A quién llamamos? Con al menos uno, tu QR queda activo."
+        sections={['contacts']}
         visibility={visibility}
         setVisible={setVisible}
       >
-        <ProfilePhoto
-          profileId={profile.id}
-          name={`${profile.firstName} ${profile.lastName}`}
-          relationship={profile.relationship}
-          isMinor={profile.isMinor}
-          photoVersion={profile.photoVersion}
-          googlePhoto={googlePhoto}
-          visible={visibility.photo}
-        />
-      </Block>
-      <Block
-        title="Datos básicos"
-        sections={['identity', 'vitals']}
-        visibility={visibility}
-        setVisible={setVisible}
-      >
-        <div className="grid gap-3.5 sm:grid-cols-3">
-          <Select
-            label="Sexo"
-            value={draft.sex}
-            onChange={(v) => set('sex', v)}
-            options={[
-              ['', 'Prefiero no decir'],
-              ['F', 'Femenino'],
-              ['M', 'Masculino'],
-              ['X', 'Otro'],
-            ]}
-          />
-          <Field
-            label="Fecha de nacimiento"
-            type="date"
-            value={draft.birthDate}
-            onChange={(e) => set('birthDate', e.target.value)}
-            hint="En la ficha solo se muestra la edad"
-            error={err('birthDate')}
-          />
-          <Field label="Idioma"
+        {draft.contacts.map((c, i) => (
+          <div key={i} className={row}>
+            <Field
+              label={`Nombre del contacto ${i + 1}`}
+                maxLength={60}
+              value={c.name}
+              onChange={(e) => setRow('contacts', i, { name: e.target.value })}
+              error={err(`contacts.${i}.name`)}
+            />
+            <Field
+              label={`Relación ${i + 1}`}
                 maxLength={40}
-                error={err('language')} value={draft.language} onChange={(e) => set('language', e.target.value)} placeholder="Español" />
-          <Select
-            label="Grupo sanguíneo"
-            value={draft.bloodType}
-            onChange={(v) => set('bloodType', v)}
-            options={[['', 'No sé'] as ['', string], ...BLOOD_TYPES.map((b) => [b, b] as [typeof b, string])]}
-          />
-          <Field
-            label="Peso (kg)"
-            inputMode="decimal"
-            value={draft.weightKg}
-            onChange={(e) => set('weightKg', e.target.value)}
-            error={err('weightKg')}
-          />
-          <Field
-            label="Altura (cm)"
-            inputMode="numeric"
-            value={draft.heightCm}
-            onChange={(e) => set('heightCm', e.target.value)}
-            error={err('heightCm')}
-          />
-        </div>
+                error={err(`contacts.${i}.relation`)}
+              value={c.relation}
+              onChange={(e) => setRow('contacts', i, { relation: e.target.value })}
+              placeholder="Madre, pareja, amigo…"
+            />
+            <Field
+              label={`Teléfono del contacto ${i + 1}`}
+                maxLength={20}
+              type="tel"
+              inputMode="tel"
+              value={c.phone}
+              onChange={(e) => setRow('contacts', i, { phone: e.target.value })}
+              placeholder="388 412-3456"
+              error={err(`contacts.${i}.phone`)}
+            />
+            <Button {...removeBtnProps} onClick={() => removeRow('contacts', i)}>
+                Quitar
+              </Button>
+          </div>
+        ))}
+        <Button
+          type="button"
+          variant="outline"
+          disabled={draft.contacts.length >= 3}
+          onClick={() => set('contacts', [...draft.contacts, { name: '', relation: '', phone: '' }])}
+        >
+          Agregar contacto
+        </Button>
       </Block>
 
       <Block
@@ -452,143 +488,166 @@ export function RecordEditor({ profile, initial, googlePhoto = false }: Props) {
       </Block>
 
       <Block
-        title="Contactos de emergencia"
-        question="¿A quién llamamos? Con al menos uno, tu QR queda activo."
-        sections={['contacts']}
+        title="Datos básicos"
+        sections={['identity', 'vitals']}
         visibility={visibility}
         setVisible={setVisible}
       >
-        {draft.contacts.map((c, i) => (
-          <div key={i} className={row}>
-            <Field
-              label={`Nombre del contacto ${i + 1}`}
-                maxLength={60}
-              value={c.name}
-              onChange={(e) => setRow('contacts', i, { name: e.target.value })}
-              error={err(`contacts.${i}.name`)}
-            />
-            <Field
-              label={`Relación ${i + 1}`}
+        <div className="grid gap-3.5 sm:grid-cols-3">
+          <Select
+            label="Sexo"
+            value={draft.sex}
+            onChange={(v) => set('sex', v)}
+            options={[
+              ['', 'Prefiero no decir'],
+              ['F', 'Femenino'],
+              ['M', 'Masculino'],
+              ['X', 'Otro'],
+            ]}
+          />
+          <Field
+            label="Fecha de nacimiento"
+            type="date"
+            value={draft.birthDate}
+            onChange={(e) => set('birthDate', e.target.value)}
+            hint="En la ficha solo se muestra la edad"
+            error={err('birthDate')}
+          />
+          <Field label="Idioma"
                 maxLength={40}
-                error={err(`contacts.${i}.relation`)}
-              value={c.relation}
-              onChange={(e) => setRow('contacts', i, { relation: e.target.value })}
-              placeholder="Madre, pareja, amigo…"
-            />
-            <Field
-              label={`Teléfono del contacto ${i + 1}`}
-                maxLength={20}
-              type="tel"
-              inputMode="tel"
-              value={c.phone}
-              onChange={(e) => setRow('contacts', i, { phone: e.target.value })}
-              placeholder="388 412-3456"
-              error={err(`contacts.${i}.phone`)}
-            />
-            <Button {...removeBtnProps} onClick={() => removeRow('contacts', i)}>
-                Quitar
-              </Button>
-          </div>
-        ))}
-        <Button
-          type="button"
-          variant="outline"
-          disabled={draft.contacts.length >= 3}
-          onClick={() => set('contacts', [...draft.contacts, { name: '', relation: '', phone: '' }])}
+                error={err('language')} value={draft.language} onChange={(e) => set('language', e.target.value)} placeholder="Español" />
+          <Select
+            label="Grupo sanguíneo"
+            value={draft.bloodType}
+            onChange={(v) => set('bloodType', v)}
+            options={[['', 'No sé'] as ['', string], ...BLOOD_TYPES.map((b) => [b, b] as [typeof b, string])]}
+          />
+          <Field
+            label="Peso (kg)"
+            inputMode="decimal"
+            value={draft.weightKg}
+            onChange={(e) => set('weightKg', e.target.value)}
+            error={err('weightKg')}
+          />
+          <Field
+            label="Altura (cm)"
+            inputMode="numeric"
+            value={draft.heightCm}
+            onChange={(e) => set('heightCm', e.target.value)}
+            error={err('heightCm')}
+          />
+        </div>
+      </Block>
+
+      <OptionalSections open={optionalOpen} onOpenChange={setOptionalOpen}>
+        <Block
+          title="Foto"
+          question="Ayuda a confirmar que la ficha es de la persona que están atendiendo."
+          sections={['photo']}
+          visibility={visibility}
+          setVisible={setVisible}
         >
-          Agregar contacto
-        </Button>
-      </Block>
-
-      <Block title="Para tener en cuenta" sections={['care']} visibility={visibility} setVisible={setVisible}>
-        <Field
-          label="¿Cómo comunicarse con vos?"
-                maxLength={200}
-                error={err('communication')}
-          value={draft.communication}
-          onChange={(e) => set('communication', e.target.value)}
-          placeholder="Soy sordo, leo los labios"
-        />
-        <div className={grid2}>
-          <Select
-            label="Transfusiones de sangre"
-            value={draft.transfusion}
-            onChange={(v) => set('transfusion', v)}
-            options={[
-              ['UNKNOWN', 'Prefiero no decir'],
-              ['ACCEPTS', 'Acepto'],
-              ['REFUSES', 'No acepto'],
-            ]}
+          <ProfilePhoto
+            profileId={profile.id}
+            name={`${profile.firstName} ${profile.lastName}`}
+            relationship={profile.relationship}
+            isMinor={profile.isMinor}
+            photoVersion={profile.photoVersion}
+            googlePhoto={googlePhoto}
+            visible={visibility.photo}
           />
-          <Select
-            label="Donante de órganos"
-            value={draft.organDonor}
-            onChange={(v) => set('organDonor', v)}
-            options={[
-              ['UNKNOWN', 'Prefiero no decir'],
-              ['YES', 'Sí, soy donante'],
-              ['NO', 'No'],
-            ]}
-          />
-        </div>
-        <TextareaField
-          label="Voluntades anticipadas"
-                maxLength={300}
-                error={err('directives')}
-          value={draft.directives}
-          onChange={(e) => set('directives', e.target.value)}
-          placeholder="Lo que querés que se respete"
-        />
-      </Block>
+        </Block>
 
-      <Block title="Cirugías e implantes" sections={['history']} visibility={visibility} setVisible={setVisible}>
-        <div className={grid2}>
-          <TextareaField label="Cirugías"
-                maxLength={300}
-                error={err('surgeries')} value={draft.surgeries} onChange={(e) => set('surgeries', e.target.value)} />
+        <Block title="Para tener en cuenta" sections={['care']} visibility={visibility} setVisible={setVisible}>
           <Field
-            label="Implantes o prótesis"
-                maxLength={200}
-                error={err('implants')}
-            value={draft.implants}
-            onChange={(e) => set('implants', e.target.value)}
-            placeholder="Marcapasos, placa de titanio…"
+            label="¿Cómo comunicarse con vos?"
+                  maxLength={200}
+                  error={err('communication')}
+            value={draft.communication}
+            onChange={(e) => set('communication', e.target.value)}
+            placeholder="Soy sordo, leo los labios"
           />
-        </div>
-      </Block>
-
-      <Block title="Obra social" sections={['insurance']} visibility={visibility} setVisible={setVisible}>
-        <div className={grid2}>
-          <Field label="Obra social o prepaga"
-                maxLength={60}
-                error={err('insurance.name')} value={draft.insuranceName} onChange={(e) => set('insuranceName', e.target.value)} />
-          <Field label="Número de afiliado"
-                maxLength={40}
-                error={err('insurance.number')} value={draft.insuranceNumber} onChange={(e) => set('insuranceNumber', e.target.value)} />
-        </div>
-      </Block>
-
-      <Block title="Médico de cabecera" sections={['doctor']} visibility={visibility} setVisible={setVisible}>
-        <div className={grid2}>
-          <Field label="Nombre del médico"
-                maxLength={60}
-                error={err('doctor.name')} value={draft.doctorName} onChange={(e) => set('doctorName', e.target.value)} />
-          <Field
-            label="Teléfono del médico"
-                maxLength={20}
-            type="tel"
-            value={draft.doctorPhone}
-            onChange={(e) => set('doctorPhone', e.target.value)}
-            error={err('doctor.phone')}
+          <div className={grid2}>
+            <Select
+              label="Transfusiones de sangre"
+              value={draft.transfusion}
+              onChange={(v) => set('transfusion', v)}
+              options={[
+                ['UNKNOWN', 'Prefiero no decir'],
+                ['ACCEPTS', 'Acepto'],
+                ['REFUSES', 'No acepto'],
+              ]}
+            />
+            <Select
+              label="Donante de órganos"
+              value={draft.organDonor}
+              onChange={(v) => set('organDonor', v)}
+              options={[
+                ['UNKNOWN', 'Prefiero no decir'],
+                ['YES', 'Sí, soy donante'],
+                ['NO', 'No'],
+              ]}
+            />
+          </div>
+          <TextareaField
+            label="Voluntades anticipadas"
+                  maxLength={300}
+                  error={err('directives')}
+            value={draft.directives}
+            onChange={(e) => set('directives', e.target.value)}
+            placeholder="Lo que querés que se respete"
           />
-        </div>
-      </Block>
+        </Block>
 
-      <Block title="Notas" sections={['notes']} visibility={visibility} setVisible={setVisible}>
-        <TextareaField label="Algo más que quieras dejar anotado"
-                maxLength={500}
-                error={err('notes')} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
-      </Block>
+        <Block title="Cirugías e implantes" sections={['history']} visibility={visibility} setVisible={setVisible}>
+          <div className={grid2}>
+            <TextareaField label="Cirugías"
+                  maxLength={300}
+                  error={err('surgeries')} value={draft.surgeries} onChange={(e) => set('surgeries', e.target.value)} />
+            <Field
+              label="Implantes o prótesis"
+                  maxLength={200}
+                  error={err('implants')}
+              value={draft.implants}
+              onChange={(e) => set('implants', e.target.value)}
+              placeholder="Marcapasos, placa de titanio…"
+            />
+          </div>
+        </Block>
+
+        <Block title="Obra social" sections={['insurance']} visibility={visibility} setVisible={setVisible}>
+          <div className={grid2}>
+            <Field label="Obra social o prepaga"
+                  maxLength={60}
+                  error={err('insurance.name')} value={draft.insuranceName} onChange={(e) => set('insuranceName', e.target.value)} />
+            <Field label="Número de afiliado"
+                  maxLength={40}
+                  error={err('insurance.number')} value={draft.insuranceNumber} onChange={(e) => set('insuranceNumber', e.target.value)} />
+          </div>
+        </Block>
+
+        <Block title="Médico de cabecera" sections={['doctor']} visibility={visibility} setVisible={setVisible}>
+          <div className={grid2}>
+            <Field label="Nombre del médico"
+                  maxLength={60}
+                  error={err('doctor.name')} value={draft.doctorName} onChange={(e) => set('doctorName', e.target.value)} />
+            <Field
+              label="Teléfono del médico"
+                  maxLength={20}
+              type="tel"
+              value={draft.doctorPhone}
+              onChange={(e) => set('doctorPhone', e.target.value)}
+              error={err('doctor.phone')}
+            />
+          </div>
+        </Block>
+
+        <Block title="Notas" sections={['notes']} visibility={visibility} setVisible={setVisible}>
+          <TextareaField label="Algo más que quieras dejar anotado"
+                  maxLength={500}
+                  error={err('notes')} value={draft.notes} onChange={(e) => set('notes', e.target.value)} />
+        </Block>
+      </OptionalSections>
       </div>
 
       {/* Columna lateral en escritorio; en celular sus piezas se reparten (progreso arriba, guardar fijo abajo). */}
@@ -620,7 +679,24 @@ export function RecordEditor({ profile, initial, googlePhoto = false }: Props) {
       </div>
 
       <div className="sticky bottom-0 grid gap-2.5 bg-linear-to-t from-paper from-75% to-transparent pt-3 pb-4 max-panel:bottom-[calc(70px+env(safe-area-inset-bottom))] max-wide:[grid-area:save] wide:static wide:bg-none wide:p-0">
-        {status === 'saved' && <Alert variant="success">Guardado. Tu QR ya muestra estos datos.</Alert>}
+        {status === 'saved' && (
+          <Alert variant="success">
+            Guardado. Tu QR ya muestra estos datos.
+            {hasContact && (
+              <>
+                {' '}
+                <a href={`/panel/perfiles/${profile.id}/imprimir`} className="font-bold">
+                  Siguiente paso: imprimilo o guardalo en el celular →
+                </a>
+              </>
+            )}
+          </Alert>
+        )}
+        {dirty && status !== 'saving' && (
+          <p className="text-center text-sm font-bold text-amber" role="status">
+            Tenés cambios sin guardar
+          </p>
+        )}
         {status === 'error' && (
           <Alert variant="error">{errors._form ?? 'Hay datos para revisar. Están marcados en rojo.'}</Alert>
         )}

@@ -73,7 +73,8 @@ test('subir una foto: queda oculta hasta que elegís mostrarla en el QR', async 
   await page.getByRole('button', { name: 'Aceptar y crear perfil' }).click();
   await expect(page).toHaveURL(/\/panel\/perfiles\/[0-9a-f-]{36}$/);
 
-  // Subir la foto: se guarda al toque
+  // La foto está entre lo opcional (plegado). Subirla: se guarda al toque
+  await page.getByRole('button', { name: /Completá cuando puedas/ }).click();
   await page.locator('input[type="file"]').setInputFiles({ name: 'yo.jpg', mimeType: 'image/jpeg', buffer: PHOTO });
   await expect(page.getByRole('button', { name: /Cambiar foto/ })).toBeVisible();
 

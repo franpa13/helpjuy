@@ -25,6 +25,67 @@ const okResponse = () =>
     headers: { 'Content-Type': 'application/json' },
   });
 
+const optionalToggle = () => screen.getByRole('button', { name: /Completá cuando puedas/ });
+const openOptional = () => userEvent.setup().click(optionalToggle());
+
+describe('RecordEditor: primero lo vital', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('arranca por lo que salva vidas (contacto primero) y deja lo demás plegado', () => {
+    render(<RecordEditor profile={profile} initial={initial} />);
+    const titles = screen.getAllByRole('heading', { level: 2 }).map((h) => h.textContent);
+    expect(titles.slice(0, 5)).toEqual(['Contactos de emergencia', 'Alergias', 'Enfermedades', 'Medicación', 'Datos básicos']);
+    expect(optionalToggle()).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByLabelText('Obra social o prepaga')).not.toBeInTheDocument();
+  });
+
+  it('si ya cargó algo de lo opcional, aparece abierto', () => {
+    const data = medicalRecordSchema.parse({ insurance: { name: 'ISJ' } });
+    render(<RecordEditor profile={profile} initial={{ data, visibility: DEFAULT_VISIBILITY }} />);
+    expect(optionalToggle()).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByLabelText('Obra social o prepaga')).toHaveValue('ISJ');
+  });
+
+  it('si hay un error en lo opcional y estaba cerrado, se abre para mostrarlo', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(globalThis, 'fetch');
+    render(<RecordEditor profile={profile} initial={initial} />);
+    await user.click(optionalToggle());
+    await user.type(screen.getByLabelText('Nombre del médico'), 'Dra. Cruz');
+    await user.type(screen.getByLabelText('Teléfono del médico'), 'llamame');
+    await user.click(optionalToggle());
+    await user.click(screen.getByRole('button', { name: 'Guardar ficha' }));
+    expect(optionalToggle()).toHaveAttribute('aria-expanded', 'true');
+    expect(await screen.findByText('Revisá el teléfono')).toBeInTheDocument();
+  });
+
+  it('avisa que hay cambios sin guardar, y deja de avisar al guardar', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(okResponse());
+    render(<RecordEditor profile={profile} initial={initial} />);
+    expect(screen.queryByText('Tenés cambios sin guardar')).not.toBeInTheDocument();
+    await user.click(screen.getByRole('checkbox', { name: 'No tengo alergias' }));
+    expect(screen.getByText('Tenés cambios sin guardar')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Guardar ficha' }));
+    await screen.findByText('Guardado. Tu QR ya muestra estos datos.');
+    expect(screen.queryByText('Tenés cambios sin guardar')).not.toBeInTheDocument();
+  });
+
+  it('al guardar con un contacto, el siguiente paso es imprimir o descargar el QR', async () => {
+    const user = userEvent.setup();
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(okResponse());
+    render(<RecordEditor profile={profile} initial={initial} />);
+    await user.click(screen.getByRole('button', { name: 'Agregar contacto' }));
+    await user.type(screen.getByLabelText('Nombre del contacto 1'), 'Jorge');
+    await user.type(screen.getByLabelText('Teléfono del contacto 1'), '3884123456');
+    await user.click(screen.getByRole('button', { name: 'Guardar ficha' }));
+    expect(await screen.findByRole('link', { name: /imprimilo o guardalo en el celular/i })).toHaveAttribute(
+      'href',
+      '/panel/perfiles/p1/imprimir',
+    );
+  });
+});
+
 describe('RecordEditor', () => {
   it('agregar una alergia y guardar envía el payload limpio', async () => {
     const user = userEvent.setup();
@@ -49,8 +110,9 @@ describe('RecordEditor', () => {
     expect(screen.getByRole('button', { name: 'Agregar alergia' })).toBeDisabled();
   });
 
-  it('la obra social arranca en "Solo yo" y las alergias en "Se ve en el QR"', () => {
+  it('la obra social arranca en "Solo yo" y las alergias en "Se ve en el QR"', async () => {
     render(<RecordEditor profile={profile} initial={initial} />);
+    await openOptional();
     const insurance = screen.getByRole('radiogroup', { name: /Obra social: ¿quién lo ve?/ });
     expect(within(insurance).getByRole('radio', { name: /Solo yo/ })).toBeChecked();
     const allergies = screen.getByRole('radiogroup', { name: /Alergias: ¿quién lo ve?/ });
@@ -101,6 +163,7 @@ describe('RecordEditor', () => {
     await user.click(screen.getByRole("button", { name: "Agregar alergia" }));
     await user.click(screen.getByRole("button", { name: "Agregar remedio" }));
     await user.click(screen.getByRole("button", { name: "Agregar contacto" }));
+    await openOptional();
     const max = (label: string) => (screen.getByLabelText(label) as HTMLInputElement).maxLength;
     expect(max("Alergia 1")).toBe(80);
     expect(max("Reacción 1")).toBe(80);

@@ -1,6 +1,6 @@
 'use client';
 
-import { Printer } from 'lucide-react';
+import { FileDown, Printer } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ApiError, postJson } from '@/shared/api/client';
@@ -8,7 +8,7 @@ import { Alert } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 
-type Step = 'idle' | 'confirm' | 'saving' | 'done' | 'outdated' | 'error';
+type Step = 'idle' | 'confirm' | 'pdf' | 'saving' | 'done' | 'outdated' | 'error';
 
 /**
  * Imprime y recién cuando la persona confirma que salió bien lo marca como impreso.
@@ -22,6 +22,12 @@ export function PrintActions({ profileId, fingerprint }: { profileId: string; fi
     // Directo en el clic: algunos navegadores (iOS) solo permiten imprimir dentro del gesto del usuario.
     window.print();
     setStep('confirm');
+  }
+
+  /** Sin impresora: el mismo diálogo, eligiendo "Guardar como PDF". Se marca impreso recién cuando lo tenga en papel. */
+  function pdf() {
+    window.print();
+    setStep('pdf');
   }
 
   async function confirm() {
@@ -42,11 +48,29 @@ export function PrintActions({ profileId, fingerprint }: { profileId: string; fi
 
   return (
     <div className="grid gap-2.5">
-      {(step === 'idle' || step === 'done' || step === 'outdated' || step === 'error') && (
-        <Button type="button" onClick={print}>
-          <Printer size={20} aria-hidden="true" />
-          Imprimir
-        </Button>
+      {(step === 'idle' || step === 'done' || step === 'outdated' || step === 'error' || step === 'pdf') && (
+        <>
+          <Button type="button" onClick={print}>
+            <Printer size={20} aria-hidden="true" />
+            Imprimir
+          </Button>
+          <Button type="button" variant="outline" onClick={pdf}>
+            <FileDown size={20} aria-hidden="true" />
+            Guardar en PDF (sin impresora)
+          </Button>
+        </>
+      )}
+
+      {step === 'pdf' && (
+        <div className="grid gap-2.5 border-2 border-ink bg-white p-3.5" role="group" aria-label="Imprimir en una fotocopiadora">
+          <p>
+            En la ventana que se abre, elegí <strong>&quot;Guardar como PDF&quot;</strong> como impresora. Llevalo a una fotocopiadora
+            (o mandáselo por WhatsApp) y pedí que lo impriman en <strong>tamaño real, al 100 %</strong>, sin &quot;ajustar a la página&quot;.
+          </p>
+          <Button type="button" variant="outline" onClick={confirm}>
+            Ya lo tengo impreso
+          </Button>
+        </div>
       )}
 
       {(step === 'confirm' || step === 'saving') && (

@@ -36,6 +36,12 @@ test('imprimir el QR y aviso de reimprimir cuando cambia algo impreso', async ({
   await expect(front).toContainText('3884123456');
   await expect(front.locator('svg').first()).toBeVisible();
   await expect(page.getByLabel('Tarjeta de billetera (dorso)')).toContainText('/e/');
+  // Sin impresora: el fondo de pantalla con el QR se descarga como PNG.
+  const wallpaper = await page.request.get(`${editorUrl}/fondo`);
+  expect(wallpaper.status()).toBe(200);
+  expect(wallpaper.headers()['content-type']).toBe('image/png');
+  expect(wallpaper.headers()['content-disposition']).toContain('helpjuy-fondo-lucia.png');
+  expect(wallpaper.headers()['cache-control']).toContain('no-store');
   // Al imprimir se ve solo la hoja (antes salían páginas en blanco: la regla que oculta el resto le ganaba a la hoja).
   await page.emulateMedia({ media: 'print' });
   const visibility = (sel: string) => page.locator(sel).first().evaluate((el) => getComputedStyle(el).visibility);

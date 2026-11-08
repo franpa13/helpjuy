@@ -1,5 +1,8 @@
 import { printFingerprintInput, printableData, type MedicalRecordResponse, type ProfileDto } from '@helpjuy/contracts';
+import { Smartphone } from 'lucide-react';
 import Link from 'next/link';
+import { buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { createHash } from 'node:crypto';
 import { notFound, redirect } from 'next/navigation';
 import QRCode from 'qrcode';
@@ -56,6 +59,20 @@ export default async function ImprimirPage({ params }: PageProps<'/panel/perfile
             {/* La misma dirección que va dentro del QR: si está mal configurada, se nota acá antes de imprimir. */}
             <a className="mt-3 inline-block font-bold" href={url} target="_blank" rel="noreferrer">
               Probar el QR: ver como el paramédico
+            </a>
+          </PanelBox>
+          <PanelBox title="En el celular">
+            <p className="mb-3 text-[15px] text-muted-foreground">
+              Ponelo de <strong className="text-ink">fondo de pantalla de bloqueo</strong>: es lo primero que mira quien te asiste, y
+              se ve sin desbloquear el celular. Muestra lo mismo que la tarjeta impresa.
+            </p>
+            <a
+              className={cn(buttonVariants({ variant: 'outline' }), 'w-full gap-2')}
+              href={`/panel/perfiles/${id}/fondo`}
+              download
+            >
+              <Smartphone size={20} aria-hidden="true" />
+              Descargar fondo de pantalla
             </a>
           </PanelBox>
           <PanelBox title="¿Perdiste el sticker?">
