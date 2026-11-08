@@ -375,7 +375,9 @@ export function Landing({ accountDeleted = false }: { accountDeleted?: boolean }
           En una emergencia llamá al <a href="tel:107">107</a> (SAME Jujuy).
         </p>
         <p>HelpJuy no reemplaza la atención médica. Los datos los carga cada persona y no los verifica un médico.</p>
-        <p>Hecho en Jujuy, Argentina.</p>
+        <p>
+          Hecho en Jujuy, Argentina · <Link href="/privacidad">Política de privacidad</Link>
+        </p>
       </footer>
     </>
   );

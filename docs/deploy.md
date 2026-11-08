@@ -43,6 +43,7 @@ no se pueden leer nunca más. No lo pegues en chats ni en el repo.
    - `PROXY_SECRET` y `REVALIDATE_SECRET` = los mismos de Render.
    - `SITE_URL` = la URL de Vercel (ej. `https://helpjuy.vercel.app`). Es la que va dentro del QR.
    - `GOOGLE_AUTH_ENABLED` = `false` (o `true` cuando termines el paso 6).
+   - `CONTACT_EMAIL` = un email de contacto para la política de privacidad (opcional, se muestra en `/privacidad`).
 4. **Deploy**. Si la URL final no es la que pusiste en `SITE_URL`, corregila y volvé a desplegar.
 
 ## 5. Volver a Render
@@ -54,7 +55,10 @@ En **Environment** poner `WEB_URL` = la URL real de Vercel (sin barra al final) 
 1. Google Cloud Console → APIs & Services → Credentials → tu OAuth Client (conviene **rotar el secreto**: el anterior se compartió en un chat).
 2. **Authorized JavaScript origins**: `https://<tu-web>.vercel.app`.
 3. **Authorized redirect URIs**: `https://<tu-web>.vercel.app/api/auth/google/callback`.
-4. En **OAuth consent screen**: si está en *Testing*, agregá como *test users* los emails que van a probar (o publicá la app).
+4. **Google Auth Platform → Público**: en *Prueba* solo entran los *usuarios de prueba* que agregues. Para publicar,
+   primero completá **Información de la marca**: nombre *HelpJuy*, email de asistencia, página principal
+   `https://<tu-web>.vercel.app`, política de privacidad `https://<tu-web>.vercel.app/privacidad`, dominio autorizado
+   `<tu-web>.vercel.app`. **No subas logo** (con logo Google pide verificar la marca). Después: **Público → Publicar app**.
 5. Render: `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`. Vercel: `GOOGLE_AUTH_ENABLED=true` y redesplegar.
 
 ## 7. Emails (opcional para probar)
