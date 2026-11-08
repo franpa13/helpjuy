@@ -28,8 +28,10 @@ export async function POST(request: Request): Promise<Response> {
   const sent = request.headers.get('x-mail-secret') ?? '';
   if (!secret || !sameSecret(sent, secret)) return Response.json({ error: 'unauthorized' }, { status: 401 });
 
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
+  // Google muestra la contraseña de aplicación en 4 grupos con espacios: los sacamos (y comillas o saltos de línea
+  // que se cuelen al copiar), así da igual cómo se haya pegado.
+  const user = process.env.GMAIL_USER?.trim().replace(/^["']|["']$/g, '');
+  const pass = process.env.GMAIL_APP_PASSWORD?.replace(/[\s"']/g, '');
   if (!user || !pass) return Response.json({ error: 'not_configured' }, { status: 503 });
 
   const parsed = mailSchema.safeParse(await request.json().catch(() => null));

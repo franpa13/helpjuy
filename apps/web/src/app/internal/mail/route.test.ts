@@ -31,7 +31,7 @@ describe('POST /internal/mail (Gmail a través de la web)', () => {
     const res = await POST(req(msg, 'secreto'));
     expect(res.status).toBe(202);
     expect(nodemailer.createTransport).toHaveBeenCalledWith(
-      expect.objectContaining({ host: 'smtp.gmail.com', port: 465, secure: true, auth: { user: 'helpjuy.avisos@gmail.com', pass: 'abcd efgh ijkl mnop' } }),
+      expect.objectContaining({ host: 'smtp.gmail.com', port: 465, secure: true, auth: { user: 'helpjuy.avisos@gmail.com', pass: 'abcdefghijklmnop' } }),
     );
     expect(sendMail).toHaveBeenCalledWith({ from: 'HelpJuy <helpjuy.avisos@gmail.com>', ...msg });
   });
@@ -40,6 +40,17 @@ describe('POST /internal/mail (Gmail a través de la web)', () => {
     expect((await POST(req({ ...msg, to: 'a@a.com, b@b.com' }, 'secreto'))).status).toBe(400);
     expect((await POST(req({ ...msg, subject: 'Hola\r\nBcc: x@y.com' }, 'secreto'))).status).toBe(400);
     expect(sendMail).not.toHaveBeenCalled();
+  });
+
+  it('limpia lo que se cuela al copiar: espacios, comillas, saltos de línea', async () => {
+    vi.stubEnv('GMAIL_USER', ' "helpjuy.avisos@gmail.com"
+');
+    vi.stubEnv('GMAIL_APP_PASSWORD', '"abcd efgh ijkl mnop"
+');
+    await POST(req(msg, 'secreto'));
+    expect(nodemailer.createTransport).toHaveBeenLastCalledWith(
+      expect.objectContaining({ auth: { user: 'helpjuy.avisos@gmail.com', pass: 'abcdefghijklmnop' } }),
+    );
   });
 
   it('si Gmail falla, 502 (la API lo registra)', async () => {
