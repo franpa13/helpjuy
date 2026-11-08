@@ -61,13 +61,22 @@ En **Environment** poner `WEB_URL` = la URL real de Vercel (sin barra al final) 
    `<tu-web>.vercel.app`. **No subas logo** (con logo Google pide verificar la marca). Después: **Público → Publicar app**.
 5. Render: `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET`. Vercel: `GOOGLE_AUTH_ENABLED=true` y redesplegar.
 
-## 7. Emails (opcional para probar)
+## 7. Emails
 
-- **Sin Resend**: los emails (confirmación, avisos) aparecen en **Render → Logs**. Para confirmar tu email copiás el link de ahí.
-- **Con Resend** (<https://resend.com>, gratis): crear una API key → `RESEND_API_KEY` en Render. Con el remitente
-  `onboarding@resend.dev` **solo llegan a tu propio email** (el de la cuenta de Resend). Para mandarle a cualquiera hay que
-  verificar un dominio propio en Resend y cambiar `MAIL_FROM` (ej. `HelpJuy <avisos@tudominio.com>`).
-  Ojo: si un aviso de emergencia no le llega a nadie, la API responde error; para probar avisos, usá tu propio email.
+Render gratis **bloquea el SMTP saliente**, y Resend sin dominio propio solo te manda a vos. Por eso la API le pide a la
+web (Vercel, que sí permite SMTP) que mande cada email por **Gmail**. Gratis, le llega a cualquiera, hasta ~500 por día.
+
+1. Creá una cuenta de Gmail para la app (ej. `helpjuy.avisos@gmail.com`): los emails salen con ese remitente.
+2. En esa cuenta activá la **Verificación en 2 pasos** y creá una **contraseña de aplicación** en
+   <https://myaccount.google.com/apppasswords> (nombre: HelpJuy). Son 16 letras.
+3. Generá un secreto: `node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"`.
+4. **Vercel** → Environment Variables: `GMAIL_USER` (la cuenta), `GMAIL_APP_PASSWORD` (las 16 letras),
+   `MAIL_RELAY_SECRET` (el secreto) → Redeploy.
+5. **Render** → Environment: `MAIL_RELAY_SECRET` (el mismo secreto). **Borrá `RESEND_API_KEY`** si la cargaste
+   (Resend tiene prioridad). Save.
+
+Si un email no sale, en Render → Logs aparece `No se pudo enviar ...` y en Vercel → Logs el motivo de Gmail.
+Con un dominio propio verificado en Resend podés volver a Resend (`RESEND_API_KEY` + `MAIL_FROM`).
 
 ## 8. Crons gratis: cron-job.org
 

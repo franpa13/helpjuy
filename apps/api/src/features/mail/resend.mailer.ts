@@ -1,11 +1,16 @@
-import { Injectable } from '@nestjs/common';
 import { Resend } from 'resend';
 import type { MailMessage, Mailer } from './mailer.js';
 
-@Injectable()
+/** Resend: necesita un dominio propio verificado para mandarle a cualquiera. */
 export class ResendMailer implements Mailer {
-  private readonly client = new Resend(process.env.RESEND_API_KEY);
-  private readonly from = process.env.MAIL_FROM ?? 'HelpJuy <no-reply@helpjuy.app>';
+  private readonly client: Resend;
+
+  constructor(
+    apiKey: string,
+    private readonly from = 'HelpJuy <no-reply@helpjuy.app>',
+  ) {
+    this.client = new Resend(apiKey);
+  }
 
   async send(msg: MailMessage): Promise<void> {
     const { error } = await this.client.emails.send({ from: this.from, ...msg });

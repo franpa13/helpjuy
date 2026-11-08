@@ -38,7 +38,10 @@ services:
         generateValue: true
       - key: MAINTENANCE_SECRET
         generateValue: true
-      # Emails (opcional). Sin RESEND_API_KEY los emails solo se ven en los logs de Render.
+      # Emails gratis por Gmail a través de la web (Render gratis bloquea SMTP). El mismo valor va en Vercel.
+      - key: MAIL_RELAY_SECRET
+        sync: false
+      # Emails con Resend (necesita dominio propio verificado; si está, tiene prioridad sobre Gmail).
       - key: RESEND_API_KEY
         sync: false
       - key: MAIL_FROM
