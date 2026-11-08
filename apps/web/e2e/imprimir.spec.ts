@@ -36,6 +36,13 @@ test('imprimir el QR y aviso de reimprimir cuando cambia algo impreso', async ({
   await expect(front).toContainText('3884123456');
   await expect(front.locator('svg').first()).toBeVisible();
   await expect(page.getByLabel('Tarjeta de billetera (dorso)')).toContainText('/e/');
+  // Al imprimir se ve solo la hoja (antes salían páginas en blanco: la regla que oculta el resto le ganaba a la hoja).
+  await page.emulateMedia({ media: 'print' });
+  const visibility = (sel: string) => page.locator(sel).first().evaluate((el) => getComputedStyle(el).visibility);
+  expect(await visibility('#hoja-imprimible')).toBe('visible');
+  expect(await visibility('#hoja-imprimible section')).toBe('visible');
+  expect(await visibility('h1')).toBe('hidden');
+  await page.emulateMedia({ media: 'screen' });
   await page.getByRole('button', { name: 'Imprimir' }).click();
   await expect.poll(() => page.evaluate(() => (window as unknown as { __printed: number }).__printed)).toBe(1);
   await page.getByRole('button', { name: 'Sí, ya lo tengo impreso' }).click();

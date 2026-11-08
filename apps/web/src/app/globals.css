@@ -167,8 +167,12 @@
 }
 
 @media print {
-  /* Solo afecta a la página que tiene la hoja: el resto de la app imprime normal. */
-  body:has(#hoja-imprimible) * {
+  /*
+   * Solo afecta a la página que tiene la hoja: el resto de la app imprime normal.
+   * :where() deja esta regla sin peso: si no, el #id dentro de :has() le gana a la regla que muestra la hoja
+   * y se imprimen páginas en blanco.
+   */
+  body:where(:has(#hoja-imprimible)) * {
     visibility: hidden;
   }
 
