@@ -43,7 +43,10 @@ export async function POST(request: Request): Promise<Response> {
     await transport.sendMail({ from: `HelpJuy <${user}>`, ...parsed.data });
     return Response.json({ sent: true }, { status: 202 });
   } catch (err) {
-    console.error(`No se pudo enviar por Gmail: ${(err as Error).message}`);
+    // Para diagnosticar sin exponer nada: la cuenta enmascarada y el largo de la contraseña (tiene que ser 16).
+    const [local = '', domain = '(sin @)'] = user.split('@');
+    const who = `${local.slice(0, 2)}***@${domain}`;
+    console.error(`No se pudo enviar por Gmail (cuenta ${who}, contraseña de ${pass.length} caracteres): ${(err as Error).message}`);
     return Response.json({ error: 'send_failed' }, { status: 502 });
   }
 }

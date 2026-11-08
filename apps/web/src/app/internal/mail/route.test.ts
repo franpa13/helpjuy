@@ -51,9 +51,15 @@ describe('POST /internal/mail (Gmail a través de la web)', () => {
     );
   });
 
-  it('si Gmail falla, 502 (la API lo registra)', async () => {
+  it('si Gmail falla, 502 y el log dice con qué cuenta (enmascarada) y cuántos caracteres tiene la contraseña', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {});
     sendMail.mockRejectedValue(new Error('Invalid login'));
     expect((await POST(req(msg, 'secreto'))).status).toBe(502);
+    const line = String(log.mock.calls[0]?.[0]);
+    expect(line).toContain('he***@gmail.com');
+    expect(line).toContain('16 caracteres');
+    expect(line).not.toContain('abcd');
+    log.mockRestore();
   });
 
   it('sin Gmail configurado, 503', async () => {
