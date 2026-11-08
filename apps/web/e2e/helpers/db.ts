@@ -13,3 +13,14 @@ export async function verifyEmail(email: string): Promise<void> {
     await client.end();
   }
 }
+
+/** Borra una cuenta de la base de test (para tests que usan un email fijo, como el del admin). */
+export async function deleteUser(email: string): Promise<void> {
+  const client = new pg.Client({ connectionString: TEST_DB });
+  await client.connect();
+  try {
+    await client.query('DELETE FROM "User" WHERE email = $1', [email.toLowerCase()]);
+  } finally {
+    await client.end();
+  }
+}

@@ -11,3 +11,4 @@ export * from './family';
 export * from './printable';
 export * from './account';
 export * from './text';
+export * from './metrics';

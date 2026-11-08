@@ -43,6 +43,9 @@ services:
         sync: false
       - key: MAIL_FROM
         value: HelpJuy <onboarding@resend.dev>
+      # Emails que pueden ver las métricas (/panel/metricas), separados por coma
+      - key: ADMIN_EMAILS
+        sync: false
       # Ingreso con Google (opcional)
       - key: GOOGLE_CLIENT_ID
         sync: false

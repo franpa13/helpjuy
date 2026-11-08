@@ -4,6 +4,7 @@ import type { LoginInput, MeResponse, RegisterInput } from '@helpjuy/contracts';
 import { EmailTokenType, Prisma, type User } from '../../generated/prisma/client.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { Mailer, type MailMessage } from '../mail/mailer.js';
+import { isAdminEmail } from './admin.js';
 import { resetPasswordMessage, signupAttemptMessage, verifyEmailMessage } from './auth-emails.js';
 import { EmailTokenService } from './email-token.service.js';
 import { SessionService } from './session.service.js';
@@ -13,7 +14,7 @@ let dummyHash: Promise<string> | undefined;
 const getDummyHash = () => (dummyHash ??= hash('helpjuy-dummy-password'));
 
 export function toMe(user: User): MeResponse {
-  return { id: user.id, email: user.email, emailVerified: user.emailVerifiedAt !== null, googlePhoto: !!user.googlePictureUrl };
+  return { id: user.id, email: user.email, emailVerified: user.emailVerifiedAt !== null, googlePhoto: !!user.googlePictureUrl, admin: isAdminEmail(user.email) };
 }
 
 @Injectable()

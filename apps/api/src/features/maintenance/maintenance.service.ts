@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 import { SCAN_RETENTION_MS } from '../emergency-card/scan.service.js';
+import { MetricsService } from '../metrics/metrics.service.js';
 
 const DAY = 24 * 60 * 60 * 1000;
 /** Spec: la ubicación aproximada de un aviso se borra a los 30 días (el aviso queda, sin ubicación). */
@@ -19,11 +20,15 @@ export type MaintenanceResult = { sessions: number; emailTokens: number; invites
 export class MaintenanceService {
   private readonly logger = new Logger('Maintenance');
 
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly metrics: MetricsService,
+  ) {}
 
   @Cron('0 4 * * *', { timeZone: 'America/Argentina/Jujuy' })
   async nightly(): Promise<void> {
     const r = await this.run();
+    await this.metrics.snapshot();
     this.logger.log(`Limpieza: ${JSON.stringify(r)}`);
   }
 

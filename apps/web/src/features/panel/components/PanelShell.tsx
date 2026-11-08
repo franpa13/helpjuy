@@ -1,4 +1,4 @@
-import { UserRound } from 'lucide-react';
+import { ChartNoAxesColumn, UserRound } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { LogoutButton } from '@/features/auth/components/AccountActions';
@@ -6,7 +6,7 @@ import { Logo } from '@/shared/brand/Logo';
 import { PanelNav } from './PanelNav';
 
 /** Armado del panel: barra lateral en escritorio; barra superior + pestañas abajo en celular. */
-export function PanelShell({ email, children }: { email?: string; children: ReactNode }) {
+export function PanelShell({ email, admin = false, children }: { email?: string; admin?: boolean; children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-paper panel:grid panel:grid-cols-[280px_1fr]">
       <aside className="hidden bg-night px-4 py-6 text-white panel:sticky panel:top-0 panel:flex panel:h-dvh panel:flex-col panel:gap-7">
@@ -15,6 +15,12 @@ export function PanelShell({ email, children }: { email?: string; children: Reac
         </Link>
         <PanelNav variant="side" />
         <div className="mt-auto grid gap-3 border-t border-white/12 px-2 pt-4 text-sm">
+          {admin && (
+            <Link href="/panel/metricas" className="inline-flex items-center gap-2 font-bold text-white no-underline hover:text-white/80">
+              <ChartNoAxesColumn size={18} aria-hidden="true" />
+              Métricas
+            </Link>
+          )}
           <Link href="/panel/cuenta" className="grid gap-0.5 break-all text-white/85 no-underline hover:text-white">
             <span className="font-head text-xs font-bold uppercase tracking-[0.12em] text-white/55">Tu cuenta</span>
             {email ?? 'Ver tu cuenta'}
@@ -33,6 +39,11 @@ export function PanelShell({ email, children }: { email?: string; children: Reac
           <Logo size={24} crossColor="var(--red-bright)" />
         </Link>
         <span className="flex items-center gap-4">
+          {admin && (
+            <Link href="/panel/metricas" className="text-white" aria-label="Métricas">
+              <ChartNoAxesColumn size={22} aria-hidden="true" />
+            </Link>
+          )}
           <Link href="/panel/cuenta" className="text-white" aria-label="Tu cuenta">
             <UserRound size={22} aria-hidden="true" />
           </Link>

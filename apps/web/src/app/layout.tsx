@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Atkinson_Hyperlegible, Barlow_Condensed } from 'next/font/google';
+import { SafeAnalytics } from '@/features/analytics/SafeAnalytics';
 import { MotionProvider } from '@/shared/motion/MotionProvider';
 import './globals.css';
 
@@ -29,6 +30,8 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     <html lang="es" className={`${body.variable} ${head.variable}`}>
       <body>
         <MotionProvider>{children}</MotionProvider>
+        {/* Solo en Vercel (ahí existe /_vercel/insights). En local y en los tests no se carga. */}
+        {process.env.VERCEL && <SafeAnalytics />}
       </body>
     </html>
   );

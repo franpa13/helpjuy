@@ -20,6 +20,8 @@ export type MeResponse = {
   emailVerified: boolean;
   /** Entró con Google y su cuenta tiene foto: se le ofrece copiarla a su ficha. */
   googlePhoto: boolean;
+  /** Puede ver las métricas (su email está en ADMIN_EMAILS). */
+  admin: boolean;
 };
 
 export const tokenSchema = z.object({ token: z.string().min(10).max(200) });

@@ -78,7 +78,15 @@ La API gratis de Render se duerme a los 15 minutos sin uso y tarda ~50 s en desp
 2. **Limpieza**: POST `https://<tu-api>.onrender.com/internal/maintenance` una vez por día (ej. 04:00), con el header
    `x-maintenance-secret: <MAINTENANCE_SECRET de Render>`.
 
-## 9. Probar
+## 9. Métricas
+
+1. **Tablero propio** (`/panel/metricas`): en Render agregá `ADMIN_EMAILS` con tu email (varios, separados por coma) →
+   Save. Al entrar con esa cuenta aparece **Métricas** en el panel. A cualquier otra cuenta le da "no encontrada".
+   La foto diaria de los totales se guarda con la limpieza (cron del paso 8).
+2. **Tráfico de la web**: Vercel → proyecto → pestaña **Analytics** → **Enable** (Web Analytics, gratis). Ya está en el
+   código; los links de las fichas (`/e/...`), invitaciones y tokens se reemplazan antes de mandarse.
+
+## 10. Probar
 
 1. Abrir la web → **Crear mi ficha** → confirmar el email (Resend o logs de Render).
 2. Cargar alergias y un contacto → **Imprimir mi QR** → escanear el QR con otro celular.

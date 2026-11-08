@@ -187,3 +187,10 @@ model ProfilePhoto {
   cipher    String
   updatedAt DateTime @updatedAt
 }
+
+/// Foto diaria de los totales (solo números, sin datos de nadie) para ver la evolución en el panel de métricas.
+model MetricsSnapshot {
+  day       DateTime @id @db.Date
+  data      Json
+  createdAt DateTime @default(now())
+}
