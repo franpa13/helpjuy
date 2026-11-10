@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 /** Totales de la app (solo números: nunca nombres, emails ni datos médicos). */
 export type MetricsTotals = {
   accounts: number;
@@ -33,3 +35,32 @@ export type AdminMetricsDto = {
   /** Fotos diarias guardadas (últimos 90 días). */
   history: MetricsHistoryDay[];
 };
+
+/** Una cuenta en la lista de administración. Nunca datos médicos ni nombres de las fichas. */
+export type AdminAccountRow = {
+  id: string;
+  email: string;
+  createdAt: string;
+  emailVerified: boolean;
+  /** Entra con Google. */
+  google: boolean;
+  /** Tiene contraseña (se registró con email). */
+  password: boolean;
+  profiles: number;
+  /** Alguna de sus fichas tiene un contacto de emergencia cargado. */
+  activeQr: boolean;
+  printed: boolean;
+  inFamily: boolean;
+  /** Último inicio de sesión que todavía tenemos registrado (las sesiones vencidas se borran). */
+  lastLoginAt: string | null;
+};
+
+export const ADMIN_ACCOUNTS_PAGE_SIZE = 25;
+
+export const adminAccountsQuerySchema = z.object({
+  q: z.string().trim().max(100).optional().default(''),
+  page: z.coerce.number().int().min(1).max(10_000).optional().default(1),
+});
+export type AdminAccountsQuery = z.infer<typeof adminAccountsQuerySchema>;
+
+export type AdminAccountsDto = { total: number; page: number; pageSize: number; q: string; items: AdminAccountRow[] };

@@ -1,5 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { completion, isActive, type AdminMetricsDto, type MetricsTotals, type MetricsWeek } from '@helpjuy/contracts';
+import {
+  ADMIN_ACCOUNTS_PAGE_SIZE,
+  completion,
+  isActive,
+  type AdminAccountRow,
+  type AdminAccountsDto,
+  type AdminAccountsQuery,
+  type AdminMetricsDto,
+  type MetricsTotals,
+  type MetricsWeek,
+} from '@helpjuy/contracts';
 import { MedicalCipher } from '../../shared/crypto/medical-cipher.js';
 import { PrismaService } from '../../shared/prisma/prisma.service.js';
 
@@ -103,6 +113,56 @@ export class MetricsService {
       ],
       weekly,
       history: snapshots.map((s) => ({ day: s.day.toISOString().slice(0, 10), ...(s.data as MetricsTotals) })),
+    };
+  }
+
+  /**
+   * Lista de cuentas para administrar: email, alta y avance. Para saber si el QR está activo hay que descifrar,
+   * pero solo sale un sí/no: nunca datos médicos ni los nombres de las fichas.
+   */
+  async accounts({ q, page }: AdminAccountsQuery): Promise<AdminAccountsDto> {
+    const where = q ? { email: { contains: q, mode: 'insensitive' as const } } : {};
+    const [total, users] = await Promise.all([
+      this.prisma.user.count({ where }),
+      this.prisma.user.findMany({
+        where,
+        orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
+        skip: (page - 1) * ADMIN_ACCOUNTS_PAGE_SIZE,
+        take: ADMIN_ACCOUNTS_PAGE_SIZE,
+        select: {
+          id: true,
+          email: true,
+          createdAt: true,
+          emailVerifiedAt: true,
+          googleId: true,
+          passwordHash: true,
+          _count: { select: { familyMembers: true } },
+          profiles: { select: { printedAt: true, medicalRecord: { select: { ciphertext: true } } } },
+          sessions: { select: { createdAt: true }, orderBy: { createdAt: 'desc' }, take: 1 },
+        },
+      }),
+    ]);
+
+    return {
+      total,
+      page,
+      pageSize: ADMIN_ACCOUNTS_PAGE_SIZE,
+      q,
+      items: users.map(
+        (u): AdminAccountRow => ({
+          id: u.id,
+          email: u.email,
+          createdAt: u.createdAt.toISOString(),
+          emailVerified: u.emailVerifiedAt !== null,
+          google: u.googleId !== null,
+          password: u.passwordHash !== null,
+          profiles: u.profiles.length,
+          activeQr: u.profiles.some((p) => p.medicalRecord && isActive(this.cipher.decrypt(p.medicalRecord.ciphertext))),
+          printed: u.profiles.some((p) => p.printedAt !== null),
+          inFamily: u._count.familyMembers > 0,
+          lastLoginAt: u.sessions[0]?.createdAt.toISOString() ?? null,
+        }),
+      ),
     };
   }
 

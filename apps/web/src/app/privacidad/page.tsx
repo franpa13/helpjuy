@@ -86,6 +86,11 @@ export default function PrivacidadPage() {
               <strong>Buscadores:</strong> las fichas no aparecen en Google; les pedimos expresamente que no las indexen.
             </li>
             <li>
+              <strong>Quien administra HelpJuy</strong> ve una lista de cuentas: tu email, cuándo te registraste, si lo
+              confirmaste, cuántas fichas tenés y si tu QR está activo o impreso. La usa para dar soporte y medir cuánto se
+              usa la app. Nunca ve tus datos médicos ni los nombres de tus fichas.
+            </li>
+            <li>
               <strong>Nadie más.</strong> No vendemos ni compartimos tus datos, no hay publicidad ni seguimiento.
             </li>
           </ul>

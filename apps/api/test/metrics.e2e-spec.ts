@@ -81,6 +81,66 @@ describe('métricas (e2e)', () => {
     expect(text).not.toContain('Paredes');
   });
 
+  describe('lista de cuentas', () => {
+    it('solo los administradores la ven', async () => {
+      const ana = await signup('ana@mail.com');
+      await request(server).get('/admin/accounts').expect(401);
+      await ana.get('/admin/accounts').expect(404);
+      const res = await admin.get('/admin/accounts').expect(200);
+      expect(res.headers['cache-control']).toContain('no-store');
+    });
+
+    it('muestra cada cuenta, la más nueva primero, con su avance (sin datos médicos ni nombres de fichas)', async () => {
+      const ana = await signup('ana@mail.com');
+      const p = (await ana.post('/profiles').send(own('Anabel')).expect(201)).body;
+      const rec = (await ana.get(`/profiles/${p.id}/record`)).body;
+      await ana
+        .put(`/profiles/${p.id}/record`)
+        .send({ data: { ...rec.data, allergies: [{ substance: 'Penicilina' }], contacts: [{ name: 'Jorge', phone: '3884123456' }] }, visibility: rec.visibility })
+        .expect(200);
+      await prisma.profile.update({ where: { id: p.id }, data: { printedHash: 'x', printedAt: new Date() } });
+      await prisma.user.update({ where: { email: 'ana@mail.com' }, data: { createdAt: new Date(Date.now() + 1000) } });
+
+      const res = await admin.get('/admin/accounts').expect(200);
+      expect(res.body).toMatchObject({ total: 2, page: 1, pageSize: 25, q: '' });
+      expect(res.body.items[0]).toEqual({
+        id: expect.any(String),
+        email: 'ana@mail.com',
+        createdAt: expect.any(String),
+        emailVerified: false,
+        google: false,
+        password: true,
+        profiles: 1,
+        activeQr: true,
+        printed: true,
+        inFamily: false,
+        lastLoginAt: expect.any(String),
+      });
+      expect(res.body.items[1]).toMatchObject({ email: 'admin@helpjuy.app', profiles: 0, activeQr: false });
+      expect(res.text).not.toContain('Penicilina');
+      expect(res.text).not.toContain('Anabel');
+      expect(res.text).not.toContain('Jorge');
+      expect(res.text).not.toContain('passwordHash');
+    });
+
+    it('busca por email y pagina de a 25', async () => {
+      for (let i = 0; i < 26; i++) await prisma.user.create({ data: { email: `persona${i}@mail.com` } });
+      await signup('beto@otro.com');
+
+      const found = (await admin.get('/admin/accounts?q=OTRO.com').expect(200)).body;
+      expect(found.total).toBe(1);
+      expect(found.items.map((a: { email: string }) => a.email)).toEqual(['beto@otro.com']);
+
+      const p1 = (await admin.get('/admin/accounts').expect(200)).body;
+      const p2 = (await admin.get('/admin/accounts?page=2').expect(200)).body;
+      expect(p1.total).toBe(28);
+      expect(p1.items).toHaveLength(25);
+      expect(p2.items).toHaveLength(3);
+      await admin.get('/admin/accounts?page=0').expect(400);
+      await admin.get(`/admin/accounts?q=${'x'.repeat(101)}`).expect(400);
+    });
+  });
+
   it('guarda una foto diaria de los totales (para ver la evolución aunque se borren cosas)', async () => {
     await app.get(MetricsService).snapshot();
     await app.get(MetricsService).snapshot(); // el mismo día se pisa, no se duplica

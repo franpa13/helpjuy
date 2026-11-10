@@ -18,6 +18,11 @@ test('el admin ve las métricas; el resto, "no encontrada"', async ({ page, brow
   await expect(page.getByRole('heading', { name: 'Métricas', level: 1 })).toBeVisible();
   await expect(page.getByRole('list', { name: 'Embudo' }).getByRole('listitem')).toHaveCount(5);
   await expect(page.getByRole('table', { name: 'Por semana' })).toBeVisible();
+  // La lista de cuentas: el admin se encuentra a sí mismo buscando su email.
+  await page.getByRole('searchbox', { name: 'Buscar por email' }).fill('admin@helpjuy');
+  await page.getByRole('button', { name: 'Buscar' }).click();
+  await expect(page).toHaveURL(/q=admin%40helpjuy/);
+  await expect(page.getByRole('table', { name: 'Cuentas registradas' }).getByRole('row', { name: new RegExp(ADMIN) })).toBeVisible();
   await page.screenshot({ path: 'test-results/metricas.png', fullPage: true });
 
   const other = await (await browser.newContext({ baseURL: 'http://localhost:3100' })).newPage();
