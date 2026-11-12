@@ -1,5 +1,5 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
-import { Throttle } from '@nestjs/throttler';
+import { Catch, Controller, Get, Query, Req, Res, UseFilters, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
+import { Throttle, ThrottlerException } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { SESSION_COOKIE, SESSION_TTL_MS } from '../session.service.js';
 import { GoogleAuthError, GoogleAuthService, type OAuthPending } from './google-auth.service.js';
@@ -28,7 +28,21 @@ function decode(raw: unknown): OAuthPending | null {
   }
 }
 
-@Throttle({ default: { limit: 10, ttl: 60_000 } })
+/**
+ * El ingreso con Google es una navegación del navegador: si se pasa del límite, lo mandamos a /ingresar con
+ * un aviso en vez de mostrarle un JSON con el 429.
+ */
+@Catch(ThrottlerException)
+class GoogleRateLimitFilter implements ExceptionFilter {
+  catch(_err: ThrottlerException, host: ArgumentsHost) {
+    host.switchToHttp().getResponse<Response>().redirect(302, '/ingresar?error=rate_limited');
+  }
+}
+
+// La contraseña la valida Google, acá no hay nada que adivinar: el límite solo frena abusos. Es generoso porque
+// en Argentina las compañías de celular hacen que mucha gente comparta la misma IP (CGNAT).
+@Throttle({ default: { limit: 40, ttl: 60_000 } })
+@UseFilters(GoogleRateLimitFilter)
 @Controller('auth/google')
 export class GoogleAuthController {
   constructor(private readonly google: GoogleAuthService) {}

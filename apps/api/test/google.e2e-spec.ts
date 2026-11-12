@@ -115,6 +115,19 @@ describe('ingreso con Google (e2e)', () => {
     expect(res.headers.location).toBe('/panel');
   });
 
+  it('aguanta varios ingresos seguidos desde la misma IP (CGNAT: muchas personas comparten IP)', async () => {
+    const server = app.getHttpServer();
+    for (let i = 0; i < 20; i++) await request(server).get('/auth/google').expect(302);
+  });
+
+  it('si igual se pasa del límite, vuelve a ingresar con un aviso (no un JSON con el 429)', async () => {
+    const server = app.getHttpServer();
+    let res = await request(server).get('/auth/google');
+    for (let i = 0; i < 40 && res.status === 302 && res.headers.location.startsWith('https://'); i++) res = await request(server).get('/auth/google');
+    expect(res.status).toBe(302);
+    expect(res.headers.location).toBe('/ingresar?error=rate_limited');
+  });
+
   it('un código inválido → error y sin sesión', async () => {
     const res = await roundTrip(request.agent(app.getHttpServer()), 'code-que-no-existe');
     expect(res.headers.location).toBe('/ingresar?error=google');
