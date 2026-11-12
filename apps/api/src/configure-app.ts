@@ -2,6 +2,7 @@ import type { INestApplication } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { json } from 'express';
 import helmet from 'helmet';
+import { requireProxy } from './shared/require-proxy.js';
 
 /** Cuerpos JSON: chicos en general; la foto (ya achicada en el navegador, en base64) puede pesar más. */
 const JSON_LIMIT = '100kb';
@@ -22,6 +23,7 @@ export function configureApp(app: INestApplication): INestApplication {
       crossOriginResourcePolicy: { policy: 'same-site' },
     }),
   );
+  app.use(requireProxy());
   app.use(cookieParser());
   // Primero el parser con límite grande solo para la foto; el resto queda con el límite chico.
   // (Si un parser ya leyó el cuerpo, el siguiente lo saltea.)

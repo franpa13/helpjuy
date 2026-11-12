@@ -106,5 +106,8 @@ La API gratis de Render se duerme a los 15 minutos sin uso y tarda ~50 s en desp
 
 - **Render no arranca**: Logs. Lo más común es una variable mal copiada (`DATABASE_URL`, `MEDICAL_DATA_KEY` de 32 bytes, `WEB_URL`).
 - **La web da error al cargar el panel**: `API_URL` mal, o `PROXY_SECRET` distinto entre Render y Vercel.
+- **La API responde `{"error":"not_found"}` a todo**: es a propósito si la llamás directo (`helpjuy-api.onrender.com`):
+  en producción solo atiende a la web, que firma cada pedido con `PROXY_SECRET`. Abiertos quedan `/health` y
+  `/internal/maintenance` (para los crons). Si pasa también desde la web, el `PROXY_SECRET` de Vercel no es igual al de Render.
 - **Imprimir dice que falta SITE_URL**: tiene que ser la URL https pública de Vercel.
 - **La ficha pública no se actualiza al editar**: `REVALIDATE_SECRET` distinto entre Render y Vercel, o `WEB_URL` mal en Render.
