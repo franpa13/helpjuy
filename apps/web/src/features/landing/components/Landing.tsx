@@ -35,6 +35,35 @@ import { HeroText } from './HeroText';
 import { HeroVisual } from './HeroVisual';
 import { StepNumber } from './StepNumber';
 
+/*
+ * Datos de siniestros viales. Solo cifras verificadas en la nota original, con su fuente.
+ * (Revisarlos cuando salga el informe final 2025 o el anual 2026.)
+ */
+const SOURCES = {
+  deaths2025: 'https://www.todojujuy.com/jujuy/jujuy-tuvo-98-muertes-viales-2025-y-supero-la-tasa-nacional-n290826',
+  crashes2025:
+    'https://www.eldestapeweb.com/sociedad/siniestros-viales/jujuy-en-alerta-reportan-4000-choques-y-casi-100-muertos-en-accidentes-viales-durante-2025-20261414555',
+  motos2026: 'https://www.todojujuy.com/sociedad/seis-cada-diez-accidentes-transito-jujuy-son-motos-n293673',
+};
+
+const ROAD_FACTS = [
+  {
+    value: '98',
+    text: 'personas murieron en siniestros viales en Jujuy durante 2025.',
+    note: 'Más de 4.100 siniestros en el año.',
+  },
+  {
+    value: '12,2',
+    text: 'muertes cada 100.000 habitantes en Jujuy. El promedio del país es 8,8.',
+    note: 'Casi un 40 % más que la media nacional.',
+  },
+  {
+    value: '65 %',
+    text: 'de los siniestros del primer semestre de 2026 fueron con motos: 6 de cada 10.',
+    note: 'En moto no hay guantera ni papeles a mano: el sticker del casco habla por vos.',
+  },
+];
+
 const STEPS = [
   {
     icon: ClipboardPen,
@@ -211,6 +240,52 @@ export function Landing({ accountDeleted = false }: { accountDeleted?: boolean }
               </StaggerItem>
             ))}
           </StaggerList>
+        </section>
+
+        <section
+          className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] pt-[clamp(56px,8vw,104px)]"
+          aria-labelledby="por-que-jujuy"
+        >
+          <Reveal>
+            <p className="label text-red">Por qué en Jujuy</p>
+            <h2 id="por-que-jujuy" className="mt-2 max-w-[18ch] text-[clamp(36px,5vw,64px)]/[0.92]">
+              En Jujuy mueren más personas en el tránsito que en el resto del país
+            </h2>
+          </Reveal>
+          <StaggerList as="ul" className="mt-10 grid list-none gap-0 border-t-3 border-ink p-0 min-[860px]:grid-cols-3" aria-label="Datos de siniestros viales en Jujuy">
+            {ROAD_FACTS.map((f) => (
+              <StaggerItem
+                as="li"
+                key={f.value}
+                className="grid content-start gap-2 border-b border-line py-6 min-[860px]:border-b-0 min-[860px]:pr-7 min-[860px]:not-first:border-l min-[860px]:not-first:pl-7"
+              >
+                <span className="font-head text-[clamp(56px,7vw,88px)]/[0.9] font-extrabold text-red tabular-nums">{f.value}</span>
+                <span className="max-w-[24em] text-[19px]/snug font-bold">{f.text}</span>
+                <span className="text-sm text-muted-foreground">{f.note}</span>
+              </StaggerItem>
+            ))}
+          </StaggerList>
+          <Reveal>
+            <p className="mt-8 max-w-[44em] border-l-6 border-red bg-white px-5 py-4 text-[19px]">
+              <strong>HelpJuy no evita un choque.</strong> Lo que sí hace es que, si quedás inconsciente, quien te asiste sepa en
+              segundos tu grupo sanguíneo, tus alergias, qué remedios tomás y a quién llamar, en vez de tener que adivinarlo.
+            </p>
+            <p className="mt-4 text-sm text-muted-foreground">
+              Fuentes: Dirección Nacional de Observatorio Vial, informe preliminar 2025 (
+              <a href={SOURCES.deaths2025} target="_blank" rel="noreferrer">
+                TodoJujuy, 30/5/2026
+              </a>
+              ); RePAT, Observatorio Vial Provincial (
+              <a href={SOURCES.crashes2025} target="_blank" rel="noreferrer">
+                El Destape, 4/1/2026
+              </a>
+              ); Observatorio de Seguridad Vial de Jujuy, primer semestre 2026 (
+              <a href={SOURCES.motos2026} target="_blank" rel="noreferrer">
+                TodoJujuy, 27/7/2026
+              </a>
+              ).
+            </p>
+          </Reveal>
         </section>
 
         <section className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]" aria-labelledby="como-funciona">

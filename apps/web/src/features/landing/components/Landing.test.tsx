@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { Landing } from './Landing';
 
 describe('Landing', () => {
@@ -8,6 +8,21 @@ describe('Landing', () => {
     expect(crear.length).toBeGreaterThanOrEqual(2);
     for (const a of crear) expect(a).toHaveAttribute('href', '/registro');
     expect(screen.getAllByRole('link', { name: /Ya tengo cuenta|Ingresar/ })[0]).toHaveAttribute('href', '/ingresar');
+  });
+
+  it('explica por qué en Jujuy, con datos oficiales y la fuente de cada uno', () => {
+    render(<Landing />);
+    const section = screen.getByRole('region', { name: 'En Jujuy mueren más personas en el tránsito que en el resto del país' });
+    expect(section).toHaveTextContent('98');
+    expect(section).toHaveTextContent('12,2');
+    expect(section).toHaveTextContent('8,8');
+    expect(section).toHaveTextContent('65 %');
+    expect(section).toHaveTextContent('6 de cada 10');
+    const sources = within(section).getAllByRole('link');
+    expect(sources.length).toBeGreaterThanOrEqual(2);
+    for (const a of sources) expect(a.getAttribute('href')).toMatch(/^https:\/\//);
+    // No prometemos lo que no hace: no evita accidentes.
+    expect(section).not.toHaveTextContent(/salva vidas|evita accidentes/i);
   });
 
   it('muestra el 107 como link de llamada', () => {
