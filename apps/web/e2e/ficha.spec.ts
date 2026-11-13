@@ -61,6 +61,18 @@ const PHOTO = Buffer.from(
   'base64',
 );
 
+test('la portada invita a probar la ficha de ejemplo, que no llama ni avisa a nadie', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: 'Ver la ficha de ejemplo' }).click();
+  await expect(page).toHaveURL(/\/demo$/);
+  await expect(page.getByRole('heading', { level: 1, name: /Lucía Mamani/ })).toBeVisible();
+  await expect(page.getByRole('note', { name: 'Ficha de ejemplo' })).toBeVisible();
+  await expect(page.locator('a[href^="tel:"]')).toHaveCount(0);
+  await page.getByRole('button', { name: /Es una emergencia/ }).click();
+  await page.getByRole('button', { name: /Sí, avisar a la familia de Lucía/ }).click();
+  await expect(page.getByText(/En una ficha real/)).toBeVisible();
+});
+
 test('subir una foto: queda oculta hasta que elegís mostrarla en el QR', async ({ page, context }) => {
   await page.goto('/registro');
   await page.getByLabel('Email').fill(`foto+${Date.now()}@mail.com`);

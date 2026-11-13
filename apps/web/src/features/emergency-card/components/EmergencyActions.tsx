@@ -37,14 +37,25 @@ const getPosition = () =>
     );
   });
 
-type Props = { token: string; firstName: string; lastName: string; contact?: { name: string; phone: string } };
+type Props = {
+  token: string;
+  firstName: string;
+  lastName: string;
+  contact?: { name: string; phone: string };
+  /** Ficha de ejemplo: no manda nada ni pide la ubicación, solo muestra cómo funciona. */
+  demo?: boolean;
+};
 
-export function EmergencyActions({ token, firstName, lastName, contact }: Props) {
-  const [step, setStep] = useState<'idle' | 'confirm' | 'sending' | 'done' | 'error'>('idle');
+export function EmergencyActions({ token, firstName, lastName, contact, demo = false }: Props) {
+  const [step, setStep] = useState<'idle' | 'confirm' | 'sending' | 'done' | 'error' | 'demo'>('idle');
   const [shareLocation, setShareLocation] = useState(true);
   const [result, setResult] = useState<EmergencyAlertResultDto>({ notified: 0, family: 0 });
 
   async function send() {
+    if (demo) {
+      setStep('demo');
+      return;
+    }
     setStep('sending');
     try {
       const pos = shareLocation ? await getPosition() : null;
@@ -112,6 +123,13 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
         </Alert>
       )}
 
+      {step === 'demo' && (
+        <Alert variant="success" className="p-3.5">
+          <strong>En una ficha real, acá le llega un email a la familia de {firstName}</strong> con la hora y la ubicación
+          aproximada en el mapa, y a vos te recordamos llamar al 107. Esta es de ejemplo: no avisamos a nadie.
+        </Alert>
+      )}
+
       {step === 'error' && (
         <Alert variant="error" className="p-3.5 font-bold">
           <p>No pudimos avisar (puede ser la señal). Llamá al 107 y, si podés, al contacto de emergencia.</p>
@@ -122,7 +140,7 @@ export function EmergencyActions({ token, firstName, lastName, contact }: Props)
       )}
 
       {contact && (
-        <a className={cn(buttonVariants({ size: 'compact' }), 'min-h-13 border-[#1d8a4a] bg-[#1d8a4a] text-[17px]')} href={whatsappHref(contact.phone, waText)} target="_blank" rel="noreferrer">
+        <a className={cn(buttonVariants({ size: 'compact' }), 'min-h-13 border-[#1d8a4a] bg-[#1d8a4a] text-[17px]')} href={demo ? '#demo' : whatsappHref(contact.phone, waText)} {...(demo ? {} : { target: '_blank', rel: 'noreferrer' })}>
           <MessageCircle size={20} aria-hidden="true" />
           Avisar por WhatsApp a {contact.name}
         </a>

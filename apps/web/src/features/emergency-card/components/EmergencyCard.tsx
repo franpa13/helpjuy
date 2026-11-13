@@ -31,15 +31,17 @@ function Vital({ label, value, unit, blood = false }: { label: string; value: st
   );
 }
 
-function CallButtons({ card, variant }: { card: PublicCardDto; variant: 'bar' | 'side' }) {
+function CallButtons({ card, variant, demo = false }: { card: PublicCardDto; variant: 'bar' | 'side'; demo?: boolean }) {
+  // En la ficha de ejemplo ningún botón marca: llevan al aviso de arriba.
+  const tel = (phone: string) => (demo ? '#demo' : telHref(phone));
   const contact = card.contacts?.[0];
   const side = variant === 'side';
   return (
     <div className={side ? undefined : callbar}>
-      <CallButton href="tel:107" tone="sos" side={side} caption="Emergencias · SAME Jujuy" title="Llamar 107" />
+      <CallButton href={demo ? '#demo' : 'tel:107'} tone="sos" side={side} caption="Emergencias · SAME Jujuy" title="Llamar 107" />
       {contact && (
         <CallButton
-          href={telHref(contact.phone)}
+          href={tel(contact.phone)}
           tone="fam"
           side={side}
           caption={contact.relation ? `Contacto · ${contact.relation}` : 'Contacto de emergencia'}
@@ -50,7 +52,7 @@ function CallButtons({ card, variant }: { card: PublicCardDto; variant: 'bar' | 
       )}
       {side &&
         card.contacts?.slice(1).map((c) => (
-          <a key={c.phone} className="block border-b border-line px-[22px] py-4 font-bold text-ink" href={telHref(c.phone)}>
+          <a key={c.phone} className="block border-b border-line px-[22px] py-4 font-bold text-ink" href={tel(c.phone)}>
             <span className={cn(tiny, 'block text-muted-foreground')}>Otro contacto</span>
             {c.name}
             {c.relation ? ` (${c.relation})` : ''}
@@ -60,7 +62,7 @@ function CallButtons({ card, variant }: { card: PublicCardDto; variant: 'bar' | 
   );
 }
 
-export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: string }) {
+export function EmergencyCard({ card, token, demo = false }: { card: PublicCardDto; token?: string; demo?: boolean }) {
   const meta = [card.identity?.sex ? SEX[card.identity.sex] : null, card.identity?.language ? `Habla ${card.identity.language}` : null]
     .filter(Boolean)
     .join(' · ');
@@ -84,6 +86,17 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
   return (
     <CardPage>
       <CardStrip logo />
+      {demo && (
+        <aside
+          id="demo"
+          role="note"
+          aria-label="Ficha de ejemplo"
+          className="scroll-mt-4 border-b-3 border-ink bg-amber-tint px-4 py-3 text-[17px] card:px-8"
+        >
+          <strong>Ficha de ejemplo.</strong> Lucía no existe: así ve tu ficha quien escanea tu QR. Los botones no llaman ni
+          avisan a nadie. <a href="/registro" className="font-bold">Hacé la tuya gratis →</a>
+        </aside>
+      )}
 
       <div className="flex items-center gap-4 border-b-3 border-ink px-4 pt-[18px] pb-3.5 card:gap-6 card:px-8">
         {card.photoVersion && token && (
@@ -117,9 +130,10 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
 
       <div className="card:grid card:grid-cols-[1fr_320px] card:items-start">
         <main className="grid card:border-r-3 card:border-ink">
-          {token && (
+          {(token || demo) && (
             <EmergencyActions
-              token={token}
+              token={token ?? ''}
+              demo={demo}
               firstName={card.firstName}
               lastName={card.lastName}
               contact={card.contacts?.[0] ? { name: card.contacts[0].name.split(' ')[0], phone: card.contacts[0].phone } : undefined}
@@ -279,7 +293,7 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
                       {card.doctor.phone && (
                         <>
                           {' · '}
-                          <a href={telHref(card.doctor.phone)}>{card.doctor.phone}</a>
+                          <a href={demo ? '#demo' : telHref(card.doctor.phone)}>{card.doctor.phone}</a>
                         </>
                       )}
                     </dd>
@@ -298,7 +312,7 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
         </main>
 
         <aside className="hidden card:sticky card:top-0 card:block">
-          <CallButtons card={card} variant="side" />
+          <CallButtons card={card} variant="side" demo={demo} />
         </aside>
       </div>
 
@@ -308,7 +322,7 @@ export function EmergencyCard({ card, token }: { card: PublicCardDto; token?: st
       </p>
 
       <nav className="fixed inset-x-0 bottom-0 z-10 card:hidden" aria-label="Llamadas">
-        <CallButtons card={card} variant="bar" />
+        <CallButtons card={card} variant="bar" demo={demo} />
       </nav>
     </CardPage>
   );

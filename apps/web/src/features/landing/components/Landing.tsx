@@ -203,7 +203,52 @@ const FAQ = [
   },
 ];
 
-export function Landing({ accountDeleted = false }: { accountDeleted?: boolean }) {
+/** "Probalo ahora": el QR de la ficha de ejemplo. Desde la compu se escanea; en el celular, se toca el link. */
+function TryDemo({ qrSvg }: { qrSvg?: string }) {
+  return (
+    <section className="bg-night text-white" aria-labelledby="probalo">
+      <div className="mx-auto grid max-w-[1240px] items-center gap-10 px-[clamp(16px,4vw,48px)] py-[clamp(48px,7vw,88px)] panel:grid-cols-[1.2fr_auto] panel:gap-16">
+        <Reveal>
+          <p className="label text-[#ff5a6e]">Probalo ahora</p>
+          <h2 id="probalo" className="mt-2 max-w-[14ch] text-[clamp(36px,5vw,64px)]/[0.92]">
+            Escaneame con tu celular
+          </h2>
+          <p className="mt-[18px] max-w-[34em] text-[19px] text-white/85">
+            Abrí la cámara y apuntá a este código. Vas a ver exactamente lo que ve un paramédico cuando escanea tu QR: en
+            segundos, sin instalar nada. Es la ficha de Lucía, una persona de ejemplo.
+          </p>
+          <a
+            href="/demo"
+            className={cn(buttonVariants({ variant: 'inverse' }), 'mt-7 inline-flex w-auto gap-2.5 px-6')}
+          >
+            <ScanQrCode size={20} aria-hidden="true" />
+            Ver la ficha de ejemplo
+          </a>
+        </Reveal>
+        {qrSvg && (
+          <Reveal delay={0.15}>
+            {/* Desde el mismo celular no se puede escanear: en pantallas chicas queda solo el botón. */}
+            <figure className="hidden w-[300px] overflow-hidden rounded-xl border-4 border-white bg-white text-ink sm:block">
+              <figcaption className="flex items-center justify-center gap-2 bg-red py-2.5 font-head text-lg font-extrabold uppercase tracking-[0.08em] text-white">
+                <ScanQrCode size={20} aria-hidden="true" />
+                Escaneame
+              </figcaption>
+              <div
+                role="img"
+                aria-label="Código QR de una ficha de ejemplo"
+                className="p-5 [&_svg]:block [&_svg]:h-auto [&_svg]:w-full"
+                // SVG generado en el servidor por la librería qrcode a partir de nuestra URL: contenido confiable.
+                dangerouslySetInnerHTML={{ __html: qrSvg }}
+              />
+            </figure>
+          </Reveal>
+        )}
+      </div>
+    </section>
+  );
+}
+
+export function Landing({ accountDeleted = false, demoQrSvg }: { accountDeleted?: boolean; demoQrSvg?: string }) {
   return (
     <>
       {accountDeleted && (
@@ -287,6 +332,10 @@ export function Landing({ accountDeleted = false }: { accountDeleted?: boolean }
             </p>
           </Reveal>
         </section>
+
+        <div className="mt-[clamp(56px,8vw,104px)]">
+          <TryDemo qrSvg={demoQrSvg} />
+        </div>
 
         <section className="mx-auto max-w-[1240px] px-[clamp(16px,4vw,48px)] py-[clamp(56px,8vw,104px)]" aria-labelledby="como-funciona">
           <Reveal>

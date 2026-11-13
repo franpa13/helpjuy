@@ -25,6 +25,18 @@ describe('Landing', () => {
     expect(section).not.toHaveTextContent(/salva vidas|evita accidentes/i);
   });
 
+  it('invita a probarlo: QR de la ficha de ejemplo para escanear con el celular, y link para quien ya está en el celular', () => {
+    render(<Landing demoQrSvg='<svg data-testid="qr-demo"></svg>' />);
+    const section = screen.getByRole('region', { name: 'Escaneame con tu celular' });
+    expect(within(section).getByRole('img', { name: /Código QR de una ficha de ejemplo/ })).toBeInTheDocument();
+    expect(within(section).getByRole('link', { name: /Ver la ficha de ejemplo/ })).toHaveAttribute('href', '/demo');
+  });
+
+  it('sin el QR igual ofrece ver la ficha de ejemplo', () => {
+    render(<Landing />);
+    expect(screen.getByRole('link', { name: /Ver la ficha de ejemplo/ })).toHaveAttribute('href', '/demo');
+  });
+
   it('muestra el 107 como link de llamada', () => {
     render(<Landing />);
     expect(screen.getByRole('link', { name: '107' })).toHaveAttribute('href', 'tel:107');
